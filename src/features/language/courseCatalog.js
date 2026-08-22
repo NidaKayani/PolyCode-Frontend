@@ -858,6 +858,15 @@ export const languageCourses = {
       href: "/learn/go-modules",
       accent: "#00add8",
     },
+    {
+      title: "Go APIs",
+      tag: "Advanced Course",
+      icon: Terminal,
+      description:
+        "Build working Go APIs with HTTP, JSON, routing, middleware, authentication, testing, and production-ready design.",
+      href: "/learn/go-apis",
+      accent: "#00add8",
+    },
   ],
   powershell: [
     {

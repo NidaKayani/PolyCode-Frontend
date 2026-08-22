@@ -60,6 +60,7 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "go-concurrency", storagePrefix: "go_concurrency", scoped: false, notes: true },
   { courseId: "go-web-development", storagePrefix: "go_web_development", scoped: false, notes: true },
   { courseId: "go-modules", storagePrefix: "go_modules", scoped: false, notes: true },
+  { courseId: "go-apis", storagePrefix: "go_apis", scoped: false, notes: true },
   { courseId: "rust-fundamentals", storagePrefix: "rust_fundamentals", scoped: false, notes: true },
   { courseId: "java-fundamentals", storagePrefix: "java_fundamentals", scoped: false, notes: true },
   { courseId: "java-intermediate", storagePrefix: "java_intermediate", scoped: false, notes: true },

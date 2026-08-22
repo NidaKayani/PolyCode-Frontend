@@ -158,6 +158,12 @@ function analyzeXp(curriculumSrc) {
   const factoryXpMatches = [...curriculumSrc.matchAll(
     /lesson\([^\n]*?,\s*\d+,\s*\n?\s*\"/g,
   )];
+  const definitionXpMatches = [...curriculumSrc.matchAll(
+    /^\s*\["[a-z0-9-]+",\s*"[^"]+",\s*(\d+),/gm,
+  )];
+  const detectedXpMatches = definitionXpMatches.length > xpMatches.length
+    ? definitionXpMatches
+    : xpMatches;
   if (factoryXpMatches.length > xpMatches.length) {
     return {
       lessonCount: factoryXpMatches.length,
@@ -165,8 +171,8 @@ function analyzeXp(curriculumSrc) {
       hasXp: true,
     };
   }
-  const lessonCount = xpMatches.length;
-  const zeroXp = xpMatches.filter((m) => Number(m[1]) === 0).length;
+  const lessonCount = detectedXpMatches.length;
+  const zeroXp = detectedXpMatches.filter((m) => Number(m[1]) === 0).length;
   return {
     lessonCount,
     zeroXp,
