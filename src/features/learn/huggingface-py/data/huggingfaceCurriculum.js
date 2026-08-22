@@ -375,7 +375,6 @@ print(model.config.num_labels)`,
             ],
             answer: 1,
             explanation:
-              `Using the same pretrained checkpoint name loads the matching tokenizer and model for that checkpoint.`,
               `The tokenizer and model must agree on vocabulary and preprocessing — passing the same checkpoint name loads the matched pair they were trained with.`,
           },
         ],
@@ -462,7 +461,12 @@ print(model.config.num_labels)`,
             type: "code",
             lang: "python",
             label: `Manual inference`,
-            content: `import torch
+            content: `from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+name = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(name)
+model = AutoModelForSequenceClassification.from_pretrained(name)
 
 inputs = tokenizer("I love this!", return_tensors="pt")
 with torch.no_grad():
@@ -496,7 +500,6 @@ print(model.config.id2label[label_id])`,
             ],
             answer: 1,
             explanation:
-              `argmax() returns the index of the largest probability, which identifies the predicted class.`,
               `argmax() returns the index of the highest-scoring class, which id2label then maps to a readable label name.`,
           },
         ],
@@ -505,10 +508,20 @@ print(model.config.id2label[label_id])`,
           title: `Manual Prediction`,
           description:
             `Tokenize \`"I love this!"\` with \`return_tensors="pt"\`, run the model, apply \`torch.softmax\`, get the \`argmax\`, and print the label via \`model.config.id2label\`.`,
-          starterCode: `import torch
+          starterCode: `from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+name = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(name)
+model = AutoModelForSequenceClassification.from_pretrained(name)
 
 `,
-          solutionCode: `import torch
+          solutionCode: `from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+name = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(name)
+model = AutoModelForSequenceClassification.from_pretrained(name)
 
 inputs = tokenizer("I love this!", return_tensors="pt")
 with torch.no_grad():
@@ -648,7 +661,10 @@ print(tokens)`,
             type: "code",
             lang: "python",
             label: `Encode and decode`,
-            content: `encoded = tokenizer("Hugging Face is great!")
+            content: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+encoded = tokenizer("Hugging Face is great!")
 print(encoded["input_ids"])
 print(tokenizer.decode(encoded["input_ids"]))`,
           },
@@ -677,10 +693,15 @@ print(tokenizer.decode(encoded["input_ids"]))`,
           title: `Encode Then Decode`,
           description:
             `Encode \`"Hugging Face is great!"\`, print \`encoded["input_ids"]\`, then print \`tokenizer.decode(encoded["input_ids"])\`.`,
-          starterCode: `
+          starterCode: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 `,
-          solutionCode: `encoded = tokenizer("Hugging Face is great!")
+          solutionCode: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+encoded = tokenizer("Hugging Face is great!")
 print(encoded["input_ids"])
 print(tokenizer.decode(encoded["input_ids"]))`,
           tests: [
@@ -717,7 +738,10 @@ print(tokenizer.decode(encoded["input_ids"]))`,
             type: "code",
             lang: "python",
             label: `Pad and truncate a batch`,
-            content: `batch = tokenizer(
+            content: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+batch = tokenizer(
     ["Great!", "This movie was way too long and I fell asleep."],
     padding=True,
     truncation=True,
@@ -751,10 +775,15 @@ print(batch["attention_mask"])`,
           title: `Pad a Batch`,
           description:
             `Tokenize \`["Great!", "This movie was way too long and I fell asleep."]\` with \`padding=True\`, \`truncation=True\`, \`return_tensors="pt"\`. Print \`batch["input_ids"].shape\`.`,
-          starterCode: `
+          starterCode: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 `,
-          solutionCode: `batch = tokenizer(
+          solutionCode: `from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+batch = tokenizer(
     ["Great!", "This movie was way too long and I fell asleep."],
     padding=True,
     truncation=True,
@@ -885,7 +914,10 @@ print(dataset["train"][0])`,
             type: "code",
             lang: "python",
             label: `Inspect and sample`,
-            content: `print(dataset["train"].features)
+            content: `from datasets import load_dataset
+
+dataset = load_dataset("imdb")
+print(dataset["train"].features)
 
 small = dataset["train"].shuffle(seed=42).select(range(5))
 print(small["label"])`,
@@ -915,10 +947,15 @@ print(small["label"])`,
           title: `Sample the Dataset`,
           description:
             `Print \`dataset["train"].features\`. Then create \`small = dataset["train"].shuffle(seed=42).select(range(5))\` and print \`small["label"]\`.`,
-          starterCode: `
+          starterCode: `from datasets import load_dataset
+
+dataset = load_dataset("imdb")
 
 `,
-          solutionCode: `print(dataset["train"].features)
+          solutionCode: `from datasets import load_dataset
+
+dataset = load_dataset("imdb")
+print(dataset["train"].features)
 
 small = dataset["train"].shuffle(seed=42).select(range(5))
 print(small["label"])`,
@@ -956,7 +993,13 @@ print(small["label"])`,
             type: "code",
             lang: "python",
             label: `Tokenize and filter`,
-            content: `def tokenize_fn(batch):
+            content: `from datasets import load_dataset
+from transformers import AutoTokenizer
+
+dataset = load_dataset("imdb")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+def tokenize_fn(batch):
     return tokenizer(batch["text"], padding=True, truncation=True)
 
 tokenized = dataset.map(tokenize_fn, batched=True)
@@ -988,10 +1031,20 @@ print(short_only)`,
           title: `Tokenize the Whole Dataset`,
           description:
             `Define \`tokenize_fn(batch)\` that returns \`tokenizer(batch["text"], padding=True, truncation=True)\`. Apply it with \`dataset.map(tokenize_fn, batched=True)\`.`,
-          starterCode: `
+          starterCode: `from datasets import load_dataset
+from transformers import AutoTokenizer
+
+dataset = load_dataset("imdb")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 `,
-          solutionCode: `def tokenize_fn(batch):
+          solutionCode: `from datasets import load_dataset
+from transformers import AutoTokenizer
+
+dataset = load_dataset("imdb")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+
+def tokenize_fn(batch):
     return tokenizer(batch["text"], padding=True, truncation=True)
 
 tokenized = dataset.map(tokenize_fn, batched=True)
@@ -1496,7 +1549,10 @@ def compute_metrics(eval_pred):
             type: "code",
             lang: "python",
             label: `Full fine-tuning run`,
-            content: `trainer = Trainer(
+            content: `from datasets import load_dataset
+from transformers import Trainer
+
+trainer = Trainer(
     model=model,
     args=args,
     train_dataset=tokenized["train"],
@@ -1532,10 +1588,14 @@ tokenizer.save_pretrained("./fine-tuned-model")`,
           title: `Train, Evaluate, Save`,
           description:
             `Build a \`Trainer\` with \`train_dataset\`, \`eval_dataset\`, and \`compute_metrics\`. Call \`trainer.train()\`, then \`model.save_pretrained("./fine-tuned-model")\`.`,
-          starterCode: `
+          starterCode: `from datasets import load_dataset
+from transformers import Trainer
 
 `,
-          solutionCode: `trainer = Trainer(
+          solutionCode: `from datasets import load_dataset
+from transformers import Trainer
+
+trainer = Trainer(
     model=model,
     args=args,
     train_dataset=tokenized["train"],
@@ -1871,8 +1931,10 @@ loaded = PeftModel.from_pretrained(base, "./lora-adapter")`,
             type: "code",
             lang: "python",
             label: `Halve memory with float16`,
-            content: `import torch
+            content: `from transformers import AutoModelForSequenceClassification
+import torch
 
+model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased")
 model = model.half()
 print(next(model.parameters()).dtype)`,
           },
@@ -1895,11 +1957,16 @@ print(next(model.parameters()).dtype)`,
           title: `Cast to Half Precision`,
           description:
             `Call \`model = model.half()\` and print \`next(model.parameters()).dtype\`.`,
-          starterCode: `import torch
+          starterCode: `from transformers import AutoModelForSequenceClassification
+import torch
+
+model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased")
 
 `,
-          solutionCode: `import torch
+          solutionCode: `from transformers import AutoModelForSequenceClassification
+import torch
 
+model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased")
 model = model.half()
 print(next(model.parameters()).dtype)`,
           tests: [
