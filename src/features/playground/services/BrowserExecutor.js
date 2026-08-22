@@ -404,6 +404,8 @@ const HEAVY_ML_MODULE_NOTES = {
   datasets: "downloads real dataset files from the Hugging Face Hub",
   huggingface_hub: "talks to the real Hugging Face Hub API (auth, uploads, model listings)",
   peft: "wraps a real PyTorch model with real LoRA adapter weights",
+  evaluate: "computes real metrics against a real dataset",
+  bitsandbytes: "runs real low-precision CUDA kernels on a real GPU",
 };
 
 export async function runPython(code, stdin = '') {

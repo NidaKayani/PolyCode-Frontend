@@ -258,6 +258,8 @@ def _softmax(x):
 
 float32 = np.float32
 float64 = np.float64
+float16 = np.float16
+bfloat16 = np.float16
 int64 = np.int64
 long = np.int64
 
@@ -601,6 +603,8 @@ torch.save = save
 torch.load = load
 torch.float32 = float32
 torch.float64 = float64
+torch.float16 = float16
+torch.bfloat16 = bfloat16
 torch.int64 = int64
 torch.long = long
 
