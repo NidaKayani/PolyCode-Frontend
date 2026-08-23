@@ -188,6 +188,8 @@ export const COURSE_DISPLAY_NAMES = {
   "java-projects": "Java Projects",
   "qsharp-fundamentals": "Q# Fundamentals",
   "qsharp-quantum-programming-basics": "Quantum Programming Basics",
+  "quantum-multi-syntax": "Quantum Multi Syntax",
+  "quantum-paradigm-coding": "Quantum Paradigm Coding",
   "qsharp-quantum-gates": "Quantum Gates",
   "qsharp-quantum-algorithms": "Quantum Algorithms",
   "qsharp-quantum-projects": "Quantum Projects",

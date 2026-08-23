@@ -1059,6 +1059,18 @@ const LEARN_COURSE_ROUTES = [
     ),
   },
   {
+    slug: "quantum-multi-syntax",
+    language: "Quantum",
+    Hub: lazyWithChunkRetry(() => import("./features/learn/quantum-multi-syntax/pages/QuantumMultiSyntaxHub")),
+    Lesson: lazyWithChunkRetry(() => import("./features/learn/quantum-multi-syntax/pages/QuantumMultiSyntaxLessonPage")),
+  },
+  {
+    slug: "quantum-paradigm-coding",
+    language: "Quantum",
+    Hub: lazyWithChunkRetry(() => import("./features/learn/quantum-paradigm-coding/pages/QuantumParadigmCodingHub")),
+    Lesson: lazyWithChunkRetry(() => import("./features/learn/quantum-paradigm-coding/pages/QuantumParadigmCodingLessonPage")),
+  },
+  {
     slug: "qsharp-fundamentals",
     language: "Q#",
     Hub: lazyWithChunkRetry(

@@ -76,6 +76,8 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "quantum-mechanics-for-programmers", storagePrefix: "quantum_mechanics_for_programmers", scoped: false, notes: false },
   { courseId: "quantum-algorithms", storagePrefix: "quantum_algorithms", scoped: false, notes: false },
   { courseId: "quantum-programming-projects", storagePrefix: "quantum_programming_projects", scoped: false, notes: false },
+  { courseId: "quantum-multi-syntax", storagePrefix: "quantum_multi_syntax", scoped: false, notes: false },
+  { courseId: "quantum-paradigm-coding", storagePrefix: "quantum_paradigm_coding", scoped: false, notes: false },
   { courseId: "css-layouts", storagePrefix: "css-layouts", scoped: false, notes: false },
   { courseId: "responsive-design", storagePrefix: "responsive-design", scoped: false, notes: false },
   { courseId: "css-animations", storagePrefix: "css-animations", scoped: false, notes: false },

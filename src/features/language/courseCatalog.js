@@ -939,6 +939,22 @@ export const languageCourses = {
       href: "/learn/quantum-programming-projects",
       accent: "#c026d3",
     },
+    {
+      title: "Quantum Multi Syntax",
+      tag: "Syntax Course",
+      icon: Terminal,
+      description: "Combine Python-style and C++-style expressions in one working Quantum .sa program.",
+      href: "/learn/quantum-multi-syntax",
+      accent: "#6366f1",
+    },
+    {
+      title: "Quantum Paradigm Coding",
+      tag: "Advanced Course",
+      icon: Atom,
+      description: "Design quantum programs around state, operations, measurement, and hybrid classical control.",
+      href: "/learn/quantum-paradigm-coding",
+      accent: "#c026d3",
+    },
   ],
   // ─── ADD RUST TRACK DEFINITION ──────────────────────────────────────────────
   rust: [
