@@ -1217,12 +1217,18 @@ print(sol.root)`,
           {
             type: "text",
             content:
-              "**Definition:** **Interpolation** estimates values **between** known data points.\n\n**Real-life example:** A GPS records a location every 10 seconds. Interpolation estimates where you were at 10.5 seconds.",
+              "**Introduction:** Real data often has **gaps**. A sensor might record a value every few seconds, but you want to know what happened **in between**.\n\n**Interpolation** means estimating values **between** known data points — using the points you already measured.\n\nIn plain words:\n\n• You know some (x, y) samples\n• You ask for y at a new x that sits **between** those samples\n• SciPy gives a sensible estimate\n• It is not magic for points far outside your data range\n\n**Real-life example:** A GPS records your location every 10 seconds. Interpolation estimates where you were at 10.5 seconds.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Why gaps appear in data\n• What interpolation does (and does not invent beyond the ends)\n• The module `scipy.interpolate`",
+              "**In this topic you will learn:**\n\n• Why gaps appear in measured data\n• What interpolation does (and what it should not invent)\n• That `scipy.interpolate` is the toolbox for this job",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Imagine dots on a page with empty space between them. Interpolation is carefully drawing a path through those dots so you can read values in the gaps — without leaping far past the first and last dots.",
           },
           {
             type: "diagram",
@@ -1244,19 +1250,27 @@ print(sol.root)`,
                 id: "out",
                 label: "Filled value",
                 color: "#6366f1",
-                items: ["Smooth enough guess"],
+                items: ["A sensible guess"],
               },
             ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Idea with numbers",
+            label: "Try it: see the gaps",
             content: `import numpy as np
+
 x = np.array([0, 2, 4])
 y = np.array([0, 4, 8])
-print("At x=2 we already know y=", 4)
-print("Interpolation will help for x=1 or x=3")`,
+
+print("At x=2 we already know y =", 4)
+print("Interpolation helps for in-between x like 1 or 3")`,
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Interpolation fills **between** known points. Guessing far outside the ends is a different (and harder) problem.",
           },
           quiz(
             "Interpolation estimates values…",
@@ -1274,6 +1288,7 @@ print("Interpolation will help for x=1 or x=3")`,
           "State the idea",
           "Create x=np.array([0,1,2]) and y=np.array([0,10,20]). Print y[1].",
           `import numpy as np
+# create x and y arrays, then print y[1]
 `,
           `import numpy as np
 x = np.array([0, 1, 2])
@@ -1293,22 +1308,54 @@ print(y[1])`,
           {
             type: "text",
             content:
-              "**Definition:** **`interp1d(x, y)`** builds a callable that estimates `y` for new `x` values between your samples.\n\n**Real-life example:** Temperature logged every hour — estimate the temperature at 2:30.",
+              "**Introduction:** The friendly tool for beginners is **`interp1d`**. You give it:\n\n• Known `x` values\n• Matching `y` values\n• A style such as `kind=\"linear\"`\n\nSciPy builds a helper you can **call like a function**. Ask it for a new x, and it estimates y.\n\n**Real-life example:** Temperature is logged every hour. Use `interp1d` to estimate the temperature at 2:30.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Build an interpolator\n• Call it like a function\n• Start with `kind='linear'`",
+              "**In this topic you will learn:**\n\n• How to build an interpolator with `interp1d`\n• How to call it for a new x value\n• Why `kind=\"linear\"` is a great first choice",
+          },
+          {
+            type: "table",
+            title: "interp1d in three steps",
+            columns: ["Step", "What you write", "What it means"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "Store samples",
+                  "`x = np.array([...])`",
+                  "Known points",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "Build helper",
+                  "`f = interp1d(x, y, kind=\"linear\")`",
+                  "Ready to estimate",
+                ],
+              },
+              {
+                label: "3",
+                values: [
+                  "Ask for a value",
+                  "`float(f(1))`",
+                  "y estimate at x=1",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Linear interp1d",
+            label: "Try it: linear interp1d",
             content: `import numpy as np
 from scipy.interpolate import interp1d
 
 x = np.array([0, 2, 4])
 y = np.array([0, 4, 8])
+
 f = interp1d(x, y, kind="linear")
 print("Estimate at 1:", float(f(1)))
 print("Estimate at 3:", float(f(3)))`,
@@ -1317,7 +1364,13 @@ print("Estimate at 3:", float(f(3)))`,
             type: "callout",
             variant: "warning",
             content:
-              "**Note:** Basic interp1d estimates *between* points. Asking far outside the range needs special settings.",
+              "**Watch out:** Basic `interp1d` is for values **between** your points. Asking far outside the first/last x needs special settings.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Use `float(...)` when you print a single estimate so the output looks clean.",
           },
           quiz(
             "interp1d returns…",
@@ -1336,6 +1389,7 @@ print("Estimate at 3:", float(f(3)))`,
           "With x=[0,10], y=[0,100], build interp1d and print float(f(5)).",
           `import numpy as np
 from scipy.interpolate import interp1d
+# build f, then print float(f(5))
 `,
           `import numpy as np
 from scipy.interpolate import interp1d
@@ -1357,24 +1411,66 @@ print(float(f(5)))`,
           {
             type: "text",
             content:
-              "**Definition:** A **spline** interpolator draws a smoother curve through points than a plain zigzag of straight lines.\n\n**Real-life example:** Animation paths or soft sensor curves often look better with cubic splines (`kind='cubic'` when you have enough points).",
+              "**Introduction:** Linear interpolation connects points with **straight lines** — simple and clear, but sometimes a bit zig-zaggy.\n\nA **spline** (often `kind=\"cubic\"`) draws a **smoother path** through the same points.\n\nIn plain words:\n\n• Linear = connect the dots with rulers\n• Cubic spline = connect the dots with a soft curve\n• You still only trust values **between** your samples\n• You need **enough points** for cubic to work well\n\n**Real-life example:** Animation paths or gentle sensor curves often look better with a cubic spline than with sharp corners.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Try cubic interpolation\n• Compare the idea to linear\n• Keep enough sample points",
+              "**In this topic you will learn:**\n\n• How to try cubic interpolation with `interp1d`\n• How cubic feels smoother than linear\n• Why you should keep enough sample points",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Linear is like folding a paper airplane edge-to-edge. A cubic spline is more like bending a flexible wire through the same points — still through every point, but softer in between.",
+          },
+          {
+            type: "table",
+            title: "Linear vs cubic",
+            columns: ["Style", "Look", "Good first use"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "`kind=\"linear\"`",
+                  "Straight segments",
+                  "First try, few points",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "`kind=\"cubic\"`",
+                  "Smoother curve",
+                  "When you have more points",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Cubic interp1d",
+            label: "Try it: cubic interp1d",
             content: `import numpy as np
 from scipy.interpolate import interp1d
 
 x = np.array([0, 1, 2, 3, 4])
 y = np.array([0, 1, 0, 1, 0])
+
 f = interp1d(x, y, kind="cubic")
 print("Smooth estimate at 1.5:", round(float(f(1.5)), 4))`,
+          },
+          {
+            type: "callout",
+            variant: "info",
+            content:
+              "**Remember:** Cubic needs enough points. If you only have two samples, start with linear.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Begin with linear. Switch to cubic only when you want a smoother look and you have several points.",
           },
           quiz(
             "Cubic interpolation is used to…",
@@ -1393,6 +1489,7 @@ print("Smooth estimate at 1.5:", round(float(f(1.5)), 4))`,
           "Use interp1d with kind='cubic' on x=0..4 and y=[0,1,0,1,0]. Print float(f(2.5)).",
           `import numpy as np
 from scipy.interpolate import interp1d
+# build cubic f, then print float(f(2.5))
 `,
           `import numpy as np
 from scipy.interpolate import interp1d
