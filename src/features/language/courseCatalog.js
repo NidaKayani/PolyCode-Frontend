@@ -382,6 +382,15 @@ export const languageCourses = {
       href: "/learn/ai_ml-py",
       accent: "#dfbe00",
     },
+    {
+      title: "Machine Learning with Python",
+      tag: "Interactive Course",
+      icon: BrainCircuit,
+      description:
+        "Learn data preparation, supervised and unsupervised learning, evaluation, feature engineering, and responsible ML with runnable Python.",
+      href: "/learn/ml-py",
+      accent: "#00add8",
+    },
   ],
   javascript: [
     {
