@@ -140,6 +140,7 @@ export const COURSE_DISPLAY_NAMES = {
   "python-file-handling-py": "Python File Handling",
   "matplotlib-py": "Matplotlib for Python",
   "ai-ml-py": "AI & ML with Python",
+  "ml-py": "Machine Learning with Python",
   "cpp-fundamentals": "C++ Fundamentals",
   "dsa-cpp": "DSA with C++",
   "c-fundamentals": "C Fundamentals",

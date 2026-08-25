@@ -61,6 +61,7 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "go-web-development", storagePrefix: "go_web_development", scoped: false, notes: true },
   { courseId: "go-modules", storagePrefix: "go_modules", scoped: false, notes: true },
   { courseId: "go-apis", storagePrefix: "go_apis", scoped: false, notes: true },
+  { courseId: "ml-py", storagePrefix: "ml_py", scoped: false, notes: false },
   { courseId: "rust-fundamentals", storagePrefix: "rust_fundamentals", scoped: false, notes: true },
   { courseId: "java-fundamentals", storagePrefix: "java_fundamentals", scoped: false, notes: true },
   { courseId: "java-intermediate", storagePrefix: "java_intermediate", scoped: false, notes: true },

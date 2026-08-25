@@ -53,6 +53,7 @@ const COURSE_NAMES = {
   "sql-stored-procedures": "SQL Stored Procedures",
   "sql-projects": "SQL Projects",
   "go-fundamentals": "Go Fundamentals",
+  "ml-py": "Machine Learning with Python",
   "rust-fundamentals": "Rust Fundamentals",
   "java-fundamentals": "Java Fundamentals",
   "java-intermediate": "Java Intermediate",
