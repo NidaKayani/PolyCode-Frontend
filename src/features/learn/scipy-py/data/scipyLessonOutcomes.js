@@ -67,19 +67,19 @@ export const SCIPY_LESSON_OUTCOMES = {
     "Describe curve fitting in plain beginner words",
   ],
   "scipy-13": [
-    "Define interpolation as filling gaps between known points",
-    "Give a GPS or sensor example",
-    "Know `scipy.interpolate` exists for this job",
+    "Explain interpolation as estimating values between known points",
+    "Give a real-life gap example (GPS or sensors)",
+    "Know that scipy.interpolate is the toolbox for this job",
   ],
   "scipy-14": [
-    "Build an `interp1d` model from x and y samples",
-    "Estimate y at a new x value",
-    "Choose linear interpolation for a first try",
+    "Build an interp1d helper from x and y samples",
+    "Estimate y at a new in-between x value",
+    "Start with kind=\"linear\" as a first try",
   ],
   "scipy-15": [
-    "Use a cubic interpolator for a smoother path",
-    "Compare linear vs smoother fills",
-    "Apply splines on small practice data",
+    "Use kind=\"cubic\" for a smoother path through points",
+    "Compare linear vs cubic in plain words",
+    "Keep enough sample points before using cubic",
   ],
   "scipy-16": [
     "Explain a distribution as a pattern of chance",
