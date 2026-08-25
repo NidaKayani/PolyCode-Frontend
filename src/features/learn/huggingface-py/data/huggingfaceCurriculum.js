@@ -862,6 +862,19 @@ print(dataset["train"][0])`,
             explanation:
               `Most Hub datasets ship with named splits, bundled together in a DatasetDict.`,
           },
+          {
+            type: "quiz",
+            question: `What does dataset["train"][0] do in the example?`,
+            options: [
+              `Loads the entire dataset again`,
+              `Returns the first example from the training split`,
+              `Creates a new training split`,
+              `Trains the model on the first example`,
+            ],
+            answer: 1,
+            explanation:
+              `dataset["train"][0] indexes into the "train" split of the DatasetDict and fetches its first item as a dictionary.`,
+          },
         ],
         challenge: {
           gradeMode: "keywords",
