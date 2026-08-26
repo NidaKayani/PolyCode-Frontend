@@ -954,6 +954,19 @@ print(small["label"])`,
             explanation:
               `.features describes the schema — column names, types (like ClassLabel), and possible label names.`,
           },
+          {
+            type: "quiz",
+            question: `What does .shuffle(seed=42).select(range(5)) do?`,
+            options: [
+              `Deletes the first 5 examples from the dataset`,
+              `Randomly shuffles the dataset and selects 5 examples`,
+              `Trains the model on 5 examples`,
+              `Changes the labels of 5 examples`,
+            ],
+            answer: 1,
+            explanation:
+              `.shuffle(seed=42) randomly reorders the dataset reproducibly, and .select(range(5)) keeps the first 5 examples from that shuffled order.`,
+          },
         ],
         challenge: {
           gradeMode: "keywords",
