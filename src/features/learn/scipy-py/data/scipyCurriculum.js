@@ -1520,22 +1520,59 @@ print(float(f(2.5)))`,
           {
             type: "text",
             content:
-              "**Definition:** A **distribution** describes how likely different outcomes are — the pattern of chance.\n\n**Real-life example:** Bus arrival delays often cluster near a typical value with fewer extreme waits — a distribution idea.",
+              "**Introduction:** Not every outcome is equally likely. Some values happen often, others rarely.\n\nA **distribution** is the pattern of chance — it tells you which outcomes are common and which are rare.\n\nIn plain words:\n\n• A distribution is a **map of likelihood**\n• Many real things cluster near a typical value\n• Extreme values can still happen, but less often\n• SciPy gives ready-made distribution helpers\n\n**Real-life example:** Bus delays often sit near a few minutes, with fewer very long waits. That “cluster + tail” shape is a distribution idea.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• What a distribution is\n• Meet a normal distribution helper\n• Sample or evaluate simple values",
+              "**In this topic you will learn:**\n\n• What a distribution means in everyday language\n• How to use a simple normal distribution helper\n• What `pdf` and `cdf` mean at a beginner level",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Imagine a dart board where most throws land near the center, and fewer land far away. A distribution describes that landing pattern — not one throw, but the overall shape of chance.",
+          },
+          {
+            type: "table",
+            title: "Two friendly terms",
+            columns: ["Term", "Plain meaning", "When to use"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "`pdf(x)`",
+                  "How “dense” the chance is at x",
+                  "Compare nearby values",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "`cdf(x)`",
+                  "Total chance up to x",
+                  "Ask “how much is below this?”",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Normal distribution helper",
+            label: "Try it: normal distribution helper",
             content: `from scipy import stats
 
+# loc = center, scale = spread
 norm = stats.norm(loc=0, scale=1)
+
 print("PDF at 0:", norm.pdf(0))
 print("CDF at 0:", norm.cdf(0))`,
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Start with `stats.norm` — it is the classic “bell curve” and a great first distribution to explore.",
           },
           quiz(
             "A distribution describes…",
@@ -1553,6 +1590,7 @@ print("CDF at 0:", norm.cdf(0))`,
           "Normal pdf",
           "Create stats.norm(loc=0, scale=1) and print its pdf(0).",
           `from scipy import stats
+# create norm, then print pdf(0)
 `,
           `from scipy import stats
 norm = stats.norm(loc=0, scale=1)
@@ -1572,34 +1610,57 @@ print(norm.pdf(0))`,
           {
             type: "text",
             content:
-              "**Definition:** **Descriptive stats** summarize a list of numbers — count, mean, variance, min, max — so you see the story quickly.\n\n**Real-life example:** Class quiz scores: what is typical? How spread out are they?",
+              "**Introduction:** Before you guess or test anything, look at your data.\n\n**Descriptive stats** summarize a list of numbers in a few lines — how many values, what is typical, and how spread out they are.\n\nIn plain words:\n\n• **Count** — how many numbers you have\n• **Mean** — the typical center\n• **Variance** — how much values spread around the mean\n• SciPy’s `stats.describe` gives these quickly\n\n**Real-life example:** Class quiz scores: what is the average? Are most students close to it, or all over the place?",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Use `stats.describe`\n• Read nobs and mean\n• Pair with NumPy arrays",
+              "**In this topic you will learn:**\n\n• How to run `stats.describe` on a NumPy array\n• How to read `nobs` and `mean`\n• Why summarizing first saves time later",
           },
           {
             type: "table",
-            title: "Useful fields",
-            columns: ["Field", "Meaning"],
+            title: "Useful fields from describe",
+            columns: ["Field", "Meaning", "Plain question"],
             rows: [
-              { label: "n", values: ["nobs", "How many values"] },
-              { label: "m", values: ["mean", "Typical center"] },
-              { label: "v", values: ["variance", "Spread"] },
+              {
+                label: "1",
+                values: ["nobs", "How many values", "How big is my sample?"],
+              },
+              {
+                label: "2",
+                values: ["mean", "Typical center", "What is average?"],
+              },
+              {
+                label: "3",
+                values: ["variance", "Spread", "How scattered is it?"],
+              },
             ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Describe scores",
+            label: "Try it: describe quiz scores",
             content: `import numpy as np
 from scipy import stats
 
 scores = np.array([88, 92, 76, 95, 84])
 d = stats.describe(scores)
+
 print("nobs:", d.nobs)
-print("mean:", d.mean)`,
+print("mean:", d.mean)
+print("variance:", d.variance)`,
+          },
+          {
+            type: "callout",
+            variant: "info",
+            content:
+              "**Remember:** A high mean with high variance means values are spread out. A tight cluster means low variance.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Always print `nobs` first — you should know how many data points your summary is based on.",
           },
           quiz(
             "stats.describe is best for…",
@@ -1618,6 +1679,7 @@ print("mean:", d.mean)`,
           "For scores = np.array([10, 20, 30]), print stats.describe(scores).mean.",
           `import numpy as np
 from scipy import stats
+# describe scores and print the mean
 `,
           `import numpy as np
 from scipy import stats
@@ -1638,22 +1700,60 @@ print(stats.describe(scores).mean)`,
           {
             type: "text",
             content:
-              "**Definition:** A **hypothesis test** asks whether data look surprising under a simple assumption. A **p-value** helps judge that surprise (carefully!).\n\n**Real-life example:** Did a new study method change average scores, or could the difference be random luck?",
+              "**Introduction:** Sometimes you wonder: **“Could this difference just be random luck?”**\n\nA **hypothesis test** is a careful way to check that. SciPy returns a **p-value** — one clue about how surprising your data look under a simple assumption.\n\nIn plain words:\n\n• You start with a plain question about your data\n• SciPy runs a test (here: one-sample t-test)\n• You get a **statistic** and a **p-value**\n• A p-value is **not proof** — it is one piece of evidence\n\n**Real-life example:** Did a new study method change average scores, or could the bump be normal random variation?",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Run a simple t-test style example\n• Read a p-value gently\n• Stay humble — context matters",
+              "**In this topic you will learn:**\n\n• How to run `stats.ttest_1samp`\n• How to read the p-value gently\n• Why context and data quality still matter most",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "You flip a coin 10 times and get 9 heads. A hypothesis test asks: “If the coin were fair, how surprising would 9 heads be?” The p-value helps answer that — but you still need to ask whether the coin is bent or the flips were fair.",
+          },
+          {
+            type: "table",
+            title: "ttest_1samp in three steps",
+            columns: ["Step", "What you write", "What it means"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "Store sample",
+                  "`sample = np.array([...])`",
+                  "Your measured values",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "Run test",
+                  "`stat, p = stats.ttest_1samp(sample, popmean=20)`",
+                  "Compare to a reference mean",
+                ],
+              },
+              {
+                label: "3",
+                values: [
+                  "Read result",
+                  "`print(p)`",
+                  "How surprising under the assumption",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "One-sample t-test idea",
+            label: "Try it: one-sample t-test",
             content: `import numpy as np
 from scipy import stats
 
 sample = np.array([20, 22, 19, 21, 23])
 stat, p = stats.ttest_1samp(sample, popmean=20)
+
 print("statistic:", stat)
 print("p-value:", p)`,
           },
@@ -1661,7 +1761,13 @@ print("p-value:", p)`,
             type: "callout",
             variant: "warning",
             content:
-              "**Careful:** A p-value is not “proof.” It is one clue. Always think about the question and the data quality.",
+              "**Watch out:** A small p-value does not automatically mean “important in real life.” Always ask: Is the question clear? Is the data trustworthy?",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** `ttest_1samp` returns two values — use the **second** one (`p`) when you want the p-value.",
           },
           quiz(
             "A p-value helps you…",
@@ -1680,6 +1786,7 @@ print("p-value:", p)`,
           "Run stats.ttest_1samp on np.array([10,12,11,13,12]) with popmean=10. Print the p-value (second return).",
           `import numpy as np
 from scipy import stats
+# run ttest_1samp and print p
 `,
           `import numpy as np
 from scipy import stats

@@ -82,19 +82,19 @@ export const SCIPY_LESSON_OUTCOMES = {
     "Keep enough sample points before using cubic",
   ],
   "scipy-16": [
-    "Explain a distribution as a pattern of chance",
-    "Sample or evaluate a simple SciPy distribution",
-    "Connect distributions to everyday randomness",
+    "Explain a distribution as a pattern of chance in plain words",
+    "Use stats.norm and read pdf vs cdf at a beginner level",
+    "Connect distributions to everyday randomness (delays, scores)",
   ],
   "scipy-17": [
-    "Summarize data with scipy.stats helpers",
-    "Read mean, variance, or describe output",
-    "Describe a class score list with SciPy",
+    "Summarize a NumPy array with stats.describe",
+    "Read nobs, mean, and variance from the result",
+    "Check how many values your summary is based on first",
   ],
   "scipy-18": [
-    "Run a gentle one-sample or two-sample idea with SciPy",
-    "Read a p-value at a beginner level",
-    "Stay careful: tests need clear questions",
+    "Run stats.ttest_1samp and read the p-value",
+    "Explain a hypothesis test as checking random luck",
+    "Stay careful: p-values are clues, not final proof",
   ],
   "scipy-19": [
     "Compare NumPy linalg and SciPy linalg",
