@@ -20,6 +20,7 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "ai-ml-py", storagePrefix: "ai_ml_py", scoped: false, notes: false },
   { courseId: "cpp-fundamentals", storagePrefix: "cpp_fundamentals", scoped: false, notes: false },
   { courseId: "dsa-cpp", storagePrefix: "dsa_cpp", scoped: false, notes: false },
+  { courseId: "cpp-data-structures", storagePrefix: "cpp_data_structures", scoped: false, notes: false },
   { courseId: "c-fundamentals", storagePrefix: "c_fundamentals", scoped: false, notes: false },
   { courseId: "c-functions", storagePrefix: "c_functions", scoped: false, notes: false },
   { courseId: "c-pointers", storagePrefix: "c_pointers", scoped: false, notes: false },

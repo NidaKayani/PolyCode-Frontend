@@ -207,6 +207,15 @@ export const languageCourses = {
       href: "/learn/dsa-cpp",
       accent: "#22c55e",
     },
+    {
+      title: "C++ Data Structures",
+      tag: "Data Structures Course",
+      icon: Cpu,
+      description:
+        "Complexity and the CPU cycle, linear vs non-linear structures, every linked-list variant, skip lists, stacks/queues/deques, hashing and collisions, BST/AVL, heaps, graphs, and Huffman compression.",
+      href: "/learn/cpp-data-structures",
+      accent: "#8b5cf6",
+    },
   ],
   "c++": [
     {
@@ -271,6 +280,15 @@ export const languageCourses = {
         "Data structures and algorithms in C++: arrays, linked lists, trees, graphs, dynamic programming, and performance-focused problem solving.",
       href: "/learn/dsa-cpp",
       accent: "#22c55e",
+    },
+    {
+      title: "C++ Data Structures",
+      tag: "Data Structures Course",
+      icon: Cpu,
+      description:
+        "Complexity and the CPU cycle, linear vs non-linear structures, every linked-list variant, skip lists, stacks/queues/deques, hashing and collisions, BST/AVL, heaps, graphs, and Huffman compression.",
+      href: "/learn/cpp-data-structures",
+      accent: "#8b5cf6",
     },
   ],
   python: [
@@ -1200,12 +1218,14 @@ export const learnNavByLanguage = {
     { label: "OOPs", to: "/learn/oops-cpp" },
     { label: "Pointers", to: "/learn/pointers-cpp" },
     { label: "DSA", to: "/learn/dsa-cpp" },
+    { label: "Data Structures", to: "/learn/cpp-data-structures" },
   ],
   "c++": [
     { label: "Basics", to: "/learn/cpp-fundamentals" },
     { label: "OOPs", to: "/learn/oops-cpp" },
     { label: "Pointers", to: "/learn/pointers-cpp" },
     { label: "DSA", to: "/learn/dsa-cpp" },
+    { label: "Data Structures", to: "/learn/cpp-data-structures" },
   ],
   python: [
     { label: "Fundamentals", to: "/learn/python-fundamentals" },
@@ -1364,7 +1384,8 @@ export function inferLanguageFromLearnPath(pathname = "") {
     pathname.startsWith("/learn/cpp-fundamentals") ||
     pathname.startsWith("/learn/oops-cpp") ||
     pathname.startsWith("/learn/pointers-cpp") ||
-    pathname.startsWith("/learn/dsa-cpp")
+    pathname.startsWith("/learn/dsa-cpp") ||
+    pathname.startsWith("/learn/cpp-data-structures")
   ) {
     return "cpp";
   }
