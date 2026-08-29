@@ -584,7 +584,7 @@ import (
     "net/http/httptest"
 )
 
-type Product struct { ID int ` + "`json:\"id\"`" + `; Name string ` + "`json:\"name\"`" + ` }
+type Product struct { ID int \`json:"id"\`; Name string \`json:"name"\` }
 
 func product(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
@@ -608,7 +608,7 @@ import (
     "strings"
 )
 
-type Product struct { ID int ` + "`json:\"id\"`" + `; Name string ` + "`json:\"name\"`" + ` }
+type Product struct { ID int \`json:"id"\`; Name string \`json:"name"\` }
 
 func product(w http.ResponseWriter, r *http.Request) {
     // set the header and encode a Product
@@ -626,7 +626,7 @@ import (
     "strings"
 )
 
-type Product struct { ID int ` + "`json:\"id\"`" + `; Name string ` + "`json:\"name\"`" + ` }
+type Product struct { ID int \`json:"id"\`; Name string \`json:"name"\` }
 
 func product(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
@@ -686,7 +686,7 @@ import (
     "net/http/httptest"
 )
 
-type Message struct { Text string ` + "`json:\"text\"`" + ` }
+type Message struct { Text string \`json:"text"\` }
 
 func create(w http.ResponseWriter, r *http.Request) {
     var message Message
@@ -704,7 +704,7 @@ import (
     "net/http/httptest"
 )
 
-type Message struct { Text string ` + "`json:\"text\"`" + ` }
+type Message struct { Text string \`json:"text"\` }
 
 func create(w http.ResponseWriter, r *http.Request) {
     var message Message

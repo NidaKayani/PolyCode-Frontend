@@ -1217,12 +1217,18 @@ print(sol.root)`,
           {
             type: "text",
             content:
-              "**Definition:** **Interpolation** estimates values **between** known data points.\n\n**Real-life example:** A GPS records a location every 10 seconds. Interpolation estimates where you were at 10.5 seconds.",
+              "**Introduction:** Real data often has **gaps**. A sensor might record a value every few seconds, but you want to know what happened **in between**.\n\n**Interpolation** means estimating values **between** known data points — using the points you already measured.\n\nIn plain words:\n\n• You know some (x, y) samples\n• You ask for y at a new x that sits **between** those samples\n• SciPy gives a sensible estimate\n• It is not magic for points far outside your data range\n\n**Real-life example:** A GPS records your location every 10 seconds. Interpolation estimates where you were at 10.5 seconds.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Why gaps appear in data\n• What interpolation does (and does not invent beyond the ends)\n• The module `scipy.interpolate`",
+              "**In this topic you will learn:**\n\n• Why gaps appear in measured data\n• What interpolation does (and what it should not invent)\n• That `scipy.interpolate` is the toolbox for this job",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Imagine dots on a page with empty space between them. Interpolation is carefully drawing a path through those dots so you can read values in the gaps — without leaping far past the first and last dots.",
           },
           {
             type: "diagram",
@@ -1244,19 +1250,27 @@ print(sol.root)`,
                 id: "out",
                 label: "Filled value",
                 color: "#6366f1",
-                items: ["Smooth enough guess"],
+                items: ["A sensible guess"],
               },
             ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Idea with numbers",
+            label: "Try it: see the gaps",
             content: `import numpy as np
+
 x = np.array([0, 2, 4])
 y = np.array([0, 4, 8])
-print("At x=2 we already know y=", 4)
-print("Interpolation will help for x=1 or x=3")`,
+
+print("At x=2 we already know y =", 4)
+print("Interpolation helps for in-between x like 1 or 3")`,
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Interpolation fills **between** known points. Guessing far outside the ends is a different (and harder) problem.",
           },
           quiz(
             "Interpolation estimates values…",
@@ -1274,6 +1288,7 @@ print("Interpolation will help for x=1 or x=3")`,
           "State the idea",
           "Create x=np.array([0,1,2]) and y=np.array([0,10,20]). Print y[1].",
           `import numpy as np
+# create x and y arrays, then print y[1]
 `,
           `import numpy as np
 x = np.array([0, 1, 2])
@@ -1293,22 +1308,54 @@ print(y[1])`,
           {
             type: "text",
             content:
-              "**Definition:** **`interp1d(x, y)`** builds a callable that estimates `y` for new `x` values between your samples.\n\n**Real-life example:** Temperature logged every hour — estimate the temperature at 2:30.",
+              "**Introduction:** The friendly tool for beginners is **`interp1d`**. You give it:\n\n• Known `x` values\n• Matching `y` values\n• A style such as `kind=\"linear\"`\n\nSciPy builds a helper you can **call like a function**. Ask it for a new x, and it estimates y.\n\n**Real-life example:** Temperature is logged every hour. Use `interp1d` to estimate the temperature at 2:30.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Build an interpolator\n• Call it like a function\n• Start with `kind='linear'`",
+              "**In this topic you will learn:**\n\n• How to build an interpolator with `interp1d`\n• How to call it for a new x value\n• Why `kind=\"linear\"` is a great first choice",
+          },
+          {
+            type: "table",
+            title: "interp1d in three steps",
+            columns: ["Step", "What you write", "What it means"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "Store samples",
+                  "`x = np.array([...])`",
+                  "Known points",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "Build helper",
+                  "`f = interp1d(x, y, kind=\"linear\")`",
+                  "Ready to estimate",
+                ],
+              },
+              {
+                label: "3",
+                values: [
+                  "Ask for a value",
+                  "`float(f(1))`",
+                  "y estimate at x=1",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Linear interp1d",
+            label: "Try it: linear interp1d",
             content: `import numpy as np
 from scipy.interpolate import interp1d
 
 x = np.array([0, 2, 4])
 y = np.array([0, 4, 8])
+
 f = interp1d(x, y, kind="linear")
 print("Estimate at 1:", float(f(1)))
 print("Estimate at 3:", float(f(3)))`,
@@ -1317,7 +1364,13 @@ print("Estimate at 3:", float(f(3)))`,
             type: "callout",
             variant: "warning",
             content:
-              "**Note:** Basic interp1d estimates *between* points. Asking far outside the range needs special settings.",
+              "**Watch out:** Basic `interp1d` is for values **between** your points. Asking far outside the first/last x needs special settings.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Use `float(...)` when you print a single estimate so the output looks clean.",
           },
           quiz(
             "interp1d returns…",
@@ -1336,6 +1389,7 @@ print("Estimate at 3:", float(f(3)))`,
           "With x=[0,10], y=[0,100], build interp1d and print float(f(5)).",
           `import numpy as np
 from scipy.interpolate import interp1d
+# build f, then print float(f(5))
 `,
           `import numpy as np
 from scipy.interpolate import interp1d
@@ -1357,24 +1411,66 @@ print(float(f(5)))`,
           {
             type: "text",
             content:
-              "**Definition:** A **spline** interpolator draws a smoother curve through points than a plain zigzag of straight lines.\n\n**Real-life example:** Animation paths or soft sensor curves often look better with cubic splines (`kind='cubic'` when you have enough points).",
+              "**Introduction:** Linear interpolation connects points with **straight lines** — simple and clear, but sometimes a bit zig-zaggy.\n\nA **spline** (often `kind=\"cubic\"`) draws a **smoother path** through the same points.\n\nIn plain words:\n\n• Linear = connect the dots with rulers\n• Cubic spline = connect the dots with a soft curve\n• You still only trust values **between** your samples\n• You need **enough points** for cubic to work well\n\n**Real-life example:** Animation paths or gentle sensor curves often look better with a cubic spline than with sharp corners.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Try cubic interpolation\n• Compare the idea to linear\n• Keep enough sample points",
+              "**In this topic you will learn:**\n\n• How to try cubic interpolation with `interp1d`\n• How cubic feels smoother than linear\n• Why you should keep enough sample points",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Linear is like folding a paper airplane edge-to-edge. A cubic spline is more like bending a flexible wire through the same points — still through every point, but softer in between.",
+          },
+          {
+            type: "table",
+            title: "Linear vs cubic",
+            columns: ["Style", "Look", "Good first use"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "`kind=\"linear\"`",
+                  "Straight segments",
+                  "First try, few points",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "`kind=\"cubic\"`",
+                  "Smoother curve",
+                  "When you have more points",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Cubic interp1d",
+            label: "Try it: cubic interp1d",
             content: `import numpy as np
 from scipy.interpolate import interp1d
 
 x = np.array([0, 1, 2, 3, 4])
 y = np.array([0, 1, 0, 1, 0])
+
 f = interp1d(x, y, kind="cubic")
 print("Smooth estimate at 1.5:", round(float(f(1.5)), 4))`,
+          },
+          {
+            type: "callout",
+            variant: "info",
+            content:
+              "**Remember:** Cubic needs enough points. If you only have two samples, start with linear.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Begin with linear. Switch to cubic only when you want a smoother look and you have several points.",
           },
           quiz(
             "Cubic interpolation is used to…",
@@ -1393,6 +1489,7 @@ print("Smooth estimate at 1.5:", round(float(f(1.5)), 4))`,
           "Use interp1d with kind='cubic' on x=0..4 and y=[0,1,0,1,0]. Print float(f(2.5)).",
           `import numpy as np
 from scipy.interpolate import interp1d
+# build cubic f, then print float(f(2.5))
 `,
           `import numpy as np
 from scipy.interpolate import interp1d
@@ -1423,22 +1520,59 @@ print(float(f(2.5)))`,
           {
             type: "text",
             content:
-              "**Definition:** A **distribution** describes how likely different outcomes are — the pattern of chance.\n\n**Real-life example:** Bus arrival delays often cluster near a typical value with fewer extreme waits — a distribution idea.",
+              "**Introduction:** Not every outcome is equally likely. Some values happen often, others rarely.\n\nA **distribution** is the pattern of chance — it tells you which outcomes are common and which are rare.\n\nIn plain words:\n\n• A distribution is a **map of likelihood**\n• Many real things cluster near a typical value\n• Extreme values can still happen, but less often\n• SciPy gives ready-made distribution helpers\n\n**Real-life example:** Bus delays often sit near a few minutes, with fewer very long waits. That “cluster + tail” shape is a distribution idea.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• What a distribution is\n• Meet a normal distribution helper\n• Sample or evaluate simple values",
+              "**In this topic you will learn:**\n\n• What a distribution means in everyday language\n• How to use a simple normal distribution helper\n• What `pdf` and `cdf` mean at a beginner level",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "Imagine a dart board where most throws land near the center, and fewer land far away. A distribution describes that landing pattern — not one throw, but the overall shape of chance.",
+          },
+          {
+            type: "table",
+            title: "Two friendly terms",
+            columns: ["Term", "Plain meaning", "When to use"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "`pdf(x)`",
+                  "How “dense” the chance is at x",
+                  "Compare nearby values",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "`cdf(x)`",
+                  "Total chance up to x",
+                  "Ask “how much is below this?”",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Normal distribution helper",
+            label: "Try it: normal distribution helper",
             content: `from scipy import stats
 
+# loc = center, scale = spread
 norm = stats.norm(loc=0, scale=1)
+
 print("PDF at 0:", norm.pdf(0))
 print("CDF at 0:", norm.cdf(0))`,
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Start with `stats.norm` — it is the classic “bell curve” and a great first distribution to explore.",
           },
           quiz(
             "A distribution describes…",
@@ -1456,6 +1590,7 @@ print("CDF at 0:", norm.cdf(0))`,
           "Normal pdf",
           "Create stats.norm(loc=0, scale=1) and print its pdf(0).",
           `from scipy import stats
+# create norm, then print pdf(0)
 `,
           `from scipy import stats
 norm = stats.norm(loc=0, scale=1)
@@ -1475,34 +1610,57 @@ print(norm.pdf(0))`,
           {
             type: "text",
             content:
-              "**Definition:** **Descriptive stats** summarize a list of numbers — count, mean, variance, min, max — so you see the story quickly.\n\n**Real-life example:** Class quiz scores: what is typical? How spread out are they?",
+              "**Introduction:** Before you guess or test anything, look at your data.\n\n**Descriptive stats** summarize a list of numbers in a few lines — how many values, what is typical, and how spread out they are.\n\nIn plain words:\n\n• **Count** — how many numbers you have\n• **Mean** — the typical center\n• **Variance** — how much values spread around the mean\n• SciPy’s `stats.describe` gives these quickly\n\n**Real-life example:** Class quiz scores: what is the average? Are most students close to it, or all over the place?",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Use `stats.describe`\n• Read nobs and mean\n• Pair with NumPy arrays",
+              "**In this topic you will learn:**\n\n• How to run `stats.describe` on a NumPy array\n• How to read `nobs` and `mean`\n• Why summarizing first saves time later",
           },
           {
             type: "table",
-            title: "Useful fields",
-            columns: ["Field", "Meaning"],
+            title: "Useful fields from describe",
+            columns: ["Field", "Meaning", "Plain question"],
             rows: [
-              { label: "n", values: ["nobs", "How many values"] },
-              { label: "m", values: ["mean", "Typical center"] },
-              { label: "v", values: ["variance", "Spread"] },
+              {
+                label: "1",
+                values: ["nobs", "How many values", "How big is my sample?"],
+              },
+              {
+                label: "2",
+                values: ["mean", "Typical center", "What is average?"],
+              },
+              {
+                label: "3",
+                values: ["variance", "Spread", "How scattered is it?"],
+              },
             ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Describe scores",
+            label: "Try it: describe quiz scores",
             content: `import numpy as np
 from scipy import stats
 
 scores = np.array([88, 92, 76, 95, 84])
 d = stats.describe(scores)
+
 print("nobs:", d.nobs)
-print("mean:", d.mean)`,
+print("mean:", d.mean)
+print("variance:", d.variance)`,
+          },
+          {
+            type: "callout",
+            variant: "info",
+            content:
+              "**Remember:** A high mean with high variance means values are spread out. A tight cluster means low variance.",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** Always print `nobs` first — you should know how many data points your summary is based on.",
           },
           quiz(
             "stats.describe is best for…",
@@ -1521,6 +1679,7 @@ print("mean:", d.mean)`,
           "For scores = np.array([10, 20, 30]), print stats.describe(scores).mean.",
           `import numpy as np
 from scipy import stats
+# describe scores and print the mean
 `,
           `import numpy as np
 from scipy import stats
@@ -1541,22 +1700,60 @@ print(stats.describe(scores).mean)`,
           {
             type: "text",
             content:
-              "**Definition:** A **hypothesis test** asks whether data look surprising under a simple assumption. A **p-value** helps judge that surprise (carefully!).\n\n**Real-life example:** Did a new study method change average scores, or could the difference be random luck?",
+              "**Introduction:** Sometimes you wonder: **“Could this difference just be random luck?”**\n\nA **hypothesis test** is a careful way to check that. SciPy returns a **p-value** — one clue about how surprising your data look under a simple assumption.\n\nIn plain words:\n\n• You start with a plain question about your data\n• SciPy runs a test (here: one-sample t-test)\n• You get a **statistic** and a **p-value**\n• A p-value is **not proof** — it is one piece of evidence\n\n**Real-life example:** Did a new study method change average scores, or could the bump be normal random variation?",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• Run a simple t-test style example\n• Read a p-value gently\n• Stay humble — context matters",
+              "**In this topic you will learn:**\n\n• How to run `stats.ttest_1samp`\n• How to read the p-value gently\n• Why context and data quality still matter most",
+          },
+          {
+            type: "scenario",
+            title: "Think of it like this",
+            content:
+              "You flip a coin 10 times and get 9 heads. A hypothesis test asks: “If the coin were fair, how surprising would 9 heads be?” The p-value helps answer that — but you still need to ask whether the coin is bent or the flips were fair.",
+          },
+          {
+            type: "table",
+            title: "ttest_1samp in three steps",
+            columns: ["Step", "What you write", "What it means"],
+            rows: [
+              {
+                label: "1",
+                values: [
+                  "Store sample",
+                  "`sample = np.array([...])`",
+                  "Your measured values",
+                ],
+              },
+              {
+                label: "2",
+                values: [
+                  "Run test",
+                  "`stat, p = stats.ttest_1samp(sample, popmean=20)`",
+                  "Compare to a reference mean",
+                ],
+              },
+              {
+                label: "3",
+                values: [
+                  "Read result",
+                  "`print(p)`",
+                  "How surprising under the assumption",
+                ],
+              },
+            ],
           },
           {
             type: "code",
             lang: "python",
-            label: "One-sample t-test idea",
+            label: "Try it: one-sample t-test",
             content: `import numpy as np
 from scipy import stats
 
 sample = np.array([20, 22, 19, 21, 23])
 stat, p = stats.ttest_1samp(sample, popmean=20)
+
 print("statistic:", stat)
 print("p-value:", p)`,
           },
@@ -1564,7 +1761,13 @@ print("p-value:", p)`,
             type: "callout",
             variant: "warning",
             content:
-              "**Careful:** A p-value is not “proof.” It is one clue. Always think about the question and the data quality.",
+              "**Watch out:** A small p-value does not automatically mean “important in real life.” Always ask: Is the question clear? Is the data trustworthy?",
+          },
+          {
+            type: "callout",
+            variant: "tip",
+            content:
+              "**Tip:** `ttest_1samp` returns two values — use the **second** one (`p`) when you want the p-value.",
           },
           quiz(
             "A p-value helps you…",
@@ -1583,6 +1786,7 @@ print("p-value:", p)`,
           "Run stats.ttest_1samp on np.array([10,12,11,13,12]) with popmean=10. Print the p-value (second return).",
           `import numpy as np
 from scipy import stats
+# run ttest_1samp and print p
 `,
           `import numpy as np
 from scipy import stats

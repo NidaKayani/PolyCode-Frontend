@@ -933,6 +933,16 @@ const LEARN_COURSE_ROUTES = [
     ),
   },
   {
+    slug: "ml-py",
+    language: "Go",
+    Hub: lazyWithChunkRetry(
+      () => import("./features/learn/ml-py/pages/MlPyHub"),
+    ),
+    Lesson: lazyWithChunkRetry(
+      () => import("./features/learn/ml-py/pages/MlPyLessonPage"),
+    ),
+  },
+  {
     slug: "powershell-fundamentals",
     language: "PowerShell",
     Hub: lazyWithChunkRetry(
@@ -1057,6 +1067,18 @@ const LEARN_COURSE_ROUTES = [
           "./features/learn/quantum-programming-projects/pages/QuantumProgrammingProjectsLessonPage"
         ),
     ),
+  },
+  {
+    slug: "quantum-multi-syntax",
+    language: "Quantum",
+    Hub: lazyWithChunkRetry(() => import("./features/learn/quantum-multi-syntax/pages/QuantumMultiSyntaxHub")),
+    Lesson: lazyWithChunkRetry(() => import("./features/learn/quantum-multi-syntax/pages/QuantumMultiSyntaxLessonPage")),
+  },
+  {
+    slug: "quantum-paradigm-coding",
+    language: "Quantum",
+    Hub: lazyWithChunkRetry(() => import("./features/learn/quantum-paradigm-coding/pages/QuantumParadigmCodingHub")),
+    Lesson: lazyWithChunkRetry(() => import("./features/learn/quantum-paradigm-coding/pages/QuantumParadigmCodingLessonPage")),
   },
   {
     slug: "qsharp-fundamentals",
