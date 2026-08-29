@@ -36,15 +36,6 @@ function objectives(items) {
   return { type: "objectives", items };
 }
 
-const CPP_MAIN = `#include <iostream>
-using namespace std;
-
-int main() {
-`;
-const CPP_MAIN_END = `    return 0;
-}
-`;
-
 const RAW_CPP_DATA_STRUCTURES_CHAPTERS = [
   {
     id: "complexity",
