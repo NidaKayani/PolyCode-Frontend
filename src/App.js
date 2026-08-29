@@ -439,6 +439,22 @@ const LEARN_COURSE_ROUTES = [
     ),
   },
   {
+    slug: "cpp-data-structures",
+    language: "C++",
+    Hub: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/cpp-data-structures/pages/CppDataStructuresHub"
+        ),
+    ),
+    Lesson: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/cpp-data-structures/pages/CppDataStructuresLessonPage"
+        ),
+    ),
+  },
+  {
     slug: "sql-fundamentals",
     language: "SQL",
     Hub: lazyWithChunkRetry(
