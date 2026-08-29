@@ -263,15 +263,37 @@ function extractFunctionCalls(code = "") {
 
 function extractImports(code = "") {
   const imports = [];
-  const re = /import\s+([\w.]+)(?:\s+as\s+(\w+))?/g;
-  let match = re.exec(code);
+  
+  // Handle "from X import Y" or "from X import Y as Z"
+  const fromImportRe = /from\s+([\w.]+)\s+import\s+([^;\n]+)/g;
+  let match = fromImportRe.exec(code);
+  while (match) {
+    const fromModule = match[1];
+    const importList = match[2];
+    const items = importList.split(",").map(s => s.trim());
+    items.forEach(item => {
+      const parts = item.split(/\s+as\s+/);
+      const importedName = parts[0].trim();
+      const alias = parts[1]?.trim() || importedName;
+      imports.push({
+        module: `${fromModule}.${importedName}`,
+        alias: alias,
+      });
+    });
+    match = fromImportRe.exec(code);
+  }
+  
+  // Handle "import X" or "import X as Y"
+  const importRe = /^import\s+([\w.]+)(?:\s+as\s+(\w+))?/gm;
+  match = importRe.exec(code);
   while (match) {
     imports.push({
       module: match[1],
       alias: match[2] || match[1].split(".").pop(),
     });
-    match = re.exec(code);
+    match = importRe.exec(code);
   }
+  
   return imports;
 }
 

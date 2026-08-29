@@ -366,16 +366,16 @@ print(model.config.num_labels)`,
           },
           {
             type: "quiz",
-            question: `Why do we use the same name with both AutoTokenizer.from_pretrained() and AutoModelForSequenceClassification.from_pretrained()?`,
+            question: `What is the key difference between using Auto* classes versus manually choosing tokenizer and model classes?`,
             options: [
-              `To download two different models`,
-              `To load the matching tokenizer and model from the same pretrained checkpoint`,
-              `To train the model twice`,
-              `To create two different tokenizers`,
+              `Auto* classes are slower but more flexible`,
+              `Auto* classes read the model's config and automatically select the correct tokenizer and model classes for you`,
+              `Auto* classes only work with small models`,
+              `Auto* classes require manual configuration of vocabulary size`,
             ],
             answer: 1,
             explanation:
-              `The tokenizer and model must agree on vocabulary and preprocessing — passing the same checkpoint name loads the matched pair they were trained with.`,
+              `Auto* classes inspect the model's config.json and automatically instantiate the matching tokenizer class (WordPiece, BPE, etc.) and model head — you never need to guess or manually select them.`,
           },
         ],
         challenge: {
@@ -491,16 +491,16 @@ print(model.config.id2label[label_id])`,
           },
           {
             type: "quiz",
-            question: `What does argmax() do in the manual inference process?`,
+            question: `What is the complete sequence of transformations that happens during manual inference from text to final label?`,
             options: [
-              `Converts logits into probabilities`,
-              `Finds the index of the largest probability`,
-              `Downloads the model from Hugging Face`,
-              `Converts text into tokens`,
+              `Text → Logits → Label directly without any processing`,
+              `Text → Tokenizer (ids) → Model (logits) → Softmax → Argmax → id2label lookup`,
+              `Text → Padding → Model only, no need for softmax`,
+              `Text → Logits → Softmax only, argmax is optional`,
             ],
             answer: 1,
             explanation:
-              `argmax() returns the index of the highest-scoring class, which id2label then maps to a readable label name.`,
+              `Manual inference follows this exact pipeline: tokenization converts text to ids, the model produces raw logits, softmax converts logits to probabilities, argmax finds the highest probability index, and id2label maps that index to a readable class name like 'POSITIVE'.`,
           },
         ],
         challenge: {
@@ -864,16 +864,16 @@ print(dataset["train"][0])`,
           },
           {
             type: "quiz",
-            question: `What does dataset["train"][0] do in the example?`,
+            question: `What are the key advantages of using the datasets library's load_dataset() over manually downloading and parsing CSV files?`,
             options: [
-              `Loads the entire dataset again`,
-              `Returns the first example from the training split`,
-              `Creates a new training split`,
-              `Trains the model on the first example`,
+              `It only works for small datasets under 1GB`,
+              `It loads the entire dataset into RAM at once`,
+              `Datasets are pre-cleaned, pre-split into train/test, cached locally after first download, and memory-mapped from disk`,
+              `Manual CSV parsing is faster than using load_dataset()`,
             ],
-            answer: 1,
+            answer: 2,
             explanation:
-              `dataset["train"][0] indexes into the "train" split of the DatasetDict and fetches its first item as a dictionary.`,
+              `load_dataset() eliminates the parsing chore: datasets come pre-validated and pre-split, they're cached locally after first download so subsequent calls are fast, and they use memory-mapping so you can work with datasets larger than your RAM without slowdown.`,
           },
         ],
         challenge: {
@@ -956,16 +956,16 @@ print(small["label"])`,
           },
           {
             type: "quiz",
-            question: `What does .shuffle(seed=42).select(range(5)) do?`,
+            question: `Why is checking dataset.features important before tokenizing or training?`,
             options: [
-              `Deletes the first 5 examples from the dataset`,
-              `Randomly shuffles the dataset and selects 5 examples`,
-              `Trains the model on 5 examples`,
-              `Changes the labels of 5 examples`,
+              `Features only show the file size`,
+              `Features describe the column names, data types, and label class names — essential to understand your data structure before processing`,
+              `Features are only needed if using GPU`,
+              `You should never look at features before training`,
             ],
             answer: 1,
             explanation:
-              `.shuffle(seed=42) randomly reorders the dataset reproducibly, and .select(range(5)) keeps the first 5 examples from that shuffled order.`,
+              `.features tells you the schema: column names, their types (like ClassLabel for labels), and crucially for classification, the actual class name behind each numeric label (e.g., 0='negative', 1='positive') — this prevents label confusion and helps you write correct preprocessing functions.`,
           },
         ],
         challenge: {
@@ -1230,6 +1230,19 @@ print(model.name_or_path)`,
             explanation:
               `revision pins from_pretrained() to a specific point in the repo's history, just like a git ref.`,
           },
+          {
+            type: "quiz",
+            question: `Why is it important to pin a specific revision when downloading a model for production?`,
+            options: [
+              `It makes the download faster`,
+              `A model's weights on the Hub can be updated over time; pinning revision ensures your experiment loads the exact same weights months later`,
+              `It reduces the file size`,
+              `Revision pinning only works with private models`,
+            ],
+            answer: 1,
+            explanation:
+              `Model repositories can be updated after initial download, so pinning revision="v1.0" guarantees reproducibility — the same weights will load in the future, not a newer or different version.`,
+          },
         ],
         challenge: {
           gradeMode: "keywords",
@@ -1305,6 +1318,19 @@ tokenizer.push_to_hub("your-username/my-sentiment-model")`,
             answer: 1,
             explanation:
               `push_to_hub() uploads the weights/config for a model, or the vocab/config files for a tokenizer, to a Hub repo.`,
+          },
+          {
+            type: "quiz",
+            question: `What is the primary purpose of logging in with huggingface_hub.login() before calling push_to_hub()?`,
+            options: [
+              `It encrypts your model file on disk`,
+              `It verifies your identity and grants permission to upload repositories to the Hub on your behalf`,
+              `It automatically creates a model card for you`,
+              `It increases your model's download speed`,
+            ],
+            answer: 1,
+            explanation:
+              `login() authenticates your identity using a token, allowing push_to_hub() to create and upload repositories under your account without requiring you to hardcode credentials in your shared code.`,
           },
         ],
         challenge: {
