@@ -68,51 +68,63 @@ const RAW_CPP_DATA_STRUCTURES_CHAPTERS = [
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Explain what time complexity and space complexity actually measure",
-            "Read Big-O notation for the common growth classes",
-            "Explain why we analyse growth instead of timing a single run",
+            "Say what \"time\" and \"space\" mean when we talk about the cost of a program",
+            "Read the common speed labels: O(1), O(n), O(n log n), O(n^2)",
+            "Explain why we care how a program *grows*, not how many seconds it takes today",
           ]),
           text(
-            "A **data structure** arranges data in memory so that the operations you care about - insert, search, delete, iterate - are cheap. \"Cheap\" has two budgets: **time** (how many steps an operation takes) and **space** (how much extra memory it needs). Almost every design decision in this course is a trade between the two.",
+            "Imagine two ways to look up a friend's number in a thick paper phone book. One: start at page 1 and flip forward until you find it. Two: open it near the middle, notice whether you've gone too far, and jump again. Both work. But as the phone book gets fatter, the first way turns into a slog while the second barely slows down.\n\nThis whole course is about choosing the second way on purpose. A **data structure** is simply a tidy way of keeping your information so the things you do most often - add something, find something, remove something, go through everything - stay quick.",
           ),
           text(
-            "We measure **growth**, not seconds. **Big-O** is an upper bound on how the step count grows as the input size `n` grows, dropping constant factors and lower-order terms: `O(n^2 + 3n + 7)` becomes `O(n^2)`. That abstraction is what makes an analysis portable across machines and compilers.",
+            "Every choice costs you one of two things:\n\n- **Time** - how many little steps the computer has to do.\n- **Space** - how much extra memory it needs while doing them.\n\nVery often you can trade one for the other: spend more memory to go faster, or use less memory and go slower. Knowing that trade is most of the skill.",
           ),
           text(
-            "The classes you will meet again and again, fastest to slowest:\n\n- `O(1)` constant - a fixed number of steps, whatever `n` is\n- `O(log n)` logarithmic - halve the problem each step (binary search)\n- `O(n)` linear - one pass over the input\n- `O(n log n)` - the good comparison-sort bound\n- `O(n^2)` quadratic - every pair of elements\n- `O(2^n)` exponential - every subset; usable only for tiny `n`",
+            "We don't measure cost in seconds, because seconds depend on the machine, the day, and whatever else is running. Instead we ask one question: **when the amount of data doubles, what happens to the work?** The shorthand for the answer is called **Big-O**, and you read it as \"grows like...\". The handful you'll see over and over:",
           ),
-          diagram("Roughly how many steps at n = 1,000,000", [
-            { id: "c1", label: "O(1)", color: C_GREEN, items: ["~1 step"] },
-            { id: "clog", label: "O(log n)", color: C_GREEN, items: ["~20 steps"] },
-            { id: "cn", label: "O(n)", color: C_AMBER, items: ["~1,000,000 steps"] },
-            { id: "cnl", label: "O(n log n)", color: C_AMBER, items: ["~20,000,000 steps"] },
-            { id: "cn2", label: "O(n^2)", color: C_RED, items: ["~1,000,000,000,000 steps"] },
+          text(
+            "- **O(1)** - \"stays the same\". The work never changes, however much data there is. (Looking at the first item.)\n- **O(log n)** - grows *painfully slowly*. Double the data, add one step. (The phone-book jump.)\n- **O(n)** - \"in step\". Double the data, double the work. (Reading every item once.)\n- **O(n log n)** - a little worse than O(n). The speed of a good sort.\n- **O(n^2)** - double the data, *four times* the work. (Comparing every item with every other item.) Gets slow quickly.\n- **O(2^n)** - blows up. Only usable when the data is tiny.",
+          ),
+          diagram("If your data had 1,000,000 items, roughly how many steps?", [
+            { id: "c1", label: "O(1)", color: C_GREEN, items: ["about 1 step", "instant"] },
+            { id: "clog", label: "O(log n)", color: C_GREEN, items: ["about 20 steps", "still instant"] },
+            { id: "cn", label: "O(n)", color: C_AMBER, items: ["about 1,000,000 steps", "a blink"] },
+            { id: "cnl", label: "O(n log n)", color: C_AMBER, items: ["about 20,000,000 steps", "still fine"] },
+            { id: "cn2", label: "O(n^2)", color: C_RED, items: ["about 1,000,000,000,000 steps", "minutes to hours"] },
           ]),
           text(
-            "**Space complexity** counts memory used *beyond the input*. Reversing an array in place is `O(1)` extra; building a hash set of every element is `O(n)` extra. A faster algorithm often costs more memory - that trade is a running theme.",
+            "Two habits to pick up now. First, **we throw away the small stuff**: if something takes `5n + 100` steps we just call it **O(n)**, because once the data is large the `5` and the `100` stop mattering - only the *shape* of the growth does. Second, unless we say otherwise **we quote the worst case**: the slowest thing that could reasonably happen, so you're never caught out.",
+          ),
+          text(
+            "**Space** is measured the same way. Turning a list around *in place* needs almost no extra room - **O(1)**. Making a full copy first needs room for every item - **O(n)**. Neither is \"bad\"; they're just different prices for the same result.",
           ),
           table(
-            "Typical cost of core operations (average case)",
-            ["Access by index", "Search", "Insert", "Delete", "Ordered?"],
+            "A map of the whole course (typical everyday cost)",
+            ["Jump to item #5", "Find a value", "Add one", "Remove one", "Kept in order?"],
             [
-              ["Static array", "O(1)", "O(n)", "O(n)", "O(n)", "by index"],
-              ["Dynamic array (vector)", "O(1)", "O(n)", "O(1)*", "O(n)", "by index"],
-              ["Linked list", "O(n)", "O(n)", "O(1)@", "O(1)@", "insertion"],
-              ["Hash table", "n/a", "O(1)", "O(1)", "O(1)", "no"],
-              ["Balanced BST", "O(log n)", "O(log n)", "O(log n)", "O(log n)", "sorted"],
-              ["Binary heap", "n/a", "O(n)", "O(log n)", "O(log n)", "min/max only"],
+              ["Plain array", "instant", "slow", "slow", "slow", "by position"],
+              ["Growable array", "instant", "slow", "fast*", "slow", "by position"],
+              ["Linked list", "slow", "slow", "fast@", "fast@", "as you inserted"],
+              ["Hash table", "-", "fast", "fast", "fast", "no order"],
+              ["Balanced tree", "medium", "medium", "medium", "medium", "sorted"],
+              ["Heap", "-", "slow", "medium", "medium", "smallest / largest only"],
             ],
-            { rowLabelHeader: "Structure", footnote: "* amortised, at the back.  @ once you already hold the position." },
+            { rowLabelHeader: "Structure", footnote: "\"fast\" = O(1), \"medium\" = O(log n), \"slow\" = O(n).  * on average, when adding at the end.  @ only once you're already holding the spot." },
           ),
           callout(
-            "info",
-            "Unless a problem says otherwise, quote the **worst case**. \"Average case\" and \"amortised\" are different, weaker promises - both covered later in this chapter.",
+            "tip",
+            "Don't try to memorise this table. By the end of the course you'll be able to rebuild it from scratch, because you'll understand *why* every cell says what it says.",
           ),
           quiz(
-            "Simplify O(4n + n log n + 100).",
-            ["O(n)", "O(n log n)", "O(4n)", "O(log n)"],
+            "A recipe app takes 5n + 300 steps to load n recipes. What's its Big-O?",
+            ["O(5n)", "O(n)", "O(300)", "O(n^2)"],
             1,
-            "Keep the dominant term and drop constants: n log n grows faster than 4n, and +100 vanishes.",
+            "Drop the multiplier and the constant - what's left is the shape: O(n). Double the recipes, roughly double the work.",
+          ),
+          quiz(
+            "Your data doubles from 1,000 items to 2,000. An O(n^2) task that did 1,000,000 units of work now does about how much?",
+            ["2,000,000", "4,000,000", "1,000,000", "3,000,000"],
+            1,
+            "O(n^2) means you square the size. Doubling the input multiplies the work by four - that's why quadratic tasks fall over on big data.",
           ),
         ],
         challenge: {
@@ -163,101 +175,72 @@ int main() {
       },
       {
         id: "cpp-ds-0-1",
-        title: "Big-O by reading the loops",
+        title: "How to guess a program's speed by looking at it",
         xp: 14,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Derive Big-O directly from control flow",
-            "Combine sequential and nested loops correctly",
-            "Solve the two recurrences behind binary search and merge sort",
+            "Work out a program's speed by asking how often its repeated part runs",
+            "Tell apart steps that run one-after-another from steps that run one-inside-another",
+            "See with your own eyes why n^2 + n + 1 is simply \"O(n^2)\"",
           ]),
           text(
-            "You can usually read complexity straight off the structure of the code:\n\n- one loop from `0` to `n` -> `O(n)`\n- two **nested** loops that both run to `n` -> `O(n^2)`\n- a loop that **halves** a range each step -> `O(log n)`\n- two loops **one after another** -> `O(n) + O(n) = O(n)` (add, then simplify)",
+            "A **loop** is just \"do this once for each item\". Most of the time you can size up how expensive a piece of code is by asking a single question: *how many times does the repeated part actually run?*",
           ),
           text(
-            "Function calls count too. A loop that calls an `O(n)` helper on every iteration is `O(n^2)`. Recursion is solved with a **recurrence** - the next lesson works through the two you meet most, `O(log n)` and `O(n log n)`.",
+            "- Go through the list once -> **O(n)** (n items, one visit each).\n- For every item, go through the whole list again -> that's a loop **inside** a loop -> **O(n x n) = O(n^2)**.\n- Each step throws away half of what's left -> **O(log n)** (you finish in very few steps).\n- Do one full pass, then a second, *separate* full pass -> **O(n) + O(n)**, which is still just **O(n)** (two passes is a constant; we drop it).",
           ),
-          diagram("What the symbols mean", [
-            {
-              id: "one",
-              label: "1  -  constant",
-              color: C_GREEN,
-              items: [
-                "A fixed amount of work",
-                "Grow the input, the work stays the same",
-                "arr[0], x + y, push onto a stack",
-              ],
-            },
-            {
-              id: "n",
-              label: "n  -  linear",
-              color: C_SKY,
-              items: [
-                "One unit of work per item",
-                "Double the input -> double the work",
-                "a single loop over the data",
-              ],
-            },
-            {
-              id: "n2",
-              label: "n^2  -  quadratic",
-              color: C_RED,
-              items: [
-                "One unit per PAIR of items",
-                "Double the input -> 4x the work",
-                "a loop nested inside a loop",
-              ],
-            },
-            {
-              id: "logn",
-              label: "log n  -  logarithmic",
-              color: C_AMBER,
-              items: [
-                "Throw away half the input each step",
-                "Double the input -> just +1 step",
-                "binary search, tree height",
-              ],
-            },
+          text(
+            "One trap: a step that *hands work off* to something else has to count that work too. \"For each of n customers, search a list of n orders\" is n searches of size n -> **O(n^2)**, even though on the page it looks like one plain loop.",
+          ),
+          diagram("The four shapes, in plain words", [
+            { id: "one", label: "O(1) - stays the same", color: C_GREEN, items: ["A fixed amount of work", "More data changes nothing", "\"look at the first item\""] },
+            { id: "n", label: "O(n) - in step", color: C_SKY, items: ["One unit of work per item", "Twice the data, twice the work", "\"visit every item once\""] },
+            { id: "n2", label: "O(n^2) - the pair-up", color: C_RED, items: ["One unit per PAIR of items", "Twice the data, FOUR times the work", "\"compare everything with everything\""] },
+            { id: "logn", label: "O(log n) - the halving", color: C_AMBER, items: ["Halve what's left each step", "Twice the data, one extra step", "\"the phone-book jump\""] },
           ]),
+          text(
+            "**Why do we throw away the smaller pieces?** Suppose a task really takes `n^2 + n + 1` steps. Look at what each part contributes as the data grows:",
+          ),
           table(
-            "Why n^2 + n + 1 is just O(n^2)",
-            ["n^2 term", "n term", "+1", "exact total", "share that is n^2"],
+            "n^2 + n + 1 : who actually does the work?",
+            ["the n^2 part", "the n part", "the +1", "grand total", "n^2's share"],
             [
-              ["n = 10", "100", "10", "1", "111", "90%"],
-              ["n = 100", "10,000", "100", "1", "10,101", "99.0%"],
-              ["n = 1,000", "1,000,000", "1,000", "1", "1,001,001", "99.9%"],
-              ["n = 1,000,000", "1e12", "1e6", "1", "~1e12", "99.9999%"],
+              ["10 items", "100", "10", "1", "111", "90%"],
+              ["100 items", "10,000", "100", "1", "10,101", "99.0%"],
+              ["1,000 items", "1,000,000", "1,000", "1", "1,001,001", "99.9%"],
+              ["1,000,000 items", "a trillion", "a million", "1", "~a trillion", "99.9999%"],
             ],
-            {
-              rowLabelHeader: "Input size",
-              highlightRows: [3],
-              footnote:
-                "As n grows the n^2 term is the whole story - the n and the +1 fade to rounding error. Big-O keeps only that dominant term and drops its coefficient, so 3n^2 + 500n + 9 is still O(n^2).",
-            },
+            { rowLabelHeader: "Data size", highlightRows: [3], footnote: "The n^2 part swallows everything else. So we just say O(n^2) and forget the rest - even 3n^2 + 500n + 9 is still O(n^2)." },
           ),
           table(
-            "How the work explodes as n grows",
-            ["n = 10", "n = 100", "n = 1,000", "n = 1,000,000"],
+            "The same idea as a picture: work done at each size",
+            ["10", "100", "1,000", "1,000,000"],
             [
               ["O(1)", "1", "1", "1", "1"],
               ["O(log n)", "3", "7", "10", "20"],
               ["O(n)", "10", "100", "1,000", "1,000,000"],
-              ["O(n log n)", "33", "664", "9,966", "~2e7"],
-              ["O(n^2)", "100", "10,000", "1,000,000", "1e12"],
-              ["O(2^n)", "1,024", "1e30", "off the chart", "off the chart"],
+              ["O(n log n)", "33", "664", "9,966", "~20 million"],
+              ["O(n^2)", "100", "10,000", "1,000,000", "a trillion"],
+              ["O(2^n)", "1,024", "huge", "off the chart", "off the chart"],
             ],
-            { rowLabelHeader: "Class", highlightRows: [4, 5], footnote: "Anything at or below O(n log n) scales; O(n^2) is a warning sign past ~10,000 items; O(2^n) is only for tiny n." },
+            { rowLabelHeader: "Shape", highlightRows: [4, 5], footnote: "O(n log n) and gentler stay usable at any size. O(n^2) is a warning past ~10,000 items. O(2^n) only for tiny inputs." },
           ),
           callout(
             "tip",
-            "The base of the logarithm never matters in Big-O - changing base only multiplies by a constant, and constants are dropped.",
+            "\"log n\" means: how many times can you halve n before you reach 1? For a million, that's about 20. The exact base doesn't matter for Big-O, so everyone just writes \"log n\".",
           ),
           quiz(
-            "The inner loop runs j from 0 to i, inside an outer loop i from 0 to n. Total work?",
-            ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+            "\"For each of 100 users, check all 100 of their photos.\" How many photo-checks, and what shape?",
+            ["100, O(n)", "200, O(n)", "10,000, O(n^2)", "100, O(log n)"],
             2,
-            "0 + 1 + ... + (n-1) is about n^2/2 iterations, which is O(n^2).",
+            "100 users x 100 photos = 10,000 checks. A loop inside a loop is O(n^2).",
+          ),
+          quiz(
+            "Code makes one full pass over the list, then a completely separate second full pass. Overall shape?",
+            ["O(n^2)", "O(2n), which we call O(n)", "O(n log n)", "O(1)"],
+            1,
+            "Passes that run one-after-another add: n + n = 2n. We drop the 2, so it's O(n). Only loops nested inside each other multiply.",
           ),
         ],
         challenge: {
@@ -583,40 +566,40 @@ int main() {
             "Connect \"one operation\" in Big-O to real CPU work, and why constants still matter",
           ]),
           text(
-            "When an analysis says an algorithm does \"`n` operations\", each operation is really the CPU grinding once through its basic loop - the **instruction cycle** - for every machine instruction.",
+            "Picture a cook at one station. In front of them is a stack of index cards, each with a single tiny instruction: \"pick up the knife\", \"make one cut\", \"put the knife down\". For every card the cook does the same four things: **take the next card, read it, do what it says, note the result** - then reach for the next card.\n\nA computer's processor works exactly like that, just billions of cards a second. That repeating four-step routine is called the **instruction cycle** (you'll also hear \"CPU cycle\" or \"fetch-decode-execute cycle\").",
           ),
-          diagram("The instruction cycle, repeated billions of times a second", [
-            { id: "fetch", label: "1. Fetch", color: ACCENT, items: ["Read the next instruction", "from the address in the program counter (PC)", "PC advances"] },
-            { id: "decode", label: "2. Decode", color: C_SKY, items: ["Control unit works out what it means", "which operation, which registers/operands"] },
-            { id: "exec", label: "3. Execute", color: C_AMBER, items: ["The ALU does the work", "add, compare, shift, address calculation"] },
-            { id: "write", label: "4. Write-back", color: C_GREEN, items: ["Store the result into a register", "or out to cache / memory", "update flags & PC, then repeat"] },
+          diagram("The four steps, repeated for every instruction", [
+            { id: "fetch", label: "1. Fetch", color: ACCENT, items: ["Grab the next instruction", "The processor keeps a bookmark pointing at it", "Move the bookmark along"] },
+            { id: "decode", label: "2. Decode", color: C_SKY, items: ["Work out what it's asking for", "Which action? Which values does it touch?"] },
+            { id: "exec", label: "3. Execute", color: C_AMBER, items: ["Actually do it", "Add, compare, work out an address..."] },
+            { id: "write", label: "4. Write-back", color: C_GREEN, items: ["Save the result", "Into a fast slot in the CPU, or out to memory", "Then go back to step 1"] },
           ]),
           text(
-            "A single line like `sum += arr[i];` is *not* one step for the CPU. Roughly: compute the address of `arr[i]`, load that value from memory into a register, add it to `sum`, write `sum` back. Several cycles - and if `arr[i]` is not in cache, the load alone can stall for hundreds of cycles.",
+            "Here's what surprises beginners: a short instruction like \"add this number to the running total\" is **not one step** for the processor. It's more like - work out where that number lives, go fetch it from memory, add it to the total, put the total back. Four or five tiny cards. And if the number isn't already close at hand, the \"go fetch it\" part alone can cost as much as a *hundred* ordinary steps.",
           ),
           text(
-            "Big-O deliberately hides all of this: it collapses \"a few cycles\" and \"one cache miss\" into the same `O(1)`. That is exactly why two `O(n)` algorithms can differ 10x in wall-clock time - same number of steps, very different work per step.",
+            "This is why Big-O is a *rough* guide, not a stopwatch. Big-O counts every step as \"one\", whether it's a snappy add or a slow trip out to memory. So two methods that are both **O(n)** can still finish ten times apart in real life - the same number of steps on paper, very different work inside each one. The next lessons dig into that gap.",
           ),
           callout(
             "info",
-            "**Registers** are the tiny, instant storage the CPU computes in - a few dozen of them. Cache and RAM are progressively slower and must be loaded into a register before the ALU can touch a value. The **write-back** stage is where a result leaves a register for cache or RAM.",
+            "Those \"fast slots in the CPU\" are called **registers** - only a few dozen exist, and they're where all the actual adding and comparing happens. Everything else (the caches, main memory) is slower and has to be pulled into a register first. \"Write-back\" is just the step where a finished result leaves a register.",
           ),
           quiz(
-            "Which stage of the instruction cycle stores the computed result back to a register or memory?",
+            "In the four-step cycle, which step saves the finished result?",
             ["Fetch", "Decode", "Execute", "Write-back"],
             3,
-            "Write-back (sometimes called store) commits the result and updates the PC/flags before the next fetch.",
+            "Write-back (also called \"store\") commits the result and nudges the bookmark to the next instruction, ready for the next Fetch.",
           ),
           quiz(
-            "Why can two O(n) algorithms have very different real running times?",
+            "Two sorting methods are both O(n). One runs twice as fast as the other on the same laptop. How is that possible?",
             [
-              "Big-O is always wrong",
-              "They do different constant work per step and touch memory differently",
-              "One of them is secretly O(n^2)",
-              "Compilers ignore Big-O",
+              "Big-O must be wrong for one of them",
+              "One does lighter work per step and reaches memory in a friendlier pattern",
+              "The slower one is secretly O(n^2)",
+              "Faster laptops ignore Big-O",
             ],
             1,
-            "Big-O drops constants and ignores cache behaviour; per-step cost and memory-access patterns still decide wall-clock time.",
+            "Big-O counts steps but ignores how heavy each step is and how the data sits in memory - and both of those decide the real time.",
           ),
         ],
         challenge: {
@@ -656,63 +639,74 @@ int main() {
       },
       {
         id: "cpp-ds-0-3",
-        title: "Why the array wins: memory hierarchy and locality",
+        title: "Why data \"in a row\" is faster",
         xp: 12,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Explain why a cache miss is so expensive relative to an instruction",
-            "Define spatial and temporal locality",
-            "Explain why a contiguous array beats a linked list at the same Big-O",
+            "Explain why reaching out to main memory is so slow compared with the CPU",
+            "Say what \"keep the things you use together, together\" buys you",
+            "Explain why the same O(n) job can be much faster with data laid out in a row",
           ]),
           text(
-            "RAM is slow next to the CPU: a cache miss can cost 100-300 cycles - long enough to execute hundreds of instructions. To hide that, the CPU keeps recently used memory in small fast **caches** (L1/L2/L3) and always transfers memory a **cache line** at a time, typically 64 bytes (about 16 `int`s).",
+            "The processor is fast. Main memory is not - by comparison it's *glacial*. Asking memory for a value the CPU doesn't already have nearby can cost as much as running a few hundred normal instructions while it waits.\n\nTo hide that wait, the CPU keeps recently used data in a few small, very fast holding areas called **caches**. And it never fetches one lonely value - it grabs a whole **chunk of neighbouring memory** at once (about 64 bytes, roughly 16 whole numbers), betting that you'll want the neighbours too.",
           ),
           table(
-            "The memory hierarchy (order-of-magnitude latency)",
-            ["Rough latency", "Analogy: if L1 took 1 second"],
+            "How far away is the data? (bigger gap = slower)",
+            ["Rough wait", "If the closest one took 1 second..."],
             [
-              ["CPU register", "0 cycles", "instant"],
-              ["L1 cache", "~4 cycles", "1 second"],
-              ["L2 cache", "~12 cycles", "3 seconds"],
-              ["L3 cache", "~40 cycles", "10 seconds"],
-              ["Main memory (RAM)", "~200 cycles", "1 minute"],
-              ["SSD", "~100,000 cycles", "7 hours"],
+              ["Inside the CPU (a register)", "no wait", "instant"],
+              ["Nearest cache", "a few ticks", "1 second"],
+              ["Middle cache", "~3x that", "3 seconds"],
+              ["Last cache", "~10x that", "10 seconds"],
+              ["Main memory", "~50x that", "about a minute"],
+              ["The disk (SSD)", "enormous", "about 7 hours"],
             ],
-            { rowLabelHeader: "Level", highlightRows: [4], footnote: "Every level down is roughly 3-5x slower. Keeping the working set in cache is what \"fast\" really means." },
+            { rowLabelHeader: "Where the value lives", highlightRows: [4], footnote: "Every step further out is roughly 3-5x slower. \"Fast code\" mostly means \"code whose data stays in the near caches\"." },
           ),
           text(
-            "Two rules follow:\n\n- **Spatial locality** - after you touch one address, touching nearby addresses is nearly free (they arrived on the same cache line).\n- **Temporal locality** - after you touch an address, touching it again soon is nearly free (still cached).",
+            "So the golden rule is: **keep the things you use together, together.** It pays off two ways:\n\n- Touch one value, and its neighbours become almost free - they came along in the same chunk.\n- Touch a value, and touching it *again* soon is almost free - it's still in cache.",
           ),
           arrayViz(
-            "One 64-byte cache line pays for the next ~15 accesses",
+            "One fetch brings in a whole neighbourhood",
             [
               {
-                label: "cache line",
-                values: ["a[0]", "a[1]", "a[2]", "a[3]", "a[4]", "a[5]", "a[6]", "a[7]", "a[8]", "a[9]", "a[10]", "a[11]", "a[12]", "a[13]", "a[14]", "a[15]"],
+                label: "one 64-byte chunk",
+                values: ["#0", "#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10", "#11", "#12", "#13", "#14", "#15"],
                 colLabels: ["0", "4", "8", "12", "16", "20", "24", "28", "32", "36", "40", "44", "48", "52", "56", "60"],
                 okIndexes: [0],
               },
             ],
-            "Reading a[0] (green) triggers one miss and loads all 16 ints; a[1]..a[15] are then free. A linked list would miss on every single node. Column labels are byte offsets within the line.",
+            "You ask for item #0 (green). The CPU quietly loads all 16 numbers sitting next to it. Items #1 to #15 are now free. Numbers laid out in a row get this for nothing.",
           ),
           text(
-            "This is why iterating a `std::vector<int>` front-to-back is far faster than walking a linked list of the same length, even though both are `O(n)`: the vector is one contiguous block (every cache line fully used, the hardware prefetcher running ahead), while list nodes are scattered across the heap - one cache miss per node, plus wasted bytes per line on the `next` pointer.",
+            "This is the real reason a **plain list of items sitting in a row** is faster to read through than the same items **scattered around memory, each with an arrow to the next**. The row: every fetched chunk is fully used, and the CPU even guesses ahead and pre-loads the next chunk. The scattered version: a fresh slow fetch for *every single item*, and part of each chunk wasted on the arrows.",
           ),
-          diagram("Same Big-O, different reality", [
-            { id: "arr", label: "Array traversal", color: C_GREEN, items: ["1 cache line -> ~16 elements", "prefetcher predicts the pattern"] },
-            { id: "list", label: "Linked-list traversal", color: C_RED, items: ["1 cache line -> 1 node", "pointer chasing defeats the prefetcher"] },
-            { id: "gap", label: "Result", color: ACCENT, items: ["Identical O(n)", "5-10x wall-clock gap in practice"] },
+          diagram("Same O(n) walk, very different speed", [
+            { id: "arr", label: "Items in a row", color: C_GREEN, items: ["1 fetch -> ~16 items", "CPU pre-loads the next chunk"] },
+            { id: "list", label: "Scattered items + arrows", color: C_RED, items: ["1 fetch -> 1 item", "CPU can't guess where you'll jump"] },
+            { id: "gap", label: "In practice", color: ACCENT, items: ["Big-O says they're equal", "The row is often 5-10x faster"] },
           ]),
           callout(
             "warning",
-            "Do not over-rotate on this. A linked list still wins when you need `O(1)` splice in the middle and rarely iterate. The point is to measure, not to assume Big-O tells the whole story.",
+            "This is not \"always use a row\". Scattered-with-arrows structures (linked lists, coming up) shine when you constantly slip items into the middle and rarely read straight through. The lesson is: Big-O isn't the whole story - measure.",
           ),
           quiz(
-            "A cache line is about 64 bytes. Iterating a contiguous array of int (4 bytes each) brings in roughly how many elements per cache miss?",
-            ["1", "4", "16", "64"],
+            "One memory chunk holds about 16 numbers. You read 16 numbers laid out in a row, front to back. Roughly how many slow trips to memory?",
+            ["16", "8", "1", "0"],
             2,
-            "64 / 4 = 16 ints per line, so one miss pays for the next ~15 accesses.",
+            "The first read triggers one trip that loads all 16. The other 15 are already there - free.",
+          ),
+          quiz(
+            "Why is the \"scattered items with arrows\" layout slower to walk through, even at the same Big-O?",
+            [
+              "It has more items in it",
+              "Each jump is a fresh slow memory trip, and the CPU can't pre-load what it can't predict",
+              "Arrows are not allowed in C++",
+              "It secretly becomes O(n^2)",
+            ],
+            1,
+            "Every \"follow the arrow\" is an unpredictable jump to a new place in memory - the worst case for the cache.",
           ),
         ],
         challenge: {
@@ -761,48 +755,75 @@ int main() {
       },
       {
         id: "cpp-ds-0-4",
-        title: "Amortised cost and measuring for real",
+        title: "The rare slow step (and timing code)",
         xp: 12,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Define amortised complexity and how it differs from worst case",
-            "Explain why n doubling push_backs cost O(n) in total",
-            "List the rules for a benchmark you can trust",
+            "Explain \"amortised\" cost: cheap almost always, rarely expensive, cheap on average",
+            "See why a growable list stays fast overall even though it sometimes moves everything",
+            "Know the basic rules for timing code honestly",
           ]),
           text(
-            "Some operations are cheap almost always and occasionally expensive. `std::vector::push_back` is `O(1)` until capacity runs out; then it allocates a bigger block and moves every element - `O(n)` that one time. **Amortised analysis** spreads that rare cost over the many cheap operations.",
+            "Some actions are cheap nearly every time, and then - once in a while - expensive. Think of a bookshelf. Adding a book is instant... until the shelf is full. Then you buy a bigger shelf and move every book across. That move is a chore. But it happens rarely, and each new shelf is *twice* the size, so the chore comes round less and less often.",
           ),
           text(
-            "Because the vector **doubles**, growing from empty to `n` copies `1 + 2 + 4 + ... + n < 2n` elements *in total*. So `n` push_backs cost `O(n)` altogether, and each one is **amortised `O(1)`** - a promise about the whole sequence, not any single call.",
+            "A **growable list** (you'll meet it properly next chapter) behaves exactly like that bookshelf. Adding an item is instant, until it's full; then it grabs a block twice as big and copies everything over. The average cost, spread across *all* the adds, is what we call the **amortised** cost - and here it works out to basically instant per add.",
           ),
           text(
-            "A real-time system that cannot tolerate the occasional `O(n)` spike will `reserve()` up front, or pick a structure with worst-case guarantees (a balanced tree, a deque of fixed chunks).",
-          ),
-          text(
-            "When you benchmark, measure carefully:",
+            "Why does doubling keep it cheap? Growing from empty to n items, the copies you pay are `1 + 2 + 4 + 8 + ...` up to about n. Add those up and the total is *less than 2n* - so n adds cost roughly n work altogether. Press **Run** and watch it happen:",
             {
-              label: "Timing a block with <chrono>",
-              content: `#include <chrono>
-#include <iostream>
+              label: "See the rare slow step",
+              content: `#include <iostream>
 using namespace std;
-using namespace std::chrono;
 
-auto t0 = high_resolution_clock::now();
-// ... work under test, enough iterations to dwarf timer noise ...
-auto t1 = high_resolution_clock::now();
-cout << duration_cast<microseconds>(t1 - t0).count() << " us\\n";`,
+int main() {
+    int capacity = 1;   // how many items there is room for
+    int size = 0;       // how many are actually stored
+    long long moved = 0;
+
+    for (int item = 1; item <= 16; item++) {
+        if (size == capacity) {
+            // the rare, expensive step: bigger block, copy everything across
+            moved += size;
+            capacity *= 2;
+            cout << "  ...full! grew to hold " << capacity
+                 << ", moved " << size << " items\\n";
+        }
+        size++;                       // the usual, instant step
+        cout << "added item " << item << "\\n";
+    }
+
+    cout << "\\n16 items added. Items copied during all the grows: "
+         << moved << "  (less than 2 x 16)\\n";
+    return 0;
+}`,
             },
           ),
           callout(
+            "info",
+            "If a program truly cannot afford the occasional pause (live audio, say), you tell the list its final size up front so it never has to grow - or you choose a structure that has no slow step at all.",
+          ),
+          callout(
             "tip",
-            "Warm up first, build with optimisations on, run enough iterations that the timer resolution is irrelevant, and be clear whether you care about **throughput** (average) or **worst-case latency** (the spike).",
+            "Timing code fairly: run it many times (not once), let it \"warm up\" first, turn optimisations on, and decide whether you care about the *average* speed or the *worst single pause* - they answer different questions.",
           ),
           quiz(
-            "n push_backs into an empty doubling vector cost how much in total?",
-            ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
-            0,
-            "Total elements moved across all resizes is 1 + 2 + 4 + ... + n < 2n, so O(n) overall and O(1) amortised each.",
+            "Adding to a doubling list is \"amortised O(1)\". What does that actually promise?",
+            [
+              "Every single add is equally fast",
+              "Across many adds, the average cost per add stays tiny - even though a few are slow",
+              "It never has to copy anything",
+              "It is only O(1) for the very first item",
+            ],
+            1,
+            "Amortised is a promise about the whole run, not any one step. Most adds are instant; the rare copy is paid off by all the cheap ones around it.",
+          ),
+          quiz(
+            "Growing a list from empty to 1,000 items (doubling each time), roughly how many item-copies happen in total?",
+            ["About 1,000,000", "About 2,000", "About 10", "About 1,000,000,000"],
+            1,
+            "1 + 2 + 4 + ... + 1,000 is just under 2,000. That's why n adds cost about n overall - each one averages out to nearly free.",
           ),
         ],
         challenge: {

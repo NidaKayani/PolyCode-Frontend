@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import LearnProfileMenu from "../../shared/LearnProfileMenu";
 import LessonContentShell from "../../shared/LessonContentShell";
 import LessonChallengeTab from "../../shared/LessonChallengeTab";
-import NumpyIntroTheory from "../../numpy-py/components/NumpyIntroTheory";
+import CppDsLesson from "../components/CppDsLesson";
 import OopsSidebar from "../../oops-cpp/components/OopsSidebar";
 import CodeChallenge from "../../oops-cpp/components/CodeChallenge";
 import {
@@ -215,7 +215,7 @@ export default function CppDataStructuresLessonPage() {
               onCodeChange={handleCodeChange}
             />
           ) : (
-            <NumpyIntroTheory
+            <CppDsLesson
               lesson={lesson}
               quizStoragePrefix={READ_GATE_PREFIX}
               confidence={confidence}

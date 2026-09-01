@@ -49,7 +49,7 @@ export default function LessonReadGate({
       >
         <p className="lesson-read-gate-hint">
           {quizzesRequired > 0
-            ? `Answer all ${quizzesRequired} quick checks above, then mark this lesson as read${hasChallenge ? " to unlock the challenge" : " to complete it"}.`
+            ? `Answer ${quizzesRequired === 1 ? "the quick check" : `all ${quizzesRequired} quick checks`} above, then mark this lesson as read${hasChallenge ? " to unlock the challenge" : " to complete it"}.`
             : hasChallenge
               ? "Finished reading? Mark this lesson as read to unlock the challenge."
               : "Finished reading? Mark this lesson as read to complete it."}
