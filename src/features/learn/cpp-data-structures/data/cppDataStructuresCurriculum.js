@@ -163,7 +163,7 @@ int main() {
       },
       {
         id: "cpp-ds-0-1",
-        title: "Big-O by reading the loops",
+        title: "How to guess a program's speed by looking at it",
         xp: 14,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
@@ -656,7 +656,7 @@ int main() {
       },
       {
         id: "cpp-ds-0-3",
-        title: "Why the array wins: memory hierarchy and locality",
+        title: "Why data \"in a row\" is faster",
         xp: 12,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
@@ -761,7 +761,7 @@ int main() {
       },
       {
         id: "cpp-ds-0-4",
-        title: "Amortised cost and measuring for real",
+        title: "The rare slow step (and timing code)",
         xp: 12,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
