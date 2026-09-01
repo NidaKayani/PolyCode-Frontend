@@ -573,7 +573,7 @@ int main() {
       },
       {
         id: "cpp-ds-0-2",
-        title: "Inside one step: fetch, decode, execute, write-back",
+        title: "CPU Cycle",
         xp: 12,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
