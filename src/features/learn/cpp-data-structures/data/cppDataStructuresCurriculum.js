@@ -180,96 +180,67 @@ int main() {
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Derive Big-O directly from control flow",
-            "Combine sequential and nested loops correctly",
-            "Solve the two recurrences behind binary search and merge sort",
+            "Work out a program's speed by asking how often its repeated part runs",
+            "Tell apart steps that run one-after-another from steps that run one-inside-another",
+            "See with your own eyes why n^2 + n + 1 is simply \"O(n^2)\"",
           ]),
           text(
-            "You can usually read complexity straight off the structure of the code:\n\n- one loop from `0` to `n` -> `O(n)`\n- two **nested** loops that both run to `n` -> `O(n^2)`\n- a loop that **halves** a range each step -> `O(log n)`\n- two loops **one after another** -> `O(n) + O(n) = O(n)` (add, then simplify)",
+            "A **loop** is just \"do this once for each item\". Most of the time you can size up how expensive a piece of code is by asking a single question: *how many times does the repeated part actually run?*",
           ),
           text(
-            "Function calls count too. A loop that calls an `O(n)` helper on every iteration is `O(n^2)`. Recursion is solved with a **recurrence** - the next lesson works through the two you meet most, `O(log n)` and `O(n log n)`.",
+            "- Go through the list once -> **O(n)** (n items, one visit each).\n- For every item, go through the whole list again -> that's a loop **inside** a loop -> **O(n x n) = O(n^2)**.\n- Each step throws away half of what's left -> **O(log n)** (you finish in very few steps).\n- Do one full pass, then a second, *separate* full pass -> **O(n) + O(n)**, which is still just **O(n)** (two passes is a constant; we drop it).",
           ),
-          diagram("What the symbols mean", [
-            {
-              id: "one",
-              label: "1  -  constant",
-              color: C_GREEN,
-              items: [
-                "A fixed amount of work",
-                "Grow the input, the work stays the same",
-                "arr[0], x + y, push onto a stack",
-              ],
-            },
-            {
-              id: "n",
-              label: "n  -  linear",
-              color: C_SKY,
-              items: [
-                "One unit of work per item",
-                "Double the input -> double the work",
-                "a single loop over the data",
-              ],
-            },
-            {
-              id: "n2",
-              label: "n^2  -  quadratic",
-              color: C_RED,
-              items: [
-                "One unit per PAIR of items",
-                "Double the input -> 4x the work",
-                "a loop nested inside a loop",
-              ],
-            },
-            {
-              id: "logn",
-              label: "log n  -  logarithmic",
-              color: C_AMBER,
-              items: [
-                "Throw away half the input each step",
-                "Double the input -> just +1 step",
-                "binary search, tree height",
-              ],
-            },
+          text(
+            "One trap: a step that *hands work off* to something else has to count that work too. \"For each of n customers, search a list of n orders\" is n searches of size n -> **O(n^2)**, even though on the page it looks like one plain loop.",
+          ),
+          diagram("The four shapes, in plain words", [
+            { id: "one", label: "O(1) - stays the same", color: C_GREEN, items: ["A fixed amount of work", "More data changes nothing", "\"look at the first item\""] },
+            { id: "n", label: "O(n) - in step", color: C_SKY, items: ["One unit of work per item", "Twice the data, twice the work", "\"visit every item once\""] },
+            { id: "n2", label: "O(n^2) - the pair-up", color: C_RED, items: ["One unit per PAIR of items", "Twice the data, FOUR times the work", "\"compare everything with everything\""] },
+            { id: "logn", label: "O(log n) - the halving", color: C_AMBER, items: ["Halve what's left each step", "Twice the data, one extra step", "\"the phone-book jump\""] },
           ]),
+          text(
+            "**Why do we throw away the smaller pieces?** Suppose a task really takes `n^2 + n + 1` steps. Look at what each part contributes as the data grows:",
+          ),
           table(
-            "Why n^2 + n + 1 is just O(n^2)",
-            ["n^2 term", "n term", "+1", "exact total", "share that is n^2"],
+            "n^2 + n + 1 : who actually does the work?",
+            ["the n^2 part", "the n part", "the +1", "grand total", "n^2's share"],
             [
-              ["n = 10", "100", "10", "1", "111", "90%"],
-              ["n = 100", "10,000", "100", "1", "10,101", "99.0%"],
-              ["n = 1,000", "1,000,000", "1,000", "1", "1,001,001", "99.9%"],
-              ["n = 1,000,000", "1e12", "1e6", "1", "~1e12", "99.9999%"],
+              ["10 items", "100", "10", "1", "111", "90%"],
+              ["100 items", "10,000", "100", "1", "10,101", "99.0%"],
+              ["1,000 items", "1,000,000", "1,000", "1", "1,001,001", "99.9%"],
+              ["1,000,000 items", "a trillion", "a million", "1", "~a trillion", "99.9999%"],
             ],
-            {
-              rowLabelHeader: "Input size",
-              highlightRows: [3],
-              footnote:
-                "As n grows the n^2 term is the whole story - the n and the +1 fade to rounding error. Big-O keeps only that dominant term and drops its coefficient, so 3n^2 + 500n + 9 is still O(n^2).",
-            },
+            { rowLabelHeader: "Data size", highlightRows: [3], footnote: "The n^2 part swallows everything else. So we just say O(n^2) and forget the rest - even 3n^2 + 500n + 9 is still O(n^2)." },
           ),
           table(
-            "How the work explodes as n grows",
-            ["n = 10", "n = 100", "n = 1,000", "n = 1,000,000"],
+            "The same idea as a picture: work done at each size",
+            ["10", "100", "1,000", "1,000,000"],
             [
               ["O(1)", "1", "1", "1", "1"],
               ["O(log n)", "3", "7", "10", "20"],
               ["O(n)", "10", "100", "1,000", "1,000,000"],
-              ["O(n log n)", "33", "664", "9,966", "~2e7"],
-              ["O(n^2)", "100", "10,000", "1,000,000", "1e12"],
-              ["O(2^n)", "1,024", "1e30", "off the chart", "off the chart"],
+              ["O(n log n)", "33", "664", "9,966", "~20 million"],
+              ["O(n^2)", "100", "10,000", "1,000,000", "a trillion"],
+              ["O(2^n)", "1,024", "huge", "off the chart", "off the chart"],
             ],
-            { rowLabelHeader: "Class", highlightRows: [4, 5], footnote: "Anything at or below O(n log n) scales; O(n^2) is a warning sign past ~10,000 items; O(2^n) is only for tiny n." },
+            { rowLabelHeader: "Shape", highlightRows: [4, 5], footnote: "O(n log n) and gentler stay usable at any size. O(n^2) is a warning past ~10,000 items. O(2^n) only for tiny inputs." },
           ),
           callout(
             "tip",
-            "The base of the logarithm never matters in Big-O - changing base only multiplies by a constant, and constants are dropped.",
+            "\"log n\" means: how many times can you halve n before you reach 1? For a million, that's about 20. The exact base doesn't matter for Big-O, so everyone just writes \"log n\".",
           ),
           quiz(
-            "The inner loop runs j from 0 to i, inside an outer loop i from 0 to n. Total work?",
-            ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+            "\"For each of 100 users, check all 100 of their photos.\" How many photo-checks, and what shape?",
+            ["100, O(n)", "200, O(n)", "10,000, O(n^2)", "100, O(log n)"],
             2,
-            "0 + 1 + ... + (n-1) is about n^2/2 iterations, which is O(n^2).",
+            "100 users x 100 photos = 10,000 checks. A loop inside a loop is O(n^2).",
+          ),
+          quiz(
+            "Code makes one full pass over the list, then a completely separate second full pass. Overall shape?",
+            ["O(n^2)", "O(2n), which we call O(n)", "O(n log n)", "O(1)"],
+            1,
+            "Passes that run one-after-another add: n + n = 2n. We drop the 2, so it's O(n). Only loops nested inside each other multiply.",
           ),
         ],
         challenge: {
