@@ -26,11 +26,11 @@ them, not just the API.
 
 ---
 
-## Chapters (9 chapters · 38 lessons)
+## Chapters (9 chapters · 39 lessons)
 
 1. **Complexity & the Machine Model** — time/space budgets, Big-O by
-   reading loops, the instruction cycle, memory hierarchy & locality,
-   amortised cost.
+   reading loops, where log n / n log n come from (merge sort), the
+   instruction cycle, memory hierarchy & locality, amortised cost.
 2. **Linear vs Non-Linear · Arrays & Lists** — the taxonomy map, the List
    ADT & static arrays, dynamic arrays / `vector` / amortised growth,
    choosing the backbone.
@@ -74,7 +74,8 @@ There is no `components/` folder — the Challenge tab reuses
 
 ## Quick tips for editors
 
-1. Lesson ids follow `cpp-ds-<chapter>-<lesson>` (e.g. `cpp-ds-0-0`) and
+1. Lesson ids follow `cpp-ds-<chapter>-<lesson>` (e.g. `cpp-ds-0-0`;
+   lessons inserted later take a trailing letter, e.g. `cpp-ds-0-1b`) and
    must stay globally unique across all learn courses.
 2. Edit lesson content in `data/cppDataStructuresCurriculum.js`. Every
    lesson object has `id`, `title`, `xp`, `chapterTitle`, `theory[]`, and

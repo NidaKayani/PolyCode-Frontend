@@ -1,5 +1,5 @@
 // PolyCode - C++ Data Structures full curriculum
-// 9 chapters - 38 lessons - every lesson has theory + quizzes + an in-browser
+// 9 chapters - 39 lessons - every lesson has theory + quizzes + an in-browser
 // C++ challenge (a few concept lessons use compileOptional keyword checks).
 // YouTube links: edit cppDataStructuresVideoLinks.js (not this file).
 
@@ -176,15 +176,64 @@ int main() {
             "You can usually read complexity straight off the structure of the code:\n\n- one loop from `0` to `n` -> `O(n)`\n- two **nested** loops that both run to `n` -> `O(n^2)`\n- a loop that **halves** a range each step -> `O(log n)`\n- two loops **one after another** -> `O(n) + O(n) = O(n)` (add, then simplify)",
           ),
           text(
-            "Function calls count. A loop that calls an `O(n)` helper on every iteration is `O(n^2)`. For recursion, solve the recurrence:\n\n- binary search: `T(n) = T(n/2) + O(1)` -> `O(log n)`\n- merge sort: `T(n) = 2T(n/2) + O(n)` -> `O(n log n)`",
+            "Function calls count too. A loop that calls an `O(n)` helper on every iteration is `O(n^2)`. Recursion is solved with a **recurrence** - the next lesson works through the two you meet most, `O(log n)` and `O(n log n)`.",
+          ),
+          diagram("What the symbols mean", [
             {
-              label: "Each pattern in code",
-              content: `for (int i = 0; i < n; i++) { /* O(1) */ }            // O(n)
-
-for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++) { /* O(1) */ }        // O(n^2)
-
-for (int k = n; k > 1; k /= 2) { /* O(1) */ }         // O(log n)`,
+              id: "one",
+              label: "1  -  constant",
+              color: C_GREEN,
+              items: [
+                "A fixed amount of work",
+                "Grow the input, the work stays the same",
+                "arr[0], x + y, push onto a stack",
+              ],
+            },
+            {
+              id: "n",
+              label: "n  -  linear",
+              color: C_SKY,
+              items: [
+                "One unit of work per item",
+                "Double the input -> double the work",
+                "a single loop over the data",
+              ],
+            },
+            {
+              id: "n2",
+              label: "n^2  -  quadratic",
+              color: C_RED,
+              items: [
+                "One unit per PAIR of items",
+                "Double the input -> 4x the work",
+                "a loop nested inside a loop",
+              ],
+            },
+            {
+              id: "logn",
+              label: "log n  -  logarithmic",
+              color: C_AMBER,
+              items: [
+                "Throw away half the input each step",
+                "Double the input -> just +1 step",
+                "binary search, tree height",
+              ],
+            },
+          ]),
+          table(
+            "Why n^2 + n + 1 is just O(n^2)",
+            ["n^2 term", "n term", "+1", "exact total", "share that is n^2"],
+            [
+              ["n = 10", "100", "10", "1", "111", "90%"],
+              ["n = 100", "10,000", "100", "1", "10,101", "99.0%"],
+              ["n = 1,000", "1,000,000", "1,000", "1", "1,001,001", "99.9%"],
+              ["n = 1,000,000", "1e12", "1e6", "1", "~1e12", "99.9999%"],
+            ],
+            {
+              rowLabelHeader: "Input size",
+              highlightRows: [3],
+              footnote:
+                "As n grows the n^2 term is the whole story - the n and the +1 fade to rounding error. Big-O keeps only that dominant term and drops its coefficient, so 3n^2 + 500n + 9 is still O(n^2).",
             },
           ),
           table(
@@ -258,6 +307,139 @@ int main() {
             { id: 1, label: "Single loop labelled O(n)", keywords: [{ pattern: "Snippet 1 is O\\(n\\)" }], hint: "One pass to n." },
             { id: 2, label: "Nested loop labelled O(n^2)", keywords: [{ pattern: "Snippet 2 is O\\(n\\^2\\)" }], hint: "Loop inside a loop." },
             { id: 3, label: "Halving loop labelled O(log n)", keywords: [{ pattern: "Snippet 3 is O\\(log n\\)" }], hint: "k /= 2 each step." },
+          ],
+        },
+      },
+      {
+        id: "cpp-ds-0-1b",
+        title: "Where log n and n log n come from",
+        xp: 12,
+        chapterTitle: "Complexity & the Machine Model",
+        theory: [
+          objectives([
+            "Explain why repeated halving gives log n steps",
+            "Explain why merge sort is n log n: log n levels times n work per level",
+            "Recognise the divide-and-conquer recurrence behind both",
+          ]),
+          text(
+            "`log n` and `n log n` come from the same move: **cut the problem in half, again and again.** The only difference is how much work you do at each cut.",
+          ),
+          text(
+            "**Halving gives log2 n steps.** Start at n, halve to n/2, then n/4, n/8, ... you reach 1 after about log2 n halvings. This is **binary search**: every comparison throws away half of what is left, so a million-element sorted array is searched in about 20 steps.",
+          ),
+          table(
+            "How few halvings it takes to reach 1",
+            ["Halvings (about log2 n)"],
+            [
+              ["n = 16", "4"],
+              ["n = 1,024", "10"],
+              ["n = 1,000,000", "20"],
+              ["n = 1,000,000,000", "30"],
+            ],
+            {
+              rowLabelHeader: "Input size",
+              footnote:
+                "Multiplying n by 1,000 adds only ~10 steps. That flat growth is the whole point of O(log n).",
+            },
+          ),
+          text(
+            "**Merge sort gives n log n.** It splits the array in half, sorts each half (the same routine, recursively), then **merges** the two sorted halves in one linear pass. Draw the recursion as a tree and the cost is easy to see.",
+          ),
+          diagram("The merge-sort recursion tree", [
+            { id: "d0", label: "Level 0", color: ACCENT, items: ["1 chunk of size n", "merge work here: n"] },
+            { id: "d1", label: "Level 1", color: C_SKY, items: ["2 chunks of size n/2", "merge work: 2 x n/2 = n"] },
+            { id: "d2", label: "Level 2", color: C_SKY, items: ["4 chunks of size n/4", "merge work: 4 x n/4 = n"] },
+            { id: "sum", label: "Add it up", color: C_GREEN, items: ["n work on every level", "log2 n levels (size halves each time)", "n x log n total"] },
+          ]),
+          text(
+            "Every level touches all n elements once (that is the merge), and there are log2 n levels because the chunk size halves each time. `n` per level times `log n` levels = **O(n log n)** - and that is the best any comparison sort can do.",
+          ),
+          table(
+            "n vs n log n vs n^2",
+            ["n = 1,000", "n = 1,000,000"],
+            [
+              ["n", "1,000", "1,000,000"],
+              ["n log n", "~10,000", "~20,000,000"],
+              ["n^2", "1,000,000", "1,000,000,000,000"],
+            ],
+            {
+              rowLabelHeader: "Growth",
+              highlightRows: [1],
+              footnote:
+                "n log n is only a small multiple of n - it scales. n^2 is already a million times bigger at n = 1,000.",
+            },
+          ),
+          callout(
+            "info",
+            "As a recurrence: merge sort is `T(n) = 2*T(n/2) + O(n)` -> O(n log n) (quicksort averages the same). Drop the per-level work to O(1) and it becomes `T(n) = T(n/2) + O(1)` -> O(log n), which is binary search.",
+          ),
+          callout(
+            "tip",
+            "Rule of thumb: **halving the problem** puts a `log n` in the answer. Doing an `O(n)` pass at each halving level makes it `n log n`.",
+          ),
+          quiz(
+            "Merge sort is O(n log n) because it does...",
+            [
+              "O(log n) work once",
+              "O(n) work on each of O(log n) levels",
+              "O(n) work once",
+              "O(n^2) work split into pieces",
+            ],
+            1,
+            "Each level merges all n elements (O(n)); halving the chunk size gives O(log n) levels; n x log n total.",
+          ),
+          quiz(
+            "Searching a sorted array of 1,000,000 items with binary search takes roughly how many comparisons?",
+            ["1,000,000", "1,000", "20", "1"],
+            2,
+            "log2(1,000,000) is about 20 - each comparison halves the range.",
+          ),
+        ],
+        challenge: {
+          title: "Merge two sorted halves",
+          description:
+            "Implement the merge step at the heart of merge sort: combine two already-sorted vectors into one sorted vector in a single linear pass.",
+          starterCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> mergeSorted(const vector<int>& a, const vector<int>& b) {
+    // TODO: walk i over a and j over b, always taking the smaller front value
+    return {};
+}
+
+int main() {
+    vector<int> out = mergeSorted({1, 4, 7, 9}, {2, 3, 8, 10});
+    for (int x : out) cout << x << " ";   // 1 2 3 4 7 8 9 10
+    cout << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> mergeSorted(const vector<int>& a, const vector<int>& b) {
+    vector<int> out;
+    size_t i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {
+        if (a[i] <= b[j]) out.push_back(a[i++]);
+        else out.push_back(b[j++]);
+    }
+    while (i < a.size()) out.push_back(a[i++]);
+    while (j < b.size()) out.push_back(b[j++]);
+    return out;
+}
+
+int main() {
+    vector<int> out = mergeSorted({1, 4, 7, 9}, {2, 3, 8, 10});
+    for (int x : out) cout << x << " ";   // 1 2 3 4 7 8 9 10
+    cout << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Compares the two fronts", keywords: [{ pattern: "a\\[i\\] <= b\\[j\\]" }], hint: "Take whichever front is smaller." },
+            { id: 2, label: "Advances through a", keywords: [{ pattern: "a\\[i\\+\\+\\]" }], hint: "push_back(a[i++]) moves past the value you took." },
+            { id: 3, label: "Drains the leftovers", keywords: [{ pattern: "while \\(i < a.size\\(\\)\\)" }], hint: "One side runs out first - copy the rest of the other." },
           ],
         },
       },
