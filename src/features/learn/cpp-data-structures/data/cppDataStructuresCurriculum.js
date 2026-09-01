@@ -1,6 +1,6 @@
 // PolyCode - C++ Data Structures full curriculum
-// 9 chapters - 38 lessons - HYBRID: theory + quizzes on every lesson, plus an
-// in-browser C++ challenge on the lessons where you implement the structure.
+// 9 chapters - 38 lessons - every lesson has theory + quizzes + an in-browser
+// C++ challenge (a few concept lessons use compileOptional keyword checks).
 // YouTube links: edit cppDataStructuresVideoLinks.js (not this file).
 
 import { applyLessonVideoLinks } from "../../shared/applyLessonVideoLinks";
@@ -115,6 +115,51 @@ const RAW_CPP_DATA_STRUCTURES_CHAPTERS = [
             "Keep the dominant term and drop constants: n log n grows faster than 4n, and +100 vanishes.",
           ),
         ],
+        challenge: {
+          title: "Count the steps",
+          description:
+            "Return how many basic steps each loop shape runs for input size n: `linearSteps` for one pass, `quadraticSteps` for a nested pass.",
+          starterCode: `#include <iostream>
+using namespace std;
+
+// One pass: for i in [0, n).
+long long linearSteps(int n) {
+    // TODO
+    return 0;
+}
+
+// Nested pass: for i in [0, n), for j in [0, n).
+long long quadraticSteps(int n) {
+    // TODO
+    return 0;
+}
+
+int main() {
+    cout << linearSteps(1000) << endl;     // 1000
+    cout << quadraticSteps(1000) << endl;  // 1000000
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+long long linearSteps(int n) {
+    return n;
+}
+
+long long quadraticSteps(int n) {
+    return (long long)n * n;
+}
+
+int main() {
+    cout << linearSteps(1000) << endl;     // 1000
+    cout << quadraticSteps(1000) << endl;  // 1000000
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "linearSteps returns n", keywords: [{ pattern: "return n;" }], hint: "One pass over n items is n steps." },
+            { id: 2, label: "quadraticSteps returns n * n", keywords: [{ pattern: "n \\* n" }], hint: "A nested pass is n * n steps." },
+          ],
+        },
       },
       {
         id: "cpp-ds-0-1",
@@ -264,6 +309,40 @@ int main() {
             "Big-O drops constants and ignores cache behaviour; per-step cost and memory-access patterns still decide wall-clock time.",
           ),
         ],
+        challenge: {
+          title: "Fused multiply-add",
+          description:
+            "Compute `a * b + c` in one expression - a multiply, an add, then the write-back of the result: the everyday work of the ALU stage.",
+          starterCode: `#include <iostream>
+using namespace std;
+
+int fma(int a, int b, int c) {
+    // TODO: a * b + c
+    return 0;
+}
+
+int main() {
+    cout << fma(3, 4, 5) << endl;    // 17
+    cout << fma(10, 10, -1) << endl; // 99
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int fma(int a, int b, int c) {
+    return a * b + c;
+}
+
+int main() {
+    cout << fma(3, 4, 5) << endl;    // 17
+    cout << fma(10, 10, -1) << endl; // 99
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Computes a * b + c", keywords: [{ pattern: "a \\* b \\+ c" }], hint: "One multiply then one add." },
+            { id: 2, label: "Returns the result", keywords: [{ pattern: "return a \\* b \\+ c" }], hint: "return the expression directly." },
+          ],
+        },
       },
       {
         id: "cpp-ds-0-3",
@@ -326,6 +405,49 @@ int main() {
             "64 / 4 = 16 ints per line, so one miss pays for the next ~15 accesses.",
           ),
         ],
+        challenge: {
+          title: "Cache-friendly row-major sum",
+          description:
+            "Sum every element of a 2D array with the **inner** loop moving along contiguous memory (the last index is contiguous in C++).",
+          starterCode: `#include <iostream>
+using namespace std;
+
+const int R = 3, C = 4;
+
+long long sumRowMajor(int m[R][C]) {
+    // TODO: outer loop over rows i, inner loop over columns j
+    return 0;
+}
+
+int main() {
+    int m[R][C] = {{1,2,3,4},{5,6,7,8},{9,10,11,12}};
+    cout << sumRowMajor(m) << endl;   // 78
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+const int R = 3, C = 4;
+
+long long sumRowMajor(int m[R][C]) {
+    long long total = 0;
+    for (int i = 0; i < R; i++)
+        for (int j = 0; j < C; j++)
+            total += m[i][j];
+    return total;
+}
+
+int main() {
+    int m[R][C] = {{1,2,3,4},{5,6,7,8},{9,10,11,12}};
+    cout << sumRowMajor(m) << endl;   // 78
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Inner loop over columns", keywords: [{ pattern: "for \\(int j" }], hint: "j is the contiguous index - keep it innermost." },
+            { id: 2, label: "Accesses m[i][j]", keywords: [{ pattern: "m\\[i\\]\\[j\\]" }], hint: "Row i, column j." },
+            { id: 3, label: "Accumulates the total", keywords: [{ pattern: "total \\+=" }], hint: "total += m[i][j]." },
+          ],
+        },
       },
       {
         id: "cpp-ds-0-4",
@@ -373,6 +495,49 @@ cout << duration_cast<microseconds>(t1 - t0).count() << " us\\n";`,
             "Total elements moved across all resizes is 1 + 2 + 4 + ... + n < 2n, so O(n) overall and O(1) amortised each.",
           ),
         ],
+        challenge: {
+          title: "Total copies for n doubling pushes",
+          description:
+            "A dynamic array starts at capacity 1 and doubles when it fills. Return the total number of elements **copied** across every resize while growing to n items - it should come out below 2n.",
+          starterCode: `#include <iostream>
+using namespace std;
+
+long long totalCopies(int n) {
+    // TODO: cap = 1; while cap < n: copies += cap; cap *= 2;  return copies
+    return 0;
+}
+
+int main() {
+    cout << totalCopies(10) << endl;   // 15  (copied 1 + 2 + 4 + 8)
+    cout << totalCopies(1) << endl;    // 0
+    cout << totalCopies(100) << endl;  // 127
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+long long totalCopies(int n) {
+    long long copies = 0;
+    long long cap = 1;
+    while (cap < n) {
+        copies += cap;
+        cap *= 2;
+    }
+    return copies;
+}
+
+int main() {
+    cout << totalCopies(10) << endl;   // 15
+    cout << totalCopies(1) << endl;    // 0
+    cout << totalCopies(100) << endl;  // 127
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Doubles the capacity", keywords: [{ pattern: "cap \\*= 2" }], hint: "Capacity doubles each resize." },
+            { id: 2, label: "Adds the copied count", keywords: [{ pattern: "copies \\+= cap" }], hint: "Each resize copies `cap` elements." },
+            { id: 3, label: "Loops until capacity reaches n", keywords: [{ pattern: "while \\(cap < n\\)" }], hint: "Stop once capacity covers n." },
+          ],
+        },
       },
     ],
   },
@@ -417,6 +582,43 @@ cout << duration_cast<microseconds>(t1 - t0).count() << " us\\n";`,
             "A BST node can have two children, so elements are not in a single sequence.",
           ),
         ],
+        challenge: {
+          title: "Sort the structures",
+          description:
+            "Replace each `TODO` with `LINEAR` or `NON-LINEAR` for that data structure.",
+          compileOptional: true,
+          starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Stack              => TODO
+    // Circular list      => TODO
+    // Binary search tree => TODO
+    // Hash table         => TODO
+    // Deque              => TODO
+    // Graph              => TODO
+    cout << "done" << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Stack              => LINEAR
+    // Circular list      => LINEAR
+    // Binary search tree => NON-LINEAR
+    // Hash table         => NON-LINEAR
+    // Deque              => LINEAR
+    // Graph              => NON-LINEAR
+    cout << "done" << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Stack is LINEAR", keywords: [{ pattern: "Stack\\s+=> LINEAR" }], hint: "One sequence, one direction." },
+            { id: 2, label: "Binary search tree is NON-LINEAR", keywords: [{ pattern: "Binary search tree => NON-LINEAR" }], hint: "Two children per node." },
+            { id: 3, label: "Graph is NON-LINEAR", keywords: [{ pattern: "Graph\\s+=> NON-LINEAR" }], hint: "Any-to-any connections." },
+          ],
+        },
       },
       {
         id: "cpp-ds-1-1",
@@ -701,6 +903,37 @@ int main() {
             "O(1) splice/erase at a held position is the linked list's real advantage; everything scan-heavy favours the vector.",
           ),
         ],
+        challenge: {
+          title: "Array or linked list?",
+          description:
+            "For each workload, replace `TODO` with `ARRAY` or `LINKED LIST` - whichever is the better backbone.",
+          compileOptional: true,
+          starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Mostly random access by index         => TODO
+    // Constant splicing at a held position   => TODO
+    // Tight loop summing every element       => TODO
+    cout << "done" << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Mostly random access by index         => ARRAY
+    // Constant splicing at a held position   => LINKED LIST
+    // Tight loop summing every element       => ARRAY
+    cout << "done" << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Random access -> ARRAY", keywords: [{ pattern: "random access by index\\s+=> ARRAY" }], hint: "O(1) indexing is the array's edge." },
+            { id: 2, label: "Splicing -> LINKED LIST", keywords: [{ pattern: "held position\\s+=> LINKED LIST" }], hint: "O(1) splice at a held node." },
+            { id: 3, label: "Scanning -> ARRAY", keywords: [{ pattern: "summing every element\\s+=> ARRAY" }], hint: "Contiguous memory wins the scan." },
+          ],
+        },
       },
     ],
   },
@@ -1116,6 +1349,56 @@ if (p) {
             "There is no nullptr; you have looped once when you are back at the node you started from.",
           ),
         ],
+        challenge: {
+          title: "Count a circular list",
+          description:
+            "Count the nodes in a circular singly linked list - the last node's `next` points back to `head`. An empty list (`head == nullptr`) has 0.",
+          starterCode: `#include <iostream>
+using namespace std;
+
+struct Node { int value; Node* next; };
+
+int countCircular(Node* head) {
+    // TODO: walk with a do/while, stopping when you return to head
+    return 0;
+}
+
+int main() {
+    Node a{1, nullptr}, b{2, nullptr}, c{3, nullptr}, d{4, nullptr};
+    a.next = &b; b.next = &c; c.next = &d; d.next = &a;   // circular
+    cout << countCircular(&a) << endl;      // 4
+    cout << countCircular(nullptr) << endl; // 0
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+struct Node { int value; Node* next; };
+
+int countCircular(Node* head) {
+    if (head == nullptr) return 0;
+    int n = 0;
+    Node* p = head;
+    do {
+        n++;
+        p = p->next;
+    } while (p != head);
+    return n;
+}
+
+int main() {
+    Node a{1, nullptr}, b{2, nullptr}, c{3, nullptr}, d{4, nullptr};
+    a.next = &b; b.next = &c; c.next = &d; d.next = &a;
+    cout << countCircular(&a) << endl;      // 4
+    cout << countCircular(nullptr) << endl; // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Uses a do/while loop", keywords: [{ pattern: "do \\{" }], hint: "Count the first node before checking the stop condition." },
+            { id: 2, label: "Stops when back at head", keywords: [{ pattern: "while \\(p != head\\)" }], hint: "One full lap ends at head." },
+            { id: 3, label: "Handles the empty list", keywords: [{ pattern: "head == nullptr" }], hint: "Return 0 before entering the loop." },
+          ],
+        },
       },
       {
         id: "cpp-ds-2-4",
@@ -1170,6 +1453,56 @@ if (p) {
             "Repeated 50/50 coin flips give the geometric level distribution that keeps search at O(log n) expected.",
           ),
         ],
+        challenge: {
+          title: "Search with an express lane",
+          description:
+            "`full` is sorted; `express` holds `full[0], full[4], full[8], ...` (stride 4). Use `express` to jump near `x`, then scan a short stretch of `full`.",
+          starterCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+bool search(const vector<int>& full, const vector<int>& express, int x) {
+    // TODO:
+    //  1) advance e while express[e + 1] <= x
+    //  2) scan full from e * 4 forward while full[i] <= x
+    return false;
+}
+
+int main() {
+    vector<int> full = {2, 5, 9, 14, 20, 25, 31, 38, 40, 44, 50, 61};
+    vector<int> express = {2, 20, 40};   // full[0], full[4], full[8]
+    cout << search(full, express, 25) << endl; // 1
+    cout << search(full, express, 44) << endl; // 1
+    cout << search(full, express, 30) << endl; // 0
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+bool search(const vector<int>& full, const vector<int>& express, int x) {
+    int e = 0;
+    while (e + 1 < (int)express.size() && express[e + 1] <= x) e++;
+    for (int i = e * 4; i < (int)full.size() && full[i] <= x; i++) {
+        if (full[i] == x) return true;
+    }
+    return false;
+}
+
+int main() {
+    vector<int> full = {2, 5, 9, 14, 20, 25, 31, 38, 40, 44, 50, 61};
+    vector<int> express = {2, 20, 40};
+    cout << search(full, express, 25) << endl; // 1
+    cout << search(full, express, 44) << endl; // 1
+    cout << search(full, express, 30) << endl; // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Walks the express lane", keywords: [{ pattern: "express\\[e \\+ 1\\]" }], hint: "Advance e while the next express value is still <= x." },
+            { id: 2, label: "Drops into the right block of full", keywords: [{ pattern: "e \\* 4" }], hint: "Express index e maps to full index e * 4." },
+            { id: 3, label: "Finds the value", keywords: [{ pattern: "full\\[i\\] == x" }], hint: "Return true on an exact match." },
+          ],
+        },
       },
     ],
   },
@@ -1441,6 +1774,51 @@ int main() {
             "vector::push_front does not exist; inserting at the front is O(n) and may reallocate.",
           ),
         ],
+        challenge: {
+          title: "Palindrome from both ends",
+          description:
+            "Treat the string as a deque: compare the two ends and move inward. Return true if it reads the same forwards and backwards.",
+          starterCode: `#include <iostream>
+#include <string>
+using namespace std;
+
+bool isPalindrome(const string& s) {
+    // TODO: left = 0, right = s.size() - 1; step inward
+    return true;
+}
+
+int main() {
+    cout << isPalindrome("racecar") << endl; // 1
+    cout << isPalindrome("level") << endl;   // 1
+    cout << isPalindrome("crane") << endl;   // 0
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <string>
+using namespace std;
+
+bool isPalindrome(const string& s) {
+    int left = 0, right = (int)s.size() - 1;
+    while (left < right) {
+        if (s[left] != s[right]) return false;
+        left++;
+        right--;
+    }
+    return true;
+}
+
+int main() {
+    cout << isPalindrome("racecar") << endl; // 1
+    cout << isPalindrome("level") << endl;   // 1
+    cout << isPalindrome("crane") << endl;   // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Compares the two ends", keywords: [{ pattern: "s\\[left\\] != s\\[right\\]" }], hint: "Mismatch means not a palindrome." },
+            { id: 2, label: "Moves the left index in", keywords: [{ pattern: "left\\+\\+" }], hint: "Advance from the front." },
+            { id: 3, label: "Moves the right index in", keywords: [{ pattern: "right--" }], hint: "Retreat from the back." },
+          ],
+        },
       },
       {
         id: "cpp-ds-3-3",
@@ -1480,6 +1858,37 @@ int main() {
             "Both ends are needed, in O(1): a deque.",
           ),
         ],
+        challenge: {
+          title: "Pick the adapter",
+          description:
+            "Replace each `TODO` with `STACK`, `QUEUE`, or `DEQUE` - the right fit for that job.",
+          compileOptional: true,
+          starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Undo history                       => TODO
+    // Print jobs served in arrival order => TODO
+    // Sliding-window maximum             => TODO
+    cout << "done" << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Undo history                       => STACK
+    // Print jobs served in arrival order => QUEUE
+    // Sliding-window maximum             => DEQUE
+    cout << "done" << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Undo -> STACK", keywords: [{ pattern: "Undo history\\s+=> STACK" }], hint: "Most recent action undone first: LIFO." },
+            { id: 2, label: "Arrival order -> QUEUE", keywords: [{ pattern: "arrival order\\s+=> QUEUE" }], hint: "First in, first out." },
+            { id: 3, label: "Sliding window -> DEQUE", keywords: [{ pattern: "Sliding-window maximum\\s+=> DEQUE" }], hint: "Add and drop at both ends." },
+          ],
+        },
       },
     ],
   },
@@ -1538,6 +1947,42 @@ int main() {
             "If every key collides into one bucket you scan a length-n list.",
           ),
         ],
+        challenge: {
+          title: "Bucket index for any key",
+          description:
+            "Map an int key (which may be negative) to a bucket in `[0, nbuckets)` - the classic `((key % n) + n) % n` guard so a negative key never gives a negative index.",
+          starterCode: `#include <iostream>
+using namespace std;
+
+int bucketOf(int key, int nbuckets) {
+    // TODO
+    return 0;
+}
+
+int main() {
+    cout << bucketOf(37, 8) << endl;  // 5
+    cout << bucketOf(-3, 8) << endl;  // 5
+    cout << bucketOf(16, 8) << endl;  // 0
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int bucketOf(int key, int nbuckets) {
+    return ((key % nbuckets) + nbuckets) % nbuckets;
+}
+
+int main() {
+    cout << bucketOf(37, 8) << endl;  // 5
+    cout << bucketOf(-3, 8) << endl;  // 5
+    cout << bucketOf(16, 8) << endl;  // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Reduces modulo the bucket count", keywords: [{ pattern: "% nbuckets" }], hint: "Two modulo operations, one add." },
+            { id: 2, label: "Adds nbuckets to fix a negative remainder", keywords: [{ pattern: "\\+ nbuckets\\) % nbuckets" }], hint: "((key % n) + n) % n." },
+          ],
+        },
       },
       {
         id: "cpp-ds-4-1",
@@ -1720,6 +2165,52 @@ if (counts.count("pear")) { /* ... */ }`,
             "Same argument as the doubling vector: total work is linear, so per-insert it averages constant.",
           ),
         ],
+        challenge: {
+          title: "Load factor and the resize trigger",
+          description:
+            "Implement `loadFactor` (entries / buckets, as a double) and `needsResize` (true when adding **one more** entry would push the load factor past `maxLoad`).",
+          starterCode: `#include <iostream>
+using namespace std;
+
+double loadFactor(int entries, int buckets) {
+    // TODO
+    return 0.0;
+}
+
+bool needsResize(int entries, int buckets, double maxLoad) {
+    // TODO: would (entries + 1) / buckets exceed maxLoad?
+    return false;
+}
+
+int main() {
+    cout << loadFactor(6, 8) << endl;            // 0.75
+    cout << needsResize(6, 8, 0.75) << endl;     // 1  (7/8 = 0.875)
+    cout << needsResize(3, 8, 0.75) << endl;     // 0
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+double loadFactor(int entries, int buckets) {
+    return (double)entries / buckets;
+}
+
+bool needsResize(int entries, int buckets, double maxLoad) {
+    return (double)(entries + 1) / buckets > maxLoad;
+}
+
+int main() {
+    cout << loadFactor(6, 8) << endl;            // 0.75
+    cout << needsResize(6, 8, 0.75) << endl;     // 1
+    cout << needsResize(3, 8, 0.75) << endl;     // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "loadFactor divides as a double", keywords: [{ pattern: "\\(double\\)entries / buckets" }], hint: "Cast so it is not integer division." },
+            { id: 2, label: "needsResize looks one entry ahead", keywords: [{ pattern: "entries \\+ 1" }], hint: "Check the load factor after the next insert." },
+            { id: 3, label: "Compares against maxLoad", keywords: [{ pattern: "> maxLoad" }], hint: "Resize when it would cross the ceiling." },
+          ],
+        },
       },
       {
         id: "cpp-ds-4-3",
@@ -1761,6 +2252,39 @@ if (counts.count("pear")) { /* ... */ }`,
             "Range predicates need sorted order; a hash index only supports equality.",
           ),
         ],
+        challenge: {
+          title: "Which index serves the query?",
+          description:
+            "Replace each `TODO` with `HASH` or `ORDERED` - the index type that can answer that query efficiently.",
+          compileOptional: true,
+          starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // WHERE id = 42            => TODO
+    // WHERE ts BETWEEN a AND b => TODO
+    // ORDER BY name            => TODO
+    // WHERE email = 'x@y.com'  => TODO
+    cout << "done" << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // WHERE id = 42            => HASH
+    // WHERE ts BETWEEN a AND b => ORDERED
+    // ORDER BY name            => ORDERED
+    // WHERE email = 'x@y.com'  => HASH
+    cout << "done" << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Equality -> HASH", keywords: [{ pattern: "id = 42\\s+=> HASH" }], hint: "Point lookup: hash index." },
+            { id: 2, label: "Range -> ORDERED", keywords: [{ pattern: "BETWEEN a AND b => ORDERED" }], hint: "Ranges need sorted order." },
+            { id: 3, label: "Sort -> ORDERED", keywords: [{ pattern: "ORDER BY name\\s+=> ORDERED" }], hint: "A hash index has no order to walk." },
+          ],
+        },
       },
       {
         id: "cpp-ds-4-4",
@@ -1809,6 +2333,45 @@ std::unordered_map<Point, int, PointHash, PointEq> grid;`,
             "A per-process random seed means an attacker cannot precompute a set of all-colliding keys.",
           ),
         ],
+        challenge: {
+          title: "A better hash mix",
+          description:
+            "Fill in an avalanche step so sequential keys 1, 2, 3, ... scatter across buckets instead of clustering: `x ^= x >> 33; x *= 0xff51afd7ed558ccdULL; x ^= x >> 33;`.",
+          starterCode: `#include <iostream>
+#include <cstdint>
+using namespace std;
+
+uint64_t mix(uint64_t x) {
+    // TODO: xor-shift, multiply by a large odd constant, xor-shift again
+    return x;
+}
+
+int main() {
+    for (uint64_t k = 1; k <= 5; k++) cout << (mix(k) % 8) << " ";
+    cout << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <cstdint>
+using namespace std;
+
+uint64_t mix(uint64_t x) {
+    x ^= x >> 33;
+    x *= 0xff51afd7ed558ccdULL;
+    x ^= x >> 33;
+    return x;
+}
+
+int main() {
+    for (uint64_t k = 1; k <= 5; k++) cout << (mix(k) % 8) << " ";
+    cout << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Xor-shifts the bits", keywords: [{ pattern: "x \\^= x >> 33" }], hint: "Mixing high bits into low bits." },
+            { id: 2, label: "Multiplies by a large constant", keywords: [{ pattern: "x \\*=" }], hint: "An odd 64-bit multiplier spreads influence across all bits." },
+          ],
+        },
       },
     ],
   },
@@ -2063,6 +2626,61 @@ int main() {
             "Heavy on the left, and the imbalance is left-left, so a single right rotation rebalances it.",
           ),
         ],
+        challenge: {
+          title: "Height and balance factor",
+          description:
+            "Implement recursive `height` (edges on the longest path; a single node is 0, `nullptr` is -1) and `balanceFactor` (`height(left) - height(right)`).",
+          starterCode: `#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct Node { int key; Node* left = nullptr; Node* right = nullptr; };
+
+int height(Node* n) {
+    // TODO
+    return -1;
+}
+
+int balanceFactor(Node* n) {
+    // TODO
+    return 0;
+}
+
+int main() {
+    Node d{4}, c{3}, b{2}, a{1};
+    a.left = &b; b.left = &c; c.left = &d;   // left-leaning spine
+    cout << height(&a) << endl;         // 3
+    cout << balanceFactor(&a) << endl;  // 3 - (-1) = 4
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct Node { int key; Node* left = nullptr; Node* right = nullptr; };
+
+int height(Node* n) {
+    if (n == nullptr) return -1;
+    return 1 + max(height(n->left), height(n->right));
+}
+
+int balanceFactor(Node* n) {
+    if (n == nullptr) return 0;
+    return height(n->left) - height(n->right);
+}
+
+int main() {
+    Node d{4}, c{3}, b{2}, a{1};
+    a.left = &b; b.left = &c; c.left = &d;
+    cout << height(&a) << endl;         // 3
+    cout << balanceFactor(&a) << endl;  // 4
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "height recurses on both children", keywords: [{ pattern: "1 \\+ max\\(height\\(n->left\\), height\\(n->right\\)\\)" }], hint: "One plus the taller subtree." },
+            { id: 2, label: "balanceFactor subtracts the subtree heights", keywords: [{ pattern: "height\\(n->left\\) - height\\(n->right\\)" }], hint: "Left minus right." },
+          ],
+        },
       },
       {
         id: "cpp-ds-5-3",
@@ -2105,6 +2723,37 @@ int main() {
             "Range-by-rank needs sorted order, which only the tree provides.",
           ),
         ],
+        challenge: {
+          title: "Hash map, ordered map, or array?",
+          description:
+            "Replace each `TODO` with `HASH_MAP`, `ORDERED_MAP`, or `ARRAY` - the best fit for that requirement.",
+          compileOptional: true,
+          starterCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Fastest average get/put, order irrelevant => TODO
+    // Need lower_bound and range scans          => TODO
+    // Keys are ints in [0, 1000)                => TODO
+    cout << "done" << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Fastest average get/put, order irrelevant => HASH_MAP
+    // Need lower_bound and range scans          => ORDERED_MAP
+    // Keys are ints in [0, 1000)                => ARRAY
+    cout << "done" << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Unordered speed -> HASH_MAP", keywords: [{ pattern: "order irrelevant => HASH_MAP" }], hint: "O(1) average, no order." },
+            { id: 2, label: "Ranges -> ORDERED_MAP", keywords: [{ pattern: "range scans\\s+=> ORDERED_MAP" }], hint: "lower_bound needs a sorted tree." },
+            { id: 3, label: "Small dense key range -> ARRAY", keywords: [{ pattern: "\\[0, 1000\\)\\s+=> ARRAY" }], hint: "Direct addressing, O(1) worst case." },
+          ],
+        },
       },
     ],
   },
@@ -2169,6 +2818,49 @@ int main() {
             "left = 2 * i + 1 = 2 * 4 + 1 = 9.",
           ),
         ],
+        challenge: {
+          title: "Validate a min-heap array",
+          description:
+            "Return true if the array satisfies the min-heap property: every node is `<=` each of its children (at `2*i+1` and `2*i+2`, when they exist).",
+          starterCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+bool isMinHeap(const vector<int>& a) {
+    // TODO: for each i, check a[i] <= its children
+    return true;
+}
+
+int main() {
+    cout << isMinHeap({1, 3, 2, 7, 8, 4, 5}) << endl;    // 1
+    cout << isMinHeap({1, 3, 2, 7, 8, 9, 1, 0}) << endl; // 0  (a[3]=7 > a[7]=0)
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+bool isMinHeap(const vector<int>& a) {
+    int n = a.size();
+    for (int i = 0; i < n; i++) {
+        int l = 2 * i + 1, r = 2 * i + 2;
+        if (l < n && a[i] > a[l]) return false;
+        if (r < n && a[i] > a[r]) return false;
+    }
+    return true;
+}
+
+int main() {
+    cout << isMinHeap({1, 3, 2, 7, 8, 4, 5}) << endl;    // 1
+    cout << isMinHeap({1, 3, 2, 7, 8, 9, 1, 0}) << endl; // 0
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Checks the left child", keywords: [{ pattern: "2 \\* i \\+ 1" }], hint: "l = 2 * i + 1." },
+            { id: 2, label: "Checks the right child", keywords: [{ pattern: "2 \\* i \\+ 2" }], hint: "r = 2 * i + 2." },
+            { id: 3, label: "Rejects a violated node", keywords: [{ pattern: "return false" }], hint: "Any parent > child breaks the property." },
+          ],
+        },
       },
       {
         id: "cpp-ds-6-1",
@@ -2343,6 +3035,59 @@ int main() {
             "The heap keeps only the current top 100; anything smaller than its root is discarded immediately.",
           ),
         ],
+        challenge: {
+          title: "k largest with a size-k min-heap",
+          description:
+            "Return the `k` largest values of `v` (any order). Push each value into a **min-heap**; whenever it grows past `k`, pop the smallest.",
+          starterCode: `#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+vector<int> kLargest(const vector<int>& v, int k) {
+    // TODO: min-heap of size k, then drain it
+    return {};
+}
+
+int main() {
+    vector<int> out = kLargest({4, 1, 7, 3, 9, 2, 8, 5}, 3);
+    long long sum = 0;
+    for (int x : out) sum += x;
+    cout << out.size() << " " << sum << endl;   // 3 24  (7 + 8 + 9)
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+vector<int> kLargest(const vector<int>& v, int k) {
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (int x : v) {
+        pq.push(x);
+        if ((int)pq.size() > k) pq.pop();
+    }
+    vector<int> out;
+    while (!pq.empty()) {
+        out.push_back(pq.top());
+        pq.pop();
+    }
+    return out;
+}
+
+int main() {
+    vector<int> out = kLargest({4, 1, 7, 3, 9, 2, 8, 5}, 3);
+    long long sum = 0;
+    for (int x : out) sum += x;
+    cout << out.size() << " " << sum << endl;   // 3 24
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Uses a min-heap", keywords: [{ pattern: "priority_queue<int, vector<int>, greater<int>>" }], hint: "greater<int> makes priority_queue a min-heap." },
+            { id: 2, label: "Caps the heap at k", keywords: [{ pattern: "pq.size\\(\\) > k" }], hint: "Pop the smallest once size exceeds k." },
+            { id: 3, label: "Evicts the smallest", keywords: [{ pattern: "pq.pop\\(\\)" }], hint: "The root is the boundary element to drop." },
+          ],
+        },
       },
     ],
   },
@@ -2388,6 +3133,52 @@ int main() {
             "Routes have a direction and carry a number, so it is directed and weighted.",
           ),
         ],
+        challenge: {
+          title: "Degree of every vertex",
+          description:
+            "Undirected graph. Return `deg` where `deg[v]` is the number of edges touching vertex `v` - each edge `(u, v)` adds one to both endpoints.",
+          starterCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> degrees(int n, const vector<pair<int,int>>& edges) {
+    vector<int> deg(n, 0);
+    // TODO: for each edge, bump deg[u] and deg[v]
+    return deg;
+}
+
+int main() {
+    vector<pair<int,int>> e = {{0,1},{0,2},{1,2},{2,3}};
+    vector<int> d = degrees(4, e);
+    for (int x : d) cout << x << " ";   // 2 2 3 1
+    cout << endl;
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> degrees(int n, const vector<pair<int,int>>& edges) {
+    vector<int> deg(n, 0);
+    for (size_t i = 0; i < edges.size(); i++) {
+        deg[edges[i].first]++;
+        deg[edges[i].second]++;
+    }
+    return deg;
+}
+
+int main() {
+    vector<pair<int,int>> e = {{0,1},{0,2},{1,2},{2,3}};
+    vector<int> d = degrees(4, e);
+    for (int x : d) cout << x << " ";   // 2 2 3 1
+    cout << endl;
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Counts the first endpoint", keywords: [{ pattern: "deg\\[edges\\[i\\].first\\]\\+\\+" }], hint: "Every edge touches u." },
+            { id: 2, label: "Counts the second endpoint", keywords: [{ pattern: "deg\\[edges\\[i\\].second\\]\\+\\+" }], hint: "Undirected: it also touches v." },
+          ],
+        },
       },
       {
         id: "cpp-ds-7-1",
@@ -2654,6 +3445,55 @@ int main() {
             "Always expanding the closest known vertex is what makes the greedy choice correct for non-negative weights.",
           ),
         ],
+        challenge: {
+          title: "One relaxation step",
+          description:
+            "Relax edge `u -> v` with weight `w`. If going through `u` gives a shorter path to `v`, update `dist[v]` and return true; otherwise return false. Treat `INF` as unreachable.",
+          starterCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+const int INF = 1000000000;
+
+bool relax(vector<int>& dist, int u, int v, int w) {
+    // TODO
+    return false;
+}
+
+int main() {
+    vector<int> dist = {0, INF, INF};
+    cout << relax(dist, 0, 1, 5) << endl;   // 1  (dist[1] becomes 5)
+    cout << relax(dist, 0, 1, 8) << endl;   // 0  (no improvement)
+    cout << dist[1] << endl;                // 5
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+using namespace std;
+
+const int INF = 1000000000;
+
+bool relax(vector<int>& dist, int u, int v, int w) {
+    if (dist[u] != INF && dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        return true;
+    }
+    return false;
+}
+
+int main() {
+    vector<int> dist = {0, INF, INF};
+    cout << relax(dist, 0, 1, 5) << endl;   // 1
+    cout << relax(dist, 0, 1, 8) << endl;   // 0
+    cout << dist[1] << endl;                // 5
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Skips an unreachable source", keywords: [{ pattern: "dist\\[u\\] != INF" }], hint: "Can't extend a path you don't have yet." },
+            { id: 2, label: "Tests for a shorter path", keywords: [{ pattern: "dist\\[u\\] \\+ w < dist\\[v\\]" }], hint: "Only update on a strict improvement." },
+            { id: 3, label: "Writes the new distance", keywords: [{ pattern: "dist\\[v\\] = dist\\[u\\] \\+ w" }], hint: "Commit the shorter path." },
+          ],
+        },
       },
     ],
   },
@@ -2698,6 +3538,51 @@ int main() {
             "Shannon's source coding theorem: you cannot beat the entropy of the source without losing information.",
           ),
         ],
+        challenge: {
+          title: "Shannon entropy",
+          description:
+            "Compute `H = -sum p * log2(p)` over a probability distribution, skipping any `p == 0` (log of zero is undefined).",
+          starterCode: `#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+double entropy(const vector<double>& p) {
+    // TODO
+    return 0.0;
+}
+
+int main() {
+    cout << entropy({0.5, 0.5}) << endl;             // 1
+    cout << entropy({1.0, 0.0}) << endl;             // 0
+    cout << entropy({0.25, 0.25, 0.25, 0.25}) << endl; // 2
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+double entropy(const vector<double>& p) {
+    double h = 0.0;
+    for (double pi : p) {
+        if (pi > 0.0) h -= pi * log2(pi);
+    }
+    return h;
+}
+
+int main() {
+    cout << entropy({0.5, 0.5}) << endl;             // 1
+    cout << entropy({1.0, 0.0}) << endl;             // 0
+    cout << entropy({0.25, 0.25, 0.25, 0.25}) << endl; // 2
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Uses log base 2", keywords: [{ pattern: "log2\\(pi\\)" }], hint: "Entropy is measured in bits." },
+            { id: 2, label: "Subtracts each term", keywords: [{ pattern: "h -= pi \\* log2\\(pi\\)" }], hint: "H = -sum p * log2(p)." },
+            { id: 3, label: "Skips zero probabilities", keywords: [{ pattern: "pi > 0" }], hint: "log2(0) is undefined - treat its contribution as 0." },
+          ],
+        },
       },
       {
         id: "cpp-ds-8-1",
@@ -2967,6 +3852,65 @@ int main() {
             "Each root-to-leaf walk decodes exactly one symbol; then you restart at the root for the next.",
           ),
         ],
+        challenge: {
+          title: "Decode a Huffman bitstring",
+          description:
+            "Walk from the root: `'0'` goes left, `'1'` goes right. On reaching a leaf, append its symbol and jump back to the root.",
+          starterCode: `#include <iostream>
+#include <string>
+using namespace std;
+
+struct HNode { char sym; HNode* left; HNode* right; };  // sym unused on internal nodes
+
+string decode(HNode* root, const string& bits) {
+    // TODO
+    return "";
+}
+
+int main() {
+    // Codes: A = 0, B = 10, C = 11
+    HNode A{'A', nullptr, nullptr};
+    HNode B{'B', nullptr, nullptr};
+    HNode C{'C', nullptr, nullptr};
+    HNode bc{'?', &B, &C};
+    HNode root{'?', &A, &bc};
+    cout << decode(&root, "010110") << endl;   // ABCA
+    return 0;
+}`,
+          solutionCode: `#include <iostream>
+#include <string>
+using namespace std;
+
+struct HNode { char sym; HNode* left; HNode* right; };
+
+string decode(HNode* root, const string& bits) {
+    string out;
+    HNode* cur = root;
+    for (char b : bits) {
+        cur = (b == '0') ? cur->left : cur->right;
+        if (cur->left == nullptr && cur->right == nullptr) {
+            out += cur->sym;
+            cur = root;
+        }
+    }
+    return out;
+}
+
+int main() {
+    HNode A{'A', nullptr, nullptr};
+    HNode B{'B', nullptr, nullptr};
+    HNode C{'C', nullptr, nullptr};
+    HNode bc{'?', &B, &C};
+    HNode root{'?', &A, &bc};
+    cout << decode(&root, "010110") << endl;   // ABCA
+    return 0;
+}`,
+          tests: [
+            { id: 1, label: "Branches on the bit", keywords: [{ pattern: "b == '0'" }], hint: "'0' -> left child, otherwise right." },
+            { id: 2, label: "Detects a leaf", keywords: [{ pattern: "cur->left == nullptr" }], hint: "A leaf has no children." },
+            { id: 3, label: "Restarts at the root", keywords: [{ pattern: "cur = root" }], hint: "After emitting a symbol, walk again from the top." },
+          ],
+        },
       },
     ],
   },
