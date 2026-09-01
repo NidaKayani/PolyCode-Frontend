@@ -13,10 +13,12 @@ ending with Huffman encoding.
 
 **Live URL:** `/learn/cpp-data-structures`
 
-**Format:** hybrid. Every lesson has theory + quizzes; the ~16
-implementation lessons also carry an in-browser C++ challenge with
-auto-checked tests. Theory-only lessons complete on **Mark as read**;
-challenge lessons complete when the challenge passes.
+**Format:** every lesson has theory + quizzes **and** an in-browser C++
+challenge with auto-checked tests. Most challenges are real compiled code;
+a few concept lessons (linear vs non-linear, picking an adapter, index
+choice, map choice) use `compileOptional` keyword checks. The Challenge tab
+unlocks after **Mark as read** (which needs every quiz attempted); the
+lesson completes when the challenge passes.
 
 **Who it's for:** learners who know basic C++ (variables, functions,
 pointers, `std::vector`) and want the structures and the reasons behind
@@ -24,11 +26,11 @@ them, not just the API.
 
 ---
 
-## Chapters (9 chapters · 38 lessons)
+## Chapters (9 chapters · 39 lessons)
 
 1. **Complexity & the Machine Model** — time/space budgets, Big-O by
-   reading loops, the instruction cycle, memory hierarchy & locality,
-   amortised cost.
+   reading loops, where log n / n log n come from (merge sort), the
+   instruction cycle, memory hierarchy & locality, amortised cost.
 2. **Linear vs Non-Linear · Arrays & Lists** — the taxonomy map, the List
    ADT & static arrays, dynamic arrays / `vector` / amortised growth,
    choosing the backbone.
@@ -72,7 +74,8 @@ There is no `components/` folder — the Challenge tab reuses
 
 ## Quick tips for editors
 
-1. Lesson ids follow `cpp-ds-<chapter>-<lesson>` (e.g. `cpp-ds-0-0`) and
+1. Lesson ids follow `cpp-ds-<chapter>-<lesson>` (e.g. `cpp-ds-0-0`;
+   lessons inserted later take a trailing letter, e.g. `cpp-ds-0-1b`) and
    must stay globally unique across all learn courses.
 2. Edit lesson content in `data/cppDataStructuresCurriculum.js`. Every
    lesson object has `id`, `title`, `xp`, `chapterTitle`, `theory[]`, and
