@@ -760,43 +760,70 @@ int main() {
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Define amortised complexity and how it differs from worst case",
-            "Explain why n doubling push_backs cost O(n) in total",
-            "List the rules for a benchmark you can trust",
+            "Explain \"amortised\" cost: cheap almost always, rarely expensive, cheap on average",
+            "See why a growable list stays fast overall even though it sometimes moves everything",
+            "Know the basic rules for timing code honestly",
           ]),
           text(
-            "Some operations are cheap almost always and occasionally expensive. `std::vector::push_back` is `O(1)` until capacity runs out; then it allocates a bigger block and moves every element - `O(n)` that one time. **Amortised analysis** spreads that rare cost over the many cheap operations.",
+            "Some actions are cheap nearly every time, and then - once in a while - expensive. Think of a bookshelf. Adding a book is instant... until the shelf is full. Then you buy a bigger shelf and move every book across. That move is a chore. But it happens rarely, and each new shelf is *twice* the size, so the chore comes round less and less often.",
           ),
           text(
-            "Because the vector **doubles**, growing from empty to `n` copies `1 + 2 + 4 + ... + n < 2n` elements *in total*. So `n` push_backs cost `O(n)` altogether, and each one is **amortised `O(1)`** - a promise about the whole sequence, not any single call.",
+            "A **growable list** (you'll meet it properly next chapter) behaves exactly like that bookshelf. Adding an item is instant, until it's full; then it grabs a block twice as big and copies everything over. The average cost, spread across *all* the adds, is what we call the **amortised** cost - and here it works out to basically instant per add.",
           ),
           text(
-            "A real-time system that cannot tolerate the occasional `O(n)` spike will `reserve()` up front, or pick a structure with worst-case guarantees (a balanced tree, a deque of fixed chunks).",
-          ),
-          text(
-            "When you benchmark, measure carefully:",
+            "Why does doubling keep it cheap? Growing from empty to n items, the copies you pay are `1 + 2 + 4 + 8 + ...` up to about n. Add those up and the total is *less than 2n* - so n adds cost roughly n work altogether. Press **Run** and watch it happen:",
             {
-              label: "Timing a block with <chrono>",
-              content: `#include <chrono>
-#include <iostream>
+              label: "See the rare slow step",
+              content: `#include <iostream>
 using namespace std;
-using namespace std::chrono;
 
-auto t0 = high_resolution_clock::now();
-// ... work under test, enough iterations to dwarf timer noise ...
-auto t1 = high_resolution_clock::now();
-cout << duration_cast<microseconds>(t1 - t0).count() << " us\\n";`,
+int main() {
+    int capacity = 1;   // how many items there is room for
+    int size = 0;       // how many are actually stored
+    long long moved = 0;
+
+    for (int item = 1; item <= 16; item++) {
+        if (size == capacity) {
+            // the rare, expensive step: bigger block, copy everything across
+            moved += size;
+            capacity *= 2;
+            cout << "  ...full! grew to hold " << capacity
+                 << ", moved " << size << " items\\n";
+        }
+        size++;                       // the usual, instant step
+        cout << "added item " << item << "\\n";
+    }
+
+    cout << "\\n16 items added. Items copied during all the grows: "
+         << moved << "  (less than 2 x 16)\\n";
+    return 0;
+}`,
             },
           ),
           callout(
+            "info",
+            "If a program truly cannot afford the occasional pause (live audio, say), you tell the list its final size up front so it never has to grow - or you choose a structure that has no slow step at all.",
+          ),
+          callout(
             "tip",
-            "Warm up first, build with optimisations on, run enough iterations that the timer resolution is irrelevant, and be clear whether you care about **throughput** (average) or **worst-case latency** (the spike).",
+            "Timing code fairly: run it many times (not once), let it \"warm up\" first, turn optimisations on, and decide whether you care about the *average* speed or the *worst single pause* - they answer different questions.",
           ),
           quiz(
-            "n push_backs into an empty doubling vector cost how much in total?",
-            ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
-            0,
-            "Total elements moved across all resizes is 1 + 2 + 4 + ... + n < 2n, so O(n) overall and O(1) amortised each.",
+            "Adding to a doubling list is \"amortised O(1)\". What does that actually promise?",
+            [
+              "Every single add is equally fast",
+              "Across many adds, the average cost per add stays tiny - even though a few are slow",
+              "It never has to copy anything",
+              "It is only O(1) for the very first item",
+            ],
+            1,
+            "Amortised is a promise about the whole run, not any one step. Most adds are instant; the rare copy is paid off by all the cheap ones around it.",
+          ),
+          quiz(
+            "Growing a list from empty to 1,000 items (doubling each time), roughly how many item-copies happen in total?",
+            ["About 1,000,000", "About 2,000", "About 10", "About 1,000,000,000"],
+            1,
+            "1 + 2 + 4 + ... + 1,000 is just under 2,000. That's why n adds cost about n overall - each one averages out to nearly free.",
           ),
         ],
         challenge: {
