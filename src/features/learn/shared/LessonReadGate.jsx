@@ -24,6 +24,9 @@ export default function LessonReadGate({
   const [quizGateError, setQuizGateError] = useState(false);
   const quizzesPending =
     quizzesRequired > 0 && quizzesAttempted < quizzesRequired;
+  // Theory-only lessons don't pass a challenge navigator; hide the CTA and
+  // adjust the copy so we never show a dead "try the challenge" button.
+  const hasChallenge = typeof onGoChallenge === "function";
 
   useEffect(() => {
     if (!quizzesPending) setQuizGateError(false);
@@ -46,8 +49,10 @@ export default function LessonReadGate({
       >
         <p className="lesson-read-gate-hint">
           {quizzesRequired > 0
-            ? `Answer all ${quizzesRequired} quick checks above, then mark this lesson as read to unlock the challenge.`
-            : "Finished reading? Mark this lesson as read to unlock the next steps."}
+            ? `Answer all ${quizzesRequired} quick checks above, then mark this lesson as read${hasChallenge ? " to unlock the challenge" : " to complete it"}.`
+            : hasChallenge
+              ? "Finished reading? Mark this lesson as read to unlock the challenge."
+              : "Finished reading? Mark this lesson as read to complete it."}
         </p>
         {quizGateError ? (
           <p className="lesson-read-gate-error" role="alert">
@@ -83,16 +88,24 @@ export default function LessonReadGate({
         </div>
       </div>
 
-      <div className="lesson-read-actions">
-        <button
-          type="button"
-          className="lesson-challenge-cta"
-          style={{ "--lesson-accent": accentColor }}
-          onClick={onGoChallenge}
-        >
-          {challengeLabel}
-        </button>
-      </div>
+      {hasChallenge ? (
+        <div className="lesson-read-actions">
+          <button
+            type="button"
+            className="lesson-challenge-cta"
+            style={{ "--lesson-accent": accentColor }}
+            onClick={onGoChallenge}
+          >
+            {challengeLabel}
+          </button>
+        </div>
+      ) : (
+        <div className="lesson-read-actions">
+          <p className="lesson-read-gate-hint lesson-read-gate-done">
+            ✓ Lesson complete — use the arrows below to continue.
+          </p>
+        </div>
+      )}
     </>
   );
 }
