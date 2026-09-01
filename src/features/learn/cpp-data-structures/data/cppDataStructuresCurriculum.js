@@ -1095,6 +1095,11 @@ if (p) {
           text(
             "Uses: round-robin schedulers (cycle through tasks forever), the buffer behind a **circular queue** (next lesson), turn order in a board game, repeating playlists, and Josephus-style elimination problems.",
           ),
+          diagram("Linear end vs circular end", [
+            { id: "lin", label: "Singly linked (linear)", color: C_GREEN, items: ["head -> A -> B -> C -> nullptr", "stop when next == nullptr"] },
+            { id: "cir", label: "Circular singly linked", color: ACCENT, items: ["head -> A -> B -> C -+", "C.next points back to A", "stop when you reach head again"] },
+            { id: "cird", label: "Circular doubly linked", color: C_SKY, items: ["head.prev == tail", "tail.next == head", "no nullptr anywhere - the std::list layout"] },
+          ]),
           callout(
             "warning",
             "Every traversal needs an explicit stop condition. A plain `while (p != nullptr)` never ends on a circular list - it spins forever.",
@@ -2141,6 +2146,18 @@ int main() {
           text(
             "This is the ideal layout from Chapter 1 - contiguous, cache-friendly, zero allocation per element.",
           ),
+          arrayViz(
+            "The same max-heap as a tree and as a flat array",
+            [
+              {
+                label: "value",
+                values: ["50", "30", "40", "10", "20", "35"],
+                colLabels: ["0", "1", "2", "3", "4", "5"],
+                okIndexes: [0],
+              },
+            ],
+            "Node at index i: parent = (i - 1) / 2, left = 2i + 1, right = 2i + 2. So index 1 (value 30) has parent 0 (50) and children 3 (10) and 4 (20). No pointers, perfect cache use.",
+          ),
           callout(
             "info",
             "A heap is only *partially* ordered - siblings have no relationship. You cannot search a heap in better than `O(n)`, and in-order traversal is meaningless. It does exactly one job well: hand you the extreme element.",
@@ -2299,6 +2316,17 @@ int main() {
           text(
             "Other heap uses: Dijkstra and Prim pull the closest frontier node; event-driven simulation pulls the next event by timestamp; Huffman coding (next chapter) repeatedly pulls the two lowest frequencies; \"merge k sorted lists\" uses a k-way heap.",
           ),
+          table(
+            "Where heapsort sits among the O(n log n) sorts",
+            ["Time (worst)", "Extra space", "Stable?", "Notes"],
+            [
+              ["Heapsort", "O(n log n)", "O(1)", "no", "reliable worst case, weak cache use"],
+              ["Quicksort", "O(n^2)", "O(log n)", "no", "fastest in practice, bad pivots hurt"],
+              ["Merge sort", "O(n log n)", "O(n)", "yes", "stable, great for linked lists / external"],
+              ["std::sort (introsort)", "O(n log n)", "O(log n)", "no", "quicksort, falls back to heapsort"],
+            ],
+            { rowLabelHeader: "Algorithm", highlightRows: [0] },
+          ),
           callout(
             "tip",
             "\"k largest\" -> min-heap of size k. \"k smallest\" -> max-heap of size k. The heap holds the *boundary*; its root is the next thing to evict.",
@@ -2382,6 +2410,18 @@ int main() {
             { id: "m", label: "Matrix", color: C_RED, items: ["25 cells", "mostly zero", "O(V^2) memory"] },
             { id: "l", label: "List", color: C_GREEN, items: ["5 short rows", "8 entries total", "O(V + E) memory"] },
           ]),
+          table(
+            "Adjacency list vs adjacency matrix",
+            ["Adjacency list", "Adjacency matrix"],
+            [
+              ["Space", "O(V + E)", "O(V^2)"],
+              ["\"Is there an edge u-v?\"", "O(degree)", "O(1)"],
+              ["Iterate a vertex's neighbours", "O(degree)", "O(V)"],
+              ["Add an edge", "O(1)", "O(1)"],
+              ["Best for", "sparse graphs, BFS/DFS/Dijkstra", "dense graphs, Floyd-Warshall"],
+            ],
+            { rowLabelHeader: "Operation" },
+          ),
           callout(
             "tip",
             "Unless you know the graph is dense, or you need `O(1)` edge-existence checks, use an adjacency list.",
@@ -2485,6 +2525,17 @@ vector<int> bfs(const vector<vector<int>>& adj, int src) {
           text(
             "Key detail: mark a node **visited when you push it onto the frontier**, not when you pop it - otherwise it can be enqueued many times before it is first processed.",
           ),
+          table(
+            "BFS vs DFS",
+            ["BFS", "DFS"],
+            [
+              ["Frontier held in", "a queue (FIFO)", "a stack / recursion (LIFO)"],
+              ["Explores", "in rings of equal distance", "one path to the end, then backtracks"],
+              ["Extra space", "O(width) of the graph", "O(depth) of the graph"],
+              ["Signature use", "shortest path in edges", "cycle detection, topological sort, SCC"],
+            ],
+            { rowLabelHeader: "Aspect", footnote: "Both are O(V + E) on an adjacency list and visit each vertex once." },
+          ),
           callout(
             "warning",
             "Recursive DFS on a graph with a long path can overflow the call stack (roughly 10^4 - 10^5 deep). Use an explicit stack for large graphs.",
@@ -2576,6 +2627,19 @@ int main() {
           text(
             "Requirements and relatives:\n\n- Dijkstra needs **non-negative** weights. Negative edges -> **Bellman-Ford**, `O(|V| * |E|)`.\n- all-pairs shortest paths -> **Floyd-Warshall**, `O(|V|^3)`, matrix-friendly\n- minimum spanning tree -> **Prim** (heap, like Dijkstra) or **Kruskal** (sort edges + **union-find**)\n- shortest/longest path on a DAG -> topological order + one relax pass, `O(|V| + |E|)`",
           ),
+          table(
+            "Pick the path algorithm by the graph you have",
+            ["Solves", "Needs", "Time", "Key structure"],
+            [
+              ["BFS", "shortest path, unweighted", "-", "O(V + E)", "queue"],
+              ["Dijkstra", "shortest path, 1 source", "weights >= 0", "O((V + E) log V)", "min-heap"],
+              ["Bellman-Ford", "shortest path, 1 source", "any weights", "O(V * E)", "edge list"],
+              ["Floyd-Warshall", "shortest path, all pairs", "any weights", "O(V^3)", "matrix"],
+              ["Topological + relax", "shortest / longest on a DAG", "acyclic", "O(V + E)", "queue / stack"],
+              ["Kruskal / Prim", "minimum spanning tree", "undirected", "O(E log V)", "union-find / min-heap"],
+            ],
+            { rowLabelHeader: "Algorithm" },
+          ),
           callout(
             "info",
             "Dijkstra *is* BFS when every weight is 1 - the priority queue just degenerates into a plain queue.",
@@ -2660,6 +2724,18 @@ int main() {
             { id: "lz", label: "LZ dictionary", color: C_SKY, items: ["repeated substrings anywhere"] },
             { id: "delta", label: "Delta", color: C_AMBER, items: ["smooth series: audio, sensors, images"] },
           ]),
+          table(
+            "Which technique for which data",
+            ["Turns this...", "...into this", "Seen in"],
+            [
+              ["RLE", "long runs of one value", "(value, count) pairs", "fax, PCX, PackBits"],
+              ["LZ77", "any repeated substring", "(distance, length, literal)", "gzip, zip, PNG"],
+              ["LZ78 / LZW", "repeated substrings", "dictionary indices", "GIF, TIFF, old compress"],
+              ["Delta", "smooth series", "small values near zero", "audio (FLAC), sensor logs, video"],
+              ["BWT + MTF", "text with local structure", "runs the entropy stage loves", "bzip2"],
+            ],
+            { rowLabelHeader: "Technique" },
+          ),
           callout(
             "tip",
             "These are *front-ends*. Their job is to hand a skewed symbol distribution to Huffman or arithmetic coding, which does the actual bit-shaving.",
@@ -2776,6 +2852,18 @@ HNode* root = pq.top();`,
           ]),
           text(
             "**Why greedy is optimal**: the two least-frequent symbols can always be made the deepest siblings without increasing total cost (an exchange argument); merging them into one super-symbol reduces the problem to n - 1 symbols, and induction finishes it. The total encoded size is `sum freq(s) * depth(s)`, which Huffman minimises; it lands within 1 bit/symbol of entropy. **Arithmetic / range coding** closes that last gap by not rounding to whole bits.",
+          ),
+          table(
+            "The finished code table for A:5 B:2 C:1 D:1",
+            ["Frequency", "Huffman code", "Code length", "Bits contributed"],
+            [
+              ["A", "5", "0", "1", "5"],
+              ["B", "2", "10", "2", "4"],
+              ["C", "1", "110", "3", "3"],
+              ["D", "1", "111", "3", "3"],
+              ["Total (9 symbols)", "9", "-", "-", "15 bits"],
+            ],
+            { rowLabelHeader: "Symbol", highlightRows: [4], footnote: "A fixed-width 2-bit code would need 9 x 2 = 18 bits. Huffman spends 15 - and no code is a prefix of another, so decoding is unambiguous." },
           ),
           callout(
             "info",
