@@ -566,40 +566,40 @@ int main() {
             "Connect \"one operation\" in Big-O to real CPU work, and why constants still matter",
           ]),
           text(
-            "When an analysis says an algorithm does \"`n` operations\", each operation is really the CPU grinding once through its basic loop - the **instruction cycle** - for every machine instruction.",
+            "Picture a cook at one station. In front of them is a stack of index cards, each with a single tiny instruction: \"pick up the knife\", \"make one cut\", \"put the knife down\". For every card the cook does the same four things: **take the next card, read it, do what it says, note the result** - then reach for the next card.\n\nA computer's processor works exactly like that, just billions of cards a second. That repeating four-step routine is called the **instruction cycle** (you'll also hear \"CPU cycle\" or \"fetch-decode-execute cycle\").",
           ),
-          diagram("The instruction cycle, repeated billions of times a second", [
-            { id: "fetch", label: "1. Fetch", color: ACCENT, items: ["Read the next instruction", "from the address in the program counter (PC)", "PC advances"] },
-            { id: "decode", label: "2. Decode", color: C_SKY, items: ["Control unit works out what it means", "which operation, which registers/operands"] },
-            { id: "exec", label: "3. Execute", color: C_AMBER, items: ["The ALU does the work", "add, compare, shift, address calculation"] },
-            { id: "write", label: "4. Write-back", color: C_GREEN, items: ["Store the result into a register", "or out to cache / memory", "update flags & PC, then repeat"] },
+          diagram("The four steps, repeated for every instruction", [
+            { id: "fetch", label: "1. Fetch", color: ACCENT, items: ["Grab the next instruction", "The processor keeps a bookmark pointing at it", "Move the bookmark along"] },
+            { id: "decode", label: "2. Decode", color: C_SKY, items: ["Work out what it's asking for", "Which action? Which values does it touch?"] },
+            { id: "exec", label: "3. Execute", color: C_AMBER, items: ["Actually do it", "Add, compare, work out an address..."] },
+            { id: "write", label: "4. Write-back", color: C_GREEN, items: ["Save the result", "Into a fast slot in the CPU, or out to memory", "Then go back to step 1"] },
           ]),
           text(
-            "A single line like `sum += arr[i];` is *not* one step for the CPU. Roughly: compute the address of `arr[i]`, load that value from memory into a register, add it to `sum`, write `sum` back. Several cycles - and if `arr[i]` is not in cache, the load alone can stall for hundreds of cycles.",
+            "Here's what surprises beginners: a short instruction like \"add this number to the running total\" is **not one step** for the processor. It's more like - work out where that number lives, go fetch it from memory, add it to the total, put the total back. Four or five tiny cards. And if the number isn't already close at hand, the \"go fetch it\" part alone can cost as much as a *hundred* ordinary steps.",
           ),
           text(
-            "Big-O deliberately hides all of this: it collapses \"a few cycles\" and \"one cache miss\" into the same `O(1)`. That is exactly why two `O(n)` algorithms can differ 10x in wall-clock time - same number of steps, very different work per step.",
+            "This is why Big-O is a *rough* guide, not a stopwatch. Big-O counts every step as \"one\", whether it's a snappy add or a slow trip out to memory. So two methods that are both **O(n)** can still finish ten times apart in real life - the same number of steps on paper, very different work inside each one. The next lessons dig into that gap.",
           ),
           callout(
             "info",
-            "**Registers** are the tiny, instant storage the CPU computes in - a few dozen of them. Cache and RAM are progressively slower and must be loaded into a register before the ALU can touch a value. The **write-back** stage is where a result leaves a register for cache or RAM.",
+            "Those \"fast slots in the CPU\" are called **registers** - only a few dozen exist, and they're where all the actual adding and comparing happens. Everything else (the caches, main memory) is slower and has to be pulled into a register first. \"Write-back\" is just the step where a finished result leaves a register.",
           ),
           quiz(
-            "Which stage of the instruction cycle stores the computed result back to a register or memory?",
+            "In the four-step cycle, which step saves the finished result?",
             ["Fetch", "Decode", "Execute", "Write-back"],
             3,
-            "Write-back (sometimes called store) commits the result and updates the PC/flags before the next fetch.",
+            "Write-back (also called \"store\") commits the result and nudges the bookmark to the next instruction, ready for the next Fetch.",
           ),
           quiz(
-            "Why can two O(n) algorithms have very different real running times?",
+            "Two sorting methods are both O(n). One runs twice as fast as the other on the same laptop. How is that possible?",
             [
-              "Big-O is always wrong",
-              "They do different constant work per step and touch memory differently",
-              "One of them is secretly O(n^2)",
-              "Compilers ignore Big-O",
+              "Big-O must be wrong for one of them",
+              "One does lighter work per step and reaches memory in a friendlier pattern",
+              "The slower one is secretly O(n^2)",
+              "Faster laptops ignore Big-O",
             ],
             1,
-            "Big-O drops constants and ignores cache behaviour; per-step cost and memory-access patterns still decide wall-clock time.",
+            "Big-O counts steps but ignores how heavy each step is and how the data sits in memory - and both of those decide the real time.",
           ),
         ],
         challenge: {
