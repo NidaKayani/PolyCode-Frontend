@@ -36,6 +36,24 @@ function objectives(items) {
   return { type: "objectives", items };
 }
 
+// Styled comparison table. `rows` is an array of ["Row label", cell, cell, ...].
+function table(title, columns, rows, options = {}) {
+  return {
+    type: "table",
+    title,
+    columns,
+    rows: rows.map((r) => ({ label: r[0], values: r.slice(1) })),
+    showTotals: false,
+    ...options,
+  };
+}
+
+// Cell-grid visual. `rows` is an array of
+// { label, values: [...], colLabels?: [...], okIndexes?: [...], missingIndexes?: [...] }.
+function arrayViz(title, rows, footnote) {
+  return { type: "array", title, rows, footnote };
+}
+
 const RAW_CPP_DATA_STRUCTURES_CHAPTERS = [
   {
     id: "complexity",
@@ -72,6 +90,19 @@ const RAW_CPP_DATA_STRUCTURES_CHAPTERS = [
           ]),
           text(
             "**Space complexity** counts memory used *beyond the input*. Reversing an array in place is `O(1)` extra; building a hash set of every element is `O(n)` extra. A faster algorithm often costs more memory - that trade is a running theme.",
+          ),
+          table(
+            "Typical cost of core operations (average case)",
+            ["Access by index", "Search", "Insert", "Delete", "Ordered?"],
+            [
+              ["Static array", "O(1)", "O(n)", "O(n)", "O(n)", "by index"],
+              ["Dynamic array (vector)", "O(1)", "O(n)", "O(1)*", "O(n)", "by index"],
+              ["Linked list", "O(n)", "O(n)", "O(1)@", "O(1)@", "insertion"],
+              ["Hash table", "n/a", "O(1)", "O(1)", "O(1)", "no"],
+              ["Balanced BST", "O(log n)", "O(log n)", "O(log n)", "O(log n)", "sorted"],
+              ["Binary heap", "n/a", "O(n)", "O(log n)", "O(log n)", "min/max only"],
+            ],
+            { rowLabelHeader: "Structure", footnote: "* amortised, at the back.  @ once you already hold the position." },
           ),
           callout(
             "info",
@@ -110,6 +141,19 @@ for (int i = 0; i < n; i++)
 
 for (int k = n; k > 1; k /= 2) { /* O(1) */ }         // O(log n)`,
             },
+          ),
+          table(
+            "How the work explodes as n grows",
+            ["n = 10", "n = 100", "n = 1,000", "n = 1,000,000"],
+            [
+              ["O(1)", "1", "1", "1", "1"],
+              ["O(log n)", "3", "7", "10", "20"],
+              ["O(n)", "10", "100", "1,000", "1,000,000"],
+              ["O(n log n)", "33", "664", "9,966", "~2e7"],
+              ["O(n^2)", "100", "10,000", "1,000,000", "1e12"],
+              ["O(2^n)", "1,024", "1e30", "off the chart", "off the chart"],
+            ],
+            { rowLabelHeader: "Class", highlightRows: [4, 5], footnote: "Anything at or below O(n log n) scales; O(n^2) is a warning sign past ~10,000 items; O(2^n) is only for tiny n." },
           ),
           callout(
             "tip",
@@ -235,8 +279,33 @@ int main() {
           text(
             "RAM is slow next to the CPU: a cache miss can cost 100-300 cycles - long enough to execute hundreds of instructions. To hide that, the CPU keeps recently used memory in small fast **caches** (L1/L2/L3) and always transfers memory a **cache line** at a time, typically 64 bytes (about 16 `int`s).",
           ),
+          table(
+            "The memory hierarchy (order-of-magnitude latency)",
+            ["Rough latency", "Analogy: if L1 took 1 second"],
+            [
+              ["CPU register", "0 cycles", "instant"],
+              ["L1 cache", "~4 cycles", "1 second"],
+              ["L2 cache", "~12 cycles", "3 seconds"],
+              ["L3 cache", "~40 cycles", "10 seconds"],
+              ["Main memory (RAM)", "~200 cycles", "1 minute"],
+              ["SSD", "~100,000 cycles", "7 hours"],
+            ],
+            { rowLabelHeader: "Level", highlightRows: [4], footnote: "Every level down is roughly 3-5x slower. Keeping the working set in cache is what \"fast\" really means." },
+          ),
           text(
             "Two rules follow:\n\n- **Spatial locality** - after you touch one address, touching nearby addresses is nearly free (they arrived on the same cache line).\n- **Temporal locality** - after you touch an address, touching it again soon is nearly free (still cached).",
+          ),
+          arrayViz(
+            "One 64-byte cache line pays for the next ~15 accesses",
+            [
+              {
+                label: "cache line",
+                values: ["a[0]", "a[1]", "a[2]", "a[3]", "a[4]", "a[5]", "a[6]", "a[7]", "a[8]", "a[9]", "a[10]", "a[11]", "a[12]", "a[13]", "a[14]", "a[15]"],
+                colLabels: ["0", "4", "8", "12", "16", "20", "24", "28", "32", "36", "40", "44", "48", "52", "56", "60"],
+                okIndexes: [0],
+              },
+            ],
+            "Reading a[0] (green) triggers one miss and loads all 16 ints; a[1]..a[15] are then free. A linked list would miss on every single node. Column labels are byte offsets within the line.",
           ),
           text(
             "This is why iterating a `std::vector<int>` front-to-back is far faster than walking a linked list of the same length, even though both are `O(n)`: the vector is one contiguous block (every cache line fully used, the hardware prefetcher running ahead), while list nodes are scattered across the heap - one cache miss per node, plus wasted bytes per line on the `next` pointer.",
@@ -375,6 +444,24 @@ std::array<int, 4> a = {10, 20, 30, 40};  // knows its own size
 cout << a.size() << "\\n";                  // 4`,
             },
           ),
+          arrayViz(
+            "Random access is address arithmetic, not a search",
+            [
+              {
+                label: "value",
+                values: ["10", "20", "30", "40", "23", "42"],
+                colLabels: ["0", "1", "2", "3", "4", "5"],
+                okIndexes: [3],
+              },
+              {
+                label: "address",
+                values: ["base", "+4", "+8", "+12", "+16", "+20"],
+                colLabels: ["0", "1", "2", "3", "4", "5"],
+                okIndexes: [3],
+              },
+            ],
+            "a[3] lives at base + 3 * 4 bytes. One multiply-add gets you there - O(1), whatever the index. Column labels are the indices.",
+          ),
           callout(
             "warning",
             "A raw array does not carry its length - `sizeof` tricks break as soon as it is passed to a function. Prefer `std::array<T, N>` (size in the type) or `std::vector<T>` (next lesson).",
@@ -475,6 +562,19 @@ for (int i = 0; i < 1000; i++) v.push_back(i);   // all O(1), zero moves`,
             { id: "full", label: "size == capacity", color: C_AMBER, items: ["allocate ~2x", "move n elements", "free old block", "O(n) this once"] },
             { id: "amort", label: "Over n pushes", color: ACCENT, items: ["total moves < 2n", "amortised O(1) each"] },
           ]),
+          arrayViz(
+            "size is what you use; capacity is what you own",
+            [
+              {
+                label: "buffer",
+                values: ["7", "1", "9", "4", "2", "8", "5", "3", "6", "0", "-", "-", "-", "-", "-", "-"],
+                colLabels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"],
+                okIndexes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                missingIndexes: [10, 11, 12, 13, 14, 15],
+              },
+            ],
+            "size = 10 (green, live elements), capacity = 16 (green + grey spare slots). push_back writes into a grey slot in O(1); when the greys run out it allocates 32, moves the 16, and frees the old block.",
+          ),
           callout(
             "tip",
             "If you know the final size, call `reserve(n)` once - it removes every reallocation and every element move.",
@@ -568,6 +668,19 @@ int main() {
           ),
           text(
             "- index access: array `O(1)` / list `O(n)`\n- insert at front: array `O(n)` / list `O(1)`\n- insert/erase at a position you already hold: array `O(n)` / list `O(1)`\n- memory overhead: array ~0 / list 1-2 pointers per element\n- cache behaviour: array excellent / list poor\n- growth: array occasional realloc+move / list one allocation per node",
+          ),
+          table(
+            "Contiguous array vs linked nodes",
+            ["Dynamic array (vector)", "Linked list"],
+            [
+              ["Index access", "O(1)", "O(n)"],
+              ["Insert / erase at front", "O(n)", "O(1)"],
+              ["Insert / erase at a held position", "O(n)", "O(1)"],
+              ["Memory overhead per element", "~0", "1-2 pointers"],
+              ["Cache behaviour on a scan", "excellent", "poor"],
+              ["Growth", "occasional realloc + move", "one alloc per node"],
+            ],
+            { rowLabelHeader: "Operation" },
           ),
           text(
             "Default to `std::vector` unless you have a specific reason not to - it wins on access, iteration, and memory. Choose a linked structure when you need `O(1)` splice or erase at a position you already hold and rarely random-access, or when you need pointers/iterators to stay valid across insertions elsewhere.",
@@ -721,6 +834,18 @@ void push_front(int x) {
 
 for (Node* p = head; p; p = p->next) cout << p->value << " ";`,
             },
+          ),
+          table(
+            "Singly linked list operation costs",
+            ["head pointer only", "head + tail pointers"],
+            [
+              ["push_front", "O(1)", "O(1)"],
+              ["push_back", "O(n)", "O(1)"],
+              ["pop_front", "O(1)", "O(1)"],
+              ["pop_back", "O(n)", "O(n)"],
+              ["search / access by index", "O(n)", "O(n)"],
+            ],
+            { rowLabelHeader: "Operation", footnote: "pop_back stays O(n) even with a tail pointer - a singly linked list can't step backward to find the new last node. That is what the doubly linked list fixes." },
           ),
           callout(
             "tip",
@@ -1012,6 +1137,18 @@ if (p) {
             { id: "l1", label: "Level 1", color: C_SKY, items: ["head -> 9 -> 17 -> 25 -> nil"] },
             { id: "l0", label: "Level 0", color: C_GREEN, items: ["3 - 9 - 12 - 17 - 21 - 25 - 30"] },
           ]),
+          table(
+            "Why the express lanes work: level populations",
+            ["Appears on this level with probability", "Nodes in a 1,000-node list"],
+            [
+              ["Level 0 (every node)", "1", "1000"],
+              ["Level 1", "1/2", "~500"],
+              ["Level 2", "1/4", "~250"],
+              ["Level 3", "1/8", "~125"],
+              ["Level k", "1 / 2^k", "~1000 / 2^k"],
+            ],
+            { rowLabelHeader: "Level", footnote: "Each level up halves the population, so the tallest tower is about log2(n) high - and search drops one level per step." },
+          ),
           callout(
             "info",
             "Redis uses skip lists for its sorted sets. They are popular in concurrent code because localised pointer updates are easier to make lock-free than tree rotations.",
@@ -1169,6 +1306,18 @@ int dequeue() {
           text(
             "`std::queue` is an adapter over `std::deque`. Queues drive BFS (Chapter 8), job scheduling, and request buffering.",
           ),
+          arrayViz(
+            "A ring buffer wraps the indices, it never shifts data",
+            [
+              {
+                label: "slots",
+                values: ["-", "-", "C", "D", "E", "-", "-", "-"],
+                colLabels: ["0", "1", "2", "3", "4", "5", "6", "7"],
+                okIndexes: [2, 3, 4],
+              },
+            ],
+            "front = 2, count = 3. dequeue returns slots[2] and sets front = 3. enqueue writes at (front + count) % 8 = (2 + 3) % 8 = 5. When an index runs past 7 it wraps back to 0 - no element ever moves.",
+          ),
           callout(
             "warning",
             "A ring buffer is **bounded**. Decide up front what a full buffer does: block, drop the oldest, drop the newest, or grow.",
@@ -1305,6 +1454,16 @@ int main() {
           text(
             "A **monotonic stack** (discard dominated elements so the stack stays sorted) solves \"next greater element\" and \"largest rectangle in a histogram\" in `O(n)`. A **monotonic deque** solves sliding-window maximum in `O(n)`. Same containers, one extra rule.",
           ),
+          table(
+            "The three adapters side by side",
+            ["Add", "Remove", "Rule", "Reach for it when"],
+            [
+              ["Stack", "top", "top", "LIFO", "undo, DFS, expression parsing, backtracking"],
+              ["Queue", "back", "front", "FIFO", "BFS, job scheduling, request buffering"],
+              ["Deque", "front or back", "front or back", "both ends", "sliding window, work-stealing, palindromes"],
+            ],
+            { rowLabelHeader: "Structure" },
+          ),
           callout(
             "tip",
             "Use `std::stack` / `std::queue` for intent-revealing code; drop to `std::vector` / `std::deque` directly when you also need to iterate or index the underlying data.",
@@ -1350,6 +1509,19 @@ int main() {
             { id: "b", label: "\"bob\"", color: C_SKY, items: ["hash -> bucket 0"] },
             { id: "c", label: "\"carol\"", color: C_RED, items: ["hash -> bucket 3", "collision with alice"] },
           ]),
+          arrayViz(
+            "hash(key) % 8 picks the bucket - collisions share one",
+            [
+              {
+                label: "bucket",
+                values: ["bob", "-", "-", "alice / carol", "-", "dave", "-", "-"],
+                colLabels: ["0", "1", "2", "3", "4", "5", "6", "7"],
+                okIndexes: [0, 5],
+                missingIndexes: [3],
+              },
+            ],
+            "\"alice\" and \"carol\" both hash into bucket 3 (red) - a collision the table must resolve. Buckets 0 and 5 hold one key each; the rest are empty.",
+          ),
           callout(
             "info",
             "`%` only distributes well if the hash is already thoroughly mixed. Real tables force `bucket_count` to a power of two (mask instead of modulo) or a prime (defends against patterned hashes).",
@@ -1386,6 +1558,19 @@ int main() {
             { id: "ch", label: "Chaining", color: C_PINK, items: ["bucket 3 -> [carol] -> [alice]", "scan a 2-element list"] },
             { id: "oa", label: "Open addressing (linear)", color: C_AMBER, items: ["alice in slot 3", "carol spills into slot 4"] },
           ]),
+          table(
+            "Separate chaining vs open addressing",
+            ["Separate chaining", "Open addressing"],
+            [
+              ["Layout", "bucket -> list of entries", "one entry per slot, probe on clash"],
+              ["Load factor it tolerates", "> 1 is fine", "keep below ~0.75"],
+              ["Cache behaviour", "pointer-chases the list", "stays in one contiguous array"],
+              ["Deletion", "unlink a node", "leave a tombstone marker"],
+              ["Extra memory", "a pointer + node per entry", "just spare empty slots"],
+              ["Used by", "std::unordered_map", "Python dict, many game engines"],
+            ],
+            { rowLabelHeader: "Aspect" },
+          ),
           callout(
             "warning",
             "Open addressing performance falls off a cliff as load factor approaches 1 - probe sequences get long. Keep it well under ~0.75 and resize early.",
@@ -1502,6 +1687,17 @@ counts.reserve(100000);           // size the buckets once
 counts["apple"]++;                // insert-or-update, O(1) average
 if (counts.count("pear")) { /* ... */ }`,
             },
+          ),
+          table(
+            "Load factor is a dial: probes vs wasted space (open addressing)",
+            ["Avg probes on a hit", "Avg probes on a miss", "Feel"],
+            [
+              ["0.50", "1.5", "2.5", "roomy, fast, half-empty"],
+              ["0.75", "2.5", "8.5", "the usual resize trigger"],
+              ["0.90", "5.5", "50", "getting slow"],
+              ["0.99", "50", "5000", "effectively broken"],
+            ],
+            { rowLabelHeader: "Load factor", highlightRows: [1, 3] },
           ),
           callout(
             "tip",
@@ -1644,6 +1840,17 @@ void inorder(Node* n) {
     inorder(n->right);
 }`,
             },
+          ),
+          table(
+            "The four traversal orders",
+            ["Visit order", "On this tree (4 / 2,6 / 1,3,-,7)", "Reach for it to"],
+            [
+              ["Pre-order", "node, left, right", "4 2 1 3 6 7", "copy or serialise a tree"],
+              ["In-order", "left, node, right", "1 2 3 4 6 7", "read a BST in sorted order"],
+              ["Post-order", "left, right, node", "1 3 2 7 6 4", "free children before the parent"],
+              ["Level-order", "by depth, left to right", "4 2 6 1 3 7", "shortest path in edges; uses a queue"],
+            ],
+            { rowLabelHeader: "Traversal" },
           ),
           callout(
             "info",
@@ -1829,6 +2036,17 @@ int main() {
           text(
             "Result: height is guaranteed <= about 1.44 * log2(n), so **search, insert and erase are worst-case `O(log n)`** - no degenerate case, ever. The price: a height/balance field per node and `O(log n)` rotation work on updates. **Red-black trees** (what `std::map` uses) allow slightly looser balance for fewer rotations on write-heavy workloads.",
           ),
+          table(
+            "The four rebalancing cases",
+            ["Shape after the bad insert", "Fix"],
+            [
+              ["LL", "heavy left, then left again", "one right rotation"],
+              ["RR", "heavy right, then right again", "one left rotation"],
+              ["LR", "heavy left, then right", "left-rotate the child, then right-rotate"],
+              ["RL", "heavy right, then left", "right-rotate the child, then left-rotate"],
+            ],
+            { rowLabelHeader: "Case", footnote: "You detect the case at the lowest node whose balance factor reached +/-2 while unwinding the insert." },
+          ),
           callout(
             "info",
             "A single rotation is `O(1)` - just pointer and height updates. An insert triggers at most one (single or double) rotation; an erase may rotate once per level, still `O(log n)` total.",
@@ -1857,6 +2075,19 @@ int main() {
           ),
           text(
             "Memory: hash tables waste empty buckets and store a hash per entry; trees store two or three pointers plus balance metadata per node. Hash tables have `O(n)` rehash pauses; trees give steady `O(log n)`.",
+          ),
+          table(
+            "unordered_map (hash) vs map (balanced tree)",
+            ["unordered_map", "map"],
+            [
+              ["Lookup / insert / erase", "O(1) average", "O(log n) always"],
+              ["Worst case", "O(n) on a bad rehash burst", "O(log n)"],
+              ["Key order", "none", "sorted"],
+              ["Range / lower_bound", "not supported", "O(log n)"],
+              ["Pause behaviour", "O(n) rehash spikes", "steady"],
+              ["Iterator stability", "all invalidated on rehash", "only the erased one"],
+            ],
+            { rowLabelHeader: "Property" },
           ),
           callout(
             "tip",
