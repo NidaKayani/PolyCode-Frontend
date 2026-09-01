@@ -313,23 +313,78 @@ int main() {
       {
         id: "cpp-ds-0-1b",
         title: "Where log n and n log n come from",
-        xp: 12,
+        xp: 14,
         chapterTitle: "Complexity & the Machine Model",
         theory: [
           objectives([
-            "Explain why repeated halving gives log n steps",
-            "Explain why merge sort is n log n: log n levels times n work per level",
+            "Follow binary search step by step and see why it is O(log n)",
+            "Follow merge sort step by step and see why it is O(n log n)",
             "Recognise the divide-and-conquer recurrence behind both",
           ]),
           text(
-            "`log n` and `n log n` come from the same move: **cut the problem in half, again and again.** The only difference is how much work you do at each cut.",
+            "`log n` and `n log n` come from the same idea: **split the problem in half, again and again.** Binary search does almost no work at each split, so it costs `log n`. Merge sort does one `O(n)` pass at each split, so it costs `n log n`. Below is each one, explained slowly, with a complete program you can run.",
+          ),
+
+          text(
+            "**1. Binary search - find a value in a sorted array.**\n\nLook at the middle element and compare it to the target:\n\n- if it *is* the target, you are done\n- if the target is **smaller**, the answer (if any) is in the **left half** - throw away the middle and everything to its right\n- if the target is **larger**, the answer is in the **right half** - throw away the middle and everything to its left\n\nEvery comparison deletes half of what is left. Starting from `n` items you hit 1 after about `log2 n` comparisons: ~20 for a million, ~30 for a billion.",
           ),
           text(
-            "**Halving gives log2 n steps.** Start at n, halve to n/2, then n/4, n/8, ... you reach 1 after about log2 n halvings. This is **binary search**: every comparison throws away half of what is left, so a million-element sorted array is searched in about 20 steps.",
+            "A trace: searching for **44** in a 12-element array. Watch the range `[lo, hi]` collapse.\n\n- start: range [0, 11], values 2 5 9 14 20 23 31 38 40 44 50 61\n- step 1: mid = 5, a[5] = 23. 44 > 23 -> keep the right half -> range [6, 11]\n- step 2: mid = 8, a[8] = 40. 44 > 40 -> keep the right half -> range [9, 11]\n- step 3: mid = 10, a[10] = 50. 44 < 50 -> keep the left half -> range [9, 9]\n- step 4: mid = 9, a[9] = 44. Match. Found in 4 comparisons instead of 12.",
+          ),
+          text(
+            "The whole program. Press **Run** - it prints every step so you can watch the range halve, then tries a value that is present at the start, and one that is missing.",
+            {
+              label: "Binary search - complete, runnable",
+              content: `#include <iostream>
+#include <vector>
+using namespace std;
+
+// Return the index of target in the SORTED vector a, or -1 if it is absent.
+int binarySearch(const vector<int>& a, int target) {
+    int lo = 0;
+    int hi = (int)a.size() - 1;
+    int steps = 0;
+
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;   // midpoint, written this way to avoid overflow
+        steps++;
+        cout << "  step " << steps << ": a[" << mid << "] = " << a[mid]
+             << "   range [" << lo << ", " << hi << "]\\n";
+
+        if (a[mid] == target) {
+            cout << "  -> found " << target << " at index " << mid
+                 << " in " << steps << " step(s)\\n";
+            return mid;
+        }
+        if (a[mid] < target)
+            lo = mid + 1;              // target must be to the right
+        else
+            hi = mid - 1;              // target must be to the left
+    }
+
+    cout << "  -> " << target << " is not in the array (" << steps << " step(s))\\n";
+    return -1;
+}
+
+int main() {
+    vector<int> a = {2, 5, 9, 14, 20, 23, 31, 38, 40, 44, 50, 61};
+    cout << "array of " << a.size() << " sorted values\\n\\n";
+
+    cout << "search 44:\\n";
+    binarySearch(a, 44);
+
+    cout << "\\nsearch 2:\\n";
+    binarySearch(a, 2);
+
+    cout << "\\nsearch 7:\\n";
+    binarySearch(a, 7);
+    return 0;
+}`,
+            },
           ),
           table(
-            "How few halvings it takes to reach 1",
-            ["Halvings (about log2 n)"],
+            "Comparisons to search n sorted items (that is log2 n)",
+            ["about log2 n comparisons"],
             [
               ["n = 16", "4"],
               ["n = 1,024", "10"],
@@ -337,22 +392,81 @@ int main() {
               ["n = 1,000,000,000", "30"],
             ],
             {
-              rowLabelHeader: "Input size",
+              rowLabelHeader: "Array size",
               footnote:
-                "Multiplying n by 1,000 adds only ~10 steps. That flat growth is the whole point of O(log n).",
+                "Multiply n by 1,000 and you add only ~10 comparisons. That near-flat growth is what O(log n) means.",
             },
           ),
-          text(
-            "**Merge sort gives n log n.** It splits the array in half, sorts each half (the same routine, recursively), then **merges** the two sorted halves in one linear pass. Draw the recursion as a tree and the cost is easy to see.",
+          callout(
+            "warning",
+            "Binary search needs the array **sorted**. On unordered data, `a[mid]` tells you nothing about which side the target is on, so you cannot discard half - and it degrades to an O(n) scan.",
           ),
-          diagram("The merge-sort recursion tree", [
-            { id: "d0", label: "Level 0", color: ACCENT, items: ["1 chunk of size n", "merge work here: n"] },
+
+          text(
+            "**2. Merge sort - sort an array with the same split-in-half move.**\n\nThree steps, applied to every piece:\n\n1. **Split** the array into a left half and a right half.\n2. **Sort each half** by calling merge sort on it. The recursion bottoms out at length 0 or 1, which is already sorted.\n3. **Merge** the two now-sorted halves into one sorted run with a single left-to-right pass.",
+          ),
+          text(
+            "The **merge** step is the heart of it. Given two sorted runs, keep taking the smaller of the two front values:\n\n- `[1 4 7 9]` and `[2 3 8 10]`\n- fronts 1 vs 2 -> take 1 -> result `[1]`\n- fronts 4 vs 2 -> take 2 -> `[1 2]`\n- fronts 4 vs 3 -> take 3 -> `[1 2 3]`\n- fronts 4 vs 8 -> take 4 -> `[1 2 3 4]`\n- fronts 7 vs 8 -> take 7 -> `[1 2 3 4 7]`\n- the left run is empty, copy the rest of the right -> `[1 2 3 4 7 8 9 10]`\n\nEach value is looked at exactly once, so merging `m` items is `O(m)`.",
+          ),
+          diagram("Why the merges add up to n log n", [
+            { id: "d0", label: "Level 0", color: ACCENT, items: ["1 chunk of size n", "merge work: n"] },
             { id: "d1", label: "Level 1", color: C_SKY, items: ["2 chunks of size n/2", "merge work: 2 x n/2 = n"] },
             { id: "d2", label: "Level 2", color: C_SKY, items: ["4 chunks of size n/4", "merge work: 4 x n/4 = n"] },
-            { id: "sum", label: "Add it up", color: C_GREEN, items: ["n work on every level", "log2 n levels (size halves each time)", "n x log n total"] },
+            { id: "sum", label: "Total", color: C_GREEN, items: ["n work on every level", "log2 n levels (the size halves each time)", "n x log n"] },
           ]),
           text(
-            "Every level touches all n elements once (that is the merge), and there are log2 n levels because the chunk size halves each time. `n` per level times `log n` levels = **O(n log n)** - and that is the best any comparison sort can do.",
+            "Every level of that tree touches all `n` elements once (the merges), and there are `log2 n` levels because the chunk size halves on the way down. `n` per level x `log n` levels = **O(n log n)** - and that is the best any comparison sort can do.",
+          ),
+          text(
+            "The whole program. **Run** it - it prints the array before and after sorting.",
+            {
+              label: "Merge sort - complete, runnable",
+              content: `#include <iostream>
+#include <vector>
+using namespace std;
+
+// Merge the two sorted halves a[lo..mid] and a[mid+1..hi] back into a[lo..hi].
+void merge(vector<int>& a, int lo, int mid, int hi) {
+    vector<int> tmp;
+    int i = lo;        // walks the left half
+    int j = mid + 1;   // walks the right half
+
+    while (i <= mid && j <= hi) {
+        if (a[i] <= a[j]) tmp.push_back(a[i++]);
+        else              tmp.push_back(a[j++]);
+    }
+    while (i <= mid) tmp.push_back(a[i++]);   // leftovers from the left half
+    while (j <= hi)  tmp.push_back(a[j++]);   // leftovers from the right half
+
+    for (int k = 0; k < (int)tmp.size(); k++) a[lo + k] = tmp[k];
+}
+
+// Sort a[lo..hi] in place: split, sort each half, merge.
+void mergeSort(vector<int>& a, int lo, int hi) {
+    if (lo >= hi) return;              // length 0 or 1 is already sorted
+    int mid = lo + (hi - lo) / 2;
+    mergeSort(a, lo, mid);            // sort the left half
+    mergeSort(a, mid + 1, hi);        // sort the right half
+    merge(a, lo, mid, hi);           // combine the two sorted halves
+}
+
+void print(const vector<int>& a) {
+    for (int x : a) cout << x << " ";
+    cout << "\\n";
+}
+
+int main() {
+    vector<int> a = {8, 3, 11, 1, 6, 2, 10, 5, 9, 4, 7};
+    cout << "before: ";
+    print(a);
+
+    mergeSort(a, 0, (int)a.size() - 1);
+
+    cout << "after:  ";
+    print(a);
+    return 0;
+}`,
+            },
           ),
           table(
             "n vs n log n vs n^2",
@@ -366,80 +480,94 @@ int main() {
               rowLabelHeader: "Growth",
               highlightRows: [1],
               footnote:
-                "n log n is only a small multiple of n - it scales. n^2 is already a million times bigger at n = 1,000.",
+                "n log n is only a small multiple of n, so it scales. n^2 is already a million times larger at n = 1,000.",
             },
           ),
           callout(
             "info",
-            "As a recurrence: merge sort is `T(n) = 2*T(n/2) + O(n)` -> O(n log n) (quicksort averages the same). Drop the per-level work to O(1) and it becomes `T(n) = T(n/2) + O(1)` -> O(log n), which is binary search.",
+            "As a recurrence: merge sort is `T(n) = 2*T(n/2) + O(n)` -> O(n log n). Binary search is `T(n) = T(n/2) + O(1)` -> O(log n). Same split; the O(n) vs O(1) per level is the whole difference.",
           ),
           callout(
             "tip",
-            "Rule of thumb: **halving the problem** puts a `log n` in the answer. Doing an `O(n)` pass at each halving level makes it `n log n`.",
+            "Halving the problem puts a `log n` in the answer. Doing an `O(n)` pass at each halving level turns it into `n log n`.",
+          ),
+          quiz(
+            "Binary search on a sorted array of 1,000,000 items takes roughly how many comparisons?",
+            ["1,000,000", "1,000", "20", "1"],
+            2,
+            "log2(1,000,000) is about 20 - each comparison halves the remaining range.",
           ),
           quiz(
             "Merge sort is O(n log n) because it does...",
             [
-              "O(log n) work once",
+              "O(log n) work one time",
               "O(n) work on each of O(log n) levels",
-              "O(n) work once",
+              "O(n) work one time",
               "O(n^2) work split into pieces",
             ],
             1,
-            "Each level merges all n elements (O(n)); halving the chunk size gives O(log n) levels; n x log n total.",
+            "Every level merges all n elements (O(n)); halving the chunk size gives O(log n) levels; n x log n total.",
           ),
           quiz(
-            "Searching a sorted array of 1,000,000 items with binary search takes roughly how many comparisons?",
-            ["1,000,000", "1,000", "20", "1"],
-            2,
-            "log2(1,000,000) is about 20 - each comparison halves the range.",
+            "Why must the array be sorted for binary search to work?",
+            [
+              "So that duplicates sit next to each other",
+              "So one comparison tells you which half to throw away",
+              "It does not need to be sorted",
+              "To make the array take less memory",
+            ],
+            1,
+            "On unsorted data, a[mid] gives you no information about which side the target is on, so you cannot discard half.",
           ),
         ],
         challenge: {
-          title: "Merge two sorted halves",
+          title: "Binary search",
           description:
-            "Implement the merge step at the heart of merge sort: combine two already-sorted vectors into one sorted vector in a single linear pass.",
+            "Implement the clean version: return the index of `target` in the sorted vector `a`, or -1 if it is absent. Halve the search range each step.",
           starterCode: `#include <iostream>
 #include <vector>
 using namespace std;
 
-vector<int> mergeSorted(const vector<int>& a, const vector<int>& b) {
-    // TODO: walk i over a and j over b, always taking the smaller front value
-    return {};
+int binarySearch(const vector<int>& a, int target) {
+    // TODO: lo = 0, hi = a.size() - 1; while lo <= hi, test the midpoint
+    return -1;
 }
 
 int main() {
-    vector<int> out = mergeSorted({1, 4, 7, 9}, {2, 3, 8, 10});
-    for (int x : out) cout << x << " ";   // 1 2 3 4 7 8 9 10
-    cout << endl;
+    vector<int> a = {2, 5, 9, 14, 20, 23, 31, 38, 40, 44, 50, 61};
+    cout << binarySearch(a, 23) << endl;  // 5
+    cout << binarySearch(a, 44) << endl;  // 9
+    cout << binarySearch(a, 7) << endl;   // -1
     return 0;
 }`,
           solutionCode: `#include <iostream>
 #include <vector>
 using namespace std;
 
-vector<int> mergeSorted(const vector<int>& a, const vector<int>& b) {
-    vector<int> out;
-    size_t i = 0, j = 0;
-    while (i < a.size() && j < b.size()) {
-        if (a[i] <= b[j]) out.push_back(a[i++]);
-        else out.push_back(b[j++]);
+int binarySearch(const vector<int>& a, int target) {
+    int lo = 0;
+    int hi = (int)a.size() - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (a[mid] == target) return mid;
+        if (a[mid] < target) lo = mid + 1;
+        else hi = mid - 1;
     }
-    while (i < a.size()) out.push_back(a[i++]);
-    while (j < b.size()) out.push_back(b[j++]);
-    return out;
+    return -1;
 }
 
 int main() {
-    vector<int> out = mergeSorted({1, 4, 7, 9}, {2, 3, 8, 10});
-    for (int x : out) cout << x << " ";   // 1 2 3 4 7 8 9 10
-    cout << endl;
+    vector<int> a = {2, 5, 9, 14, 20, 23, 31, 38, 40, 44, 50, 61};
+    cout << binarySearch(a, 23) << endl;  // 5
+    cout << binarySearch(a, 44) << endl;  // 9
+    cout << binarySearch(a, 7) << endl;   // -1
     return 0;
 }`,
           tests: [
-            { id: 1, label: "Compares the two fronts", keywords: [{ pattern: "a\\[i\\] <= b\\[j\\]" }], hint: "Take whichever front is smaller." },
-            { id: 2, label: "Advances through a", keywords: [{ pattern: "a\\[i\\+\\+\\]" }], hint: "push_back(a[i++]) moves past the value you took." },
-            { id: 3, label: "Drains the leftovers", keywords: [{ pattern: "while \\(i < a.size\\(\\)\\)" }], hint: "One side runs out first - copy the rest of the other." },
+            { id: 1, label: "Overflow-safe midpoint", keywords: [{ pattern: "lo \\+ \\(hi - lo\\) / 2" }], hint: "mid = lo + (hi - lo) / 2." },
+            { id: 2, label: "Returns the index on a match", keywords: [{ pattern: "return mid" }], hint: "a[mid] == target -> return mid." },
+            { id: 3, label: "Discards the correct half", keywords: [{ pattern: "lo = mid \\+ 1" }], hint: "a[mid] < target means the answer is to the right." },
+            { id: 4, label: "Returns -1 when absent", keywords: [{ pattern: "return -1" }], hint: "The loop exits once lo > hi." },
           ],
         },
       },
