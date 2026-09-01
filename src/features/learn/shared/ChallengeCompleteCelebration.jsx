@@ -1,6 +1,8 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useNextLessonPath } from "./lessonNavStore";
 import "./challenge-complete.css";
 
 export default function ChallengeCompleteCelebration({
@@ -8,7 +10,20 @@ export default function ChallengeCompleteCelebration({
   title = "Challenge complete!",
   message = "Go ahead!",
   onDismiss,
+  onGoAhead,
 }) {
+  const navigate = useNavigate();
+  const nextLessonPath = useNextLessonPath();
+
+  function handleGoAhead() {
+    onDismiss?.();
+    if (onGoAhead) {
+      onGoAhead(nextLessonPath);
+      return;
+    }
+    if (nextLessonPath) navigate(nextLessonPath);
+  }
+
   if (typeof document === "undefined") return null;
 
   return createPortal(
@@ -93,7 +108,7 @@ export default function ChallengeCompleteCelebration({
             <motion.button
               type="button"
               className="challenge-complete-btn"
-              onClick={onDismiss}
+              onClick={handleGoAhead}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.72, duration: 0.3 }}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CHAPTERS } from "../data/oopsCurriculum";
 import { useLearnNav } from "../../shared/LearnNavContext";
+import { useRegisterLessonNav } from "../../shared/lessonNavStore";
 import LearnChapterIcon from "../../shared/LearnChapterIcon";
 import LessonStatusIcon from "../../shared/LessonStatusIcon";
 
@@ -16,6 +17,8 @@ export default function OopsSidebar({
   const navigate = useNavigate();
   const { menuOpen, closeMenu } = useLearnNav();
   const [collapsed, setCollapsed] = useState(false);
+
+  useRegisterLessonNav({ basePath, chapters, currentLessonId });
 
   // Which chapters are expanded — default: expand current chapter
   const currentChapter = chapters.find((ch) =>
