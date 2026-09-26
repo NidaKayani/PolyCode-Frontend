@@ -1,6 +1,6 @@
-// PolyCode — Ruby on Rails course (Beginner → Advanced)
+// PolyCode — Ruby OOP course (Beginner → Advanced)
 
-const ACCENT = "#cc0000";
+const ACCENT = "#10b981"; // Green accent for OOP course
 
 function quiz(question, options, answer, explanation) {
   return { type: "quiz", question, options, answer, explanation };
@@ -21,2274 +21,1698 @@ function text(content, codeBlock = null) {
   return { type: "text", content };
 }
 
-export const RUBY_ON_RAILS_CHAPTERS = [
+function diagram(title, nodes) {
+  return { type: "diagram", title, nodes };
+}
+
+export const RUBY_OOP_CHAPTERS = [
   {
-    id: "rails-intro",
-    title: "Introduction to Ruby on Rails — Beginner",
+    id: "oop-basics",
+    title: "Classes & Objects — Beginner",
     stage: "beginner",
-    icon: "🚂",
+    icon: "📦",
     color: ACCENT,
     lessons: [
       {
-        id: "rails-0",
-        title: "What is Ruby on Rails?",
+        id: "oop-0",
+        title: "Introduction to Classes and Objects",
         xp: 10,
         theory: [
           text(
-            "Ruby on Rails (often called Rails) is a web application framework written in Ruby. It follows the MVC (Model-View-Controller) architectural pattern and emphasizes Convention Over Configuration (CoC) and Don't Repeat Yourself (DRY) principles."
+            "Object-Oriented Programming (OOP) is a programming paradigm based on 'objects' which contain data (attributes) and behavior (methods). In Ruby, absolutely everything is an object."
           ),
           text(
-            "Rails is built on Ruby, so if you know Ruby basics, you're ready to learn Rails. Rails handles the boilerplate of web development — routing, database access, sessions, caching — so you can focus on building features."
-          ),
-          callout(
-            "info",
-            "Course level: Beginner to Advanced — each chapter builds on the previous. Examples simulate Rails patterns in pure Ruby so they run in the browser-backed interpreter."
-          ),
-        ],
-        challenge: {
-          title: "Rails Concept Check",
-          description: "Create a class that simulates a Rails-like router. It should have a `match` method that registers a route and a `route_for` method that finds a registered route. Return the route path string.",
-          starterCode: `# Simulate a simple Rails-like router
-class Router
-  def initialize
-    @routes = {}
-  end
-
-  def match(path, controller, action)
-    # Register a route
-  end
-
-  def route_for(path)
-    # Return route info
-  end
-end
-
-router = Router.new
-router.match("/users", "UsersController", "index")
-puts router.route_for("/users")`,
-          solutionCode: `class Router
-  def initialize
-    @routes = {}
-  end
-
-  def match(path, controller, action)
-    @routes[path] = { controller: controller, action: action }
-  end
-
-  def route_for(path)
-    route = @routes[path]
-    return "Route not found" unless route
-    "#{route[:controller]}##{route[:action]}"
-  end
-end
-
-router = Router.new
-router.match("/users", "UsersController", "index")
-puts router.route_for("/users")`,
-          tests: [
-            { id: 1, label: "Has match method", keywords: [{ pattern: "def match" }] },
-            { id: 2, label: "Has route_for method", keywords: [{ pattern: "def route_for" }] },
-            { id: 3, label: "Returns controller#action", keywords: [{ pattern: "UsersController" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-1",
-        title: "MVC Architecture",
-        xp: 12,
-        theory: [
-          text(
-            "MVC separates concerns: Model handles data and business logic, View handles presentation, and Controller coordinates between them. In Rails, this maps to app/models, app/views, and app/controllers.",
+            "A class serves as a blueprint for creating objects. You define a class using the `class` keyword and instantiate new objects using `.new`.",
             {
-              label: "MVC simulation in Ruby",
-              content: `# Simulating Rails MVC structure
-# Model: represents data
-class Article
-  attr_accessor :title, :body
+              label: "Basic Class Example with Comments",
+              content: `# Define the Car class
+class Car
+  # attr_accessor creates getter and setter methods automatically
+  attr_accessor :brand, :model
 
-  def initialize(title, body)
-    @title = title
-    @body = body
+  # Constructor method to initialize object attributes
+  def initialize(brand, model)
+    @brand = brand
+    @model = model
   end
 
-  def summary
-    "#{@title}: #{@body[0..50]}..."
-  end
-end
-
-# View: presents data
-class ArticleView
-  def render(article)
-    puts "=== #{article.title} ==="
-    puts article.body
-    puts "---"
+  # Instance method
+  def start_engine
+    "The #{@brand} #{@model} engine is now running. Vroom!"
   end
 end
 
-# Controller: coordinates
-class ArticlesController
-  def index
-    articles = [
-      Article.new("Rails Intro", "Ruby on Rails is a powerful framework."),
-      Article.new("MVC Pattern", "Model-View-Controller separates concerns."),
-    ]
-    view = ArticleView.new
-    articles.each { |a| view.render(a) }
-  end
-end
-
-ArticlesController.new.index`,
-            },
-          ),
-          quiz(
-            "In Rails MVC, which component handles database operations?",
-            ["View", "Controller", "Model", "Router"],
-            2,
-            "The Model handles data and business logic, including database operations through Active Record."
+# Instantiate a new object from the Car class
+my_car = Car.new("Toyota", "Corolla")
+puts my_car.start_engine`,
+            }
           ),
         ],
         challenge: {
-          title: "MVC Todo App",
-          description: "Create a Todo model with `title` and `done` attributes, a TodoView that renders todos with [x] or [ ] prefix, and a TodosController with an `index` action that shows all todos.",
-          starterCode: `# Implement MVC for a Todo app
-class Todo
-  # attr_accessor :title, :done
-  # def initialize(title); end
+          title: "Create a Dog Class",
+          description: "Define a `Dog` class with `name` and `breed` attributes via `initialize`, and a `bark` method that returns 'Woof! My name is [name].'",
+          starterCode: `class Dog
+  # TODO: Define attr_accessor, initialize, and bark methods
 end
 
-class TodoView
-  # def render(todos); end
-end
-
-class TodosController
-  def index
-    # Create todos and render them
-  end
-end
-
-TodosController.new.index`,
-          solutionCode: `class Todo
-  attr_accessor :title, :done
-
-  def initialize(title)
-    @title = title
-    @done = false
-  end
-end
-
-class TodoView
-  def render(todos)
-    todos.each do |todo|
-      mark = todo.done ? "[x]" : "[ ]"
-      puts "#{mark} #{todo.title}"
-    end
-  end
-end
-
-class TodosController
-  def index
-    todos = [
-      Todo.new("Learn Rails"),
-      Todo.new("Build app"),
-    ]
-    view = TodoView.new
-    view.render(todos)
-  end
-end
-
-TodosController.new.index`,
-          tests: [
-            { id: 1, label: "Has Todo class", keywords: [{ pattern: "class Todo" }] },
-            { id: 2, label: "Has TodoView", keywords: [{ pattern: "class TodoView" }] },
-            { id: 3, label: "Has TodosController", keywords: [{ pattern: "class TodosController" }] },
-          ],
-        },
-      },
-    ],
-  },
-
-  {
-    id: "rails-routes-controllers",
-    title: "Routes & Controllers — Beginner",
-    stage: "beginner",
-    icon: "🛣️",
-    color: "#dc2626",
-    lessons: [
-      {
-        id: "rails-2",
-        title: "Rails Routing Basics",
-        xp: 14,
-        theory: [
-          text(
-            "Rails routing maps URLs to controller actions. The routes.rb file defines these mappings. Rails uses RESTful conventions: GET, POST, PUT/PATCH, DELETE map to index, show, create, update, destroy.",
-            {
-              label: "Rails routing simulation",
-              content: `# Simulating Rails routes
-class RailsRouter
-  def initialize(&block)
-    @routes = { get: [], post: [], put: [], patch: [], delete: [] }
-    instance_eval(&block) if block_given?
-  end
-
-  def get(path, to:)
-    controller, action = to.split("#")
-    @routes[:get] << { path: path, controller: controller, action: action }
-  end
-
-  def resources(name)
-    get "/#{name}", to: "#{name}_controller#index"
-    get "/#{name}/:id", to: "#{name}_controller#show"
-    post "/#{name}", to: "#{name}_controller#create"
-    put "/#{name}/:id", to: "#{name}_controller#update"
-    delete "/#{name}/:id", to: "#{name}_controller#destroy"
-  end
-
-  def recognize_path(method, path)
-    @routes[method.to_sym]&.find { |r| r[:path] == path }
-  end
-end
-
-router = RailsRouter.new do
-  get "/", to: "pages#home"
-  resources :articles
-end
-
-route = router.recognize_path("get", "/articles")
-puts "Controller: #{route[:controller]}, Action: #{route[:action]}"`,
-            },
-          ),
-          callout("tip", "Use `rails routes` in terminal to see all available routes in your Rails app."),
-        ],
-        challenge: {
-          title: "RESTful Router",
-          description: "Create a `resources` method that generates all 7 RESTful routes for a given resource name. The routes should be stored in a routes array and printed.",
-          starterCode: `# Implement a RESTful resources method
-class RESTRouter
-  def initialize
-    @routes = []
-  end
-
-  def get(path, controller_action)
-    @routes << { method: "GET", path: path, to: controller_action }
-  end
-
-  def resources(name)
-    # Generate all 7 RESTful routes
-    # GET    /name          -> index
-    # GET    /name/:id       -> show
-    # GET    /name/new       -> new
-    # GET    /name/:id/edit  -> edit
-    # POST   /name           -> create
-    # PUT    /name/:id       -> update
-    # DELETE /name/:id       -> destroy
-  end
-
-  def print_routes
-    @routes.each { |r| puts "#{r[:method].ljust(6)} #{r[:path]}" }
-  end
-end
-
-router = RESTRouter.new
-router.resources(:posts)
-router.print_routes`,
-          solutionCode: `class RESTRouter
-  def initialize
-    @routes = []
-  end
-
-  def get(path, controller_action)
-    @routes << { method: "GET", path: path, to: controller_action }
-  end
-
-  def post(path, controller_action)
-    @routes << { method: "POST", path: path, to: controller_action }
-  end
-
-  def put(path, controller_action)
-    @routes << { method: "PUT", path: path, to: controller_action }
-  end
-
-  def delete(path, controller_action)
-    @routes << { method: "DELETE", path: path, to: controller_action }
-  end
-
-  def resources(name)
-    get "/#{name}", "#{name}_controller#index"
-    get "/#{name}/:id", "#{name}_controller#show"
-    get "/#{name}/new", "#{name}_controller#new"
-    get "/#{name}/:id/edit", "#{name}_controller#edit"
-    post "/#{name}", "#{name}_controller#create"
-    put "/#{name}/:id", "#{name}_controller#update"
-    delete "/#{name}/:id", "#{name}_controller#destroy"
-  end
-
-  def print_routes
-    @routes.each { |r| puts "#{r[:method].ljust(6)} #{r[:path]}" }
-  end
-end
-
-router = RESTRouter.new
-router.resources(:posts)
-router.print_routes`,
-          tests: [
-            { id: 1, label: "Generates index route", keywords: [{ pattern: "/posts" }] },
-            { id: 2, label: "Generates 7 routes", keywords: [{ pattern: "DELETE" }] },
-            { id: 3, label: "Uses resources method", keywords: [{ pattern: "def resources" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-3",
-        title: "Controller Actions & Params",
-        xp: 14,
-        theory: [
-          text(
-            "Controllers handle incoming requests and return responses. The `params` hash contains request data. Strong parameters protect against mass assignment. Flash messages provide one-time notifications.",
-            {
-              label: "Controller simulation",
-              content: `# Simulating Rails controller
-class RailsController
-  attr_accessor :request, :response, :params, :flash
-
-  def initialize
-    @flash = {}
-    @response = {}
-  end
-
-  def params
-    @params ||= {}
-  end
-
-  def redirect_to(url)
-    @response[:redirect] = url
-    puts "Redirecting to: #{url}"
-  end
-
-  def render(view_name, locals: {})
-    @response[:view] = view_name
-    puts "Rendering: #{view_name}"
-    puts "Locals: #{locals}"
-  end
-end
-
-class PostsController < RailsController
-  def index
-    @posts = ["Post 1", "Post 2", "Post 3"]
-    render "posts/index", locals: { posts: @posts }
-  end
-
-  def show
-    id = params[:id]
-    @post = "Post #{id}"
-    render "posts/show", locals: { post: @post }
-  end
-
-  def create
-    title = params[:post]&.dig(:title) || "Untitled"
-    flash[:notice] = "Post created: #{title}"
-    redirect_to "/posts"
-  end
-end
-
-# Simulate requests
-req1 = PostsController.new
-req1.params[:id] = 42
-req1.show
-
-puts "---"
-req2 = PostsController.new
-req2.params[:post] = { title: "Hello Rails" }
-req2.create
-puts "Flash: #{req2.flash}"`,
-            },
-          ),
-        ],
-        challenge: {
-          title: "Secure Controller",
-          description: "Create a UsersController with `index`, `show`, and `create` actions. Use strong parameters pattern to filter allowed fields. The `create` action should only accept `name` and `email`, not `role`.",
-          starterCode: `# Implement a controller with strong parameters
-class ApplicationController
-  def params
-    @params ||= {}
-  end
-end
-
-class UsersController < ApplicationController
-  private
-
-  def user_params
-    # Filter params to only allow :name and :email
-  end
-
-  public
-
-  def create
-    filtered = user_params
-    puts "Creating user with: #{filtered}"
-    { name: filtered[:name], email: filtered[:email] }
-  end
-end
-
-# Test it
-controller = UsersController.new
-controller.params[:user] = { name: "Alice", email: "alice@example.com", role: "admin" }
-result = controller.create
-puts "Result: #{result}"`,
-          solutionCode: `class ApplicationController
-  def params
-    @params ||= {}
-  end
-end
-
-class UsersController < ApplicationController
-  private
-
-  def user_params
-    params[:user]&.slice(:name, :email) || {}
-  end
-
-  public
-
-  def create
-    filtered = user_params
-    puts "Creating user with: #{filtered}"
-    { name: filtered[:name], email: filtered[:email] }
-  end
-end
-
-controller = UsersController.new
-controller.params[:user] = { name: "Alice", email: "alice@example.com", role: "admin" }
-result = controller.create
-puts "Result: #{result}"`,
-          tests: [
-            { id: 1, label: "Has user_params method", keywords: [{ pattern: "def user_params" }] },
-            { id: 2, label: "Filters allowed fields", keywords: [{ pattern: "slice" }] },
-            { id: 3, label: "Excludes role", keywords: [{ pattern: "role" }] },
-          ],
-        },
-      },
-    ],
-  },
-  {
-    id: "rails-models",
-    title: "Active Record & Models — Intermediate",
-    stage: "intermediate",
-    icon: "🗄️",
-    color: "#ea580c",
-    lessons: [
-      {
-        id: "rails-4",
-        title: "Active Record Basics",
-        xp: 16,
-        theory: [
-          text(
-            "Active Record is Rails' ORM (Object-Relational Mapping) layer. It maps database tables to Ruby classes. Common methods: `all`, `find`, `create`, `update`, `destroy`, `where`.",
-            {
-              label: "Active Record simulation",
-              content: `# Simulating Active Record with a simple in-memory store
-class SimpleRecord
-  @@connection = {}
-  @@id_counter = 0
-
-  class << self
-    def table_name
-      name.downcase + "s"
-    end
-
-    def all
-      (@@connection[table_name] || []).map { |attrs| new(attrs) }
-    end
-
-    def find(id)
-      record = (@@connection[table_name] || []).find { |r| r[:id] == id }
-      raise "Couldn't find #{name} with id=#{id}" unless record
-      new(record)
-    end
-
-    def where(conditions)
-      results = (@@connection[table_name] || []).select do |r|
-        conditions.all? { |k, v| r[k] == v }
-      end
-      results.map { |attrs| new(attrs) }
-    end
-
-    def create(attributes)
-      record = new(attributes)
-      record.save
-      record
-    end
-
-    def reset_db
-      @@connection[table_name] = []
-      @@id_counter = 0
-    end
-  end
-
-  attr_accessor :id, :attributes
-
-  def initialize(attrs = {})
-    @attributes = attrs.dup
-    @id = attrs[:id]
-  end
-
-  def save
-    return update(@attributes) if @id
-    @@id_counter += 1
-    @id ||= @@id_counter
-    @attributes[:id] = @id
-    @@connection[self.class.table_name] ||= []
-    @@connection[self.class.table_name] << @attributes.dup
-    true
-  end
-
-  def update(attrs = {})
-    @attributes.merge!(attrs)
-    @@connection[self.class.table_name]&.each do |r|
-      r.merge!(@attributes) if r[:id] == @id
-    end
-    true
-  end
-
-  def destroy
-    @@connection[self.class.table_name]&.delete_if { |r| r[:id] == @id }
-    true
-  end
-
-  def method_missing(m, *args, &block)
-    if @attributes.key?(m)
-      @attributes[m]
-    elsif m.to_s.end_with?("=")
-      attr = m.to_s.chomp("=").to_sym
-      @attributes[attr] = args.first
-    else
-      super
-    end
-  end
-
-  def respond_to_missing?(m, include_private = false)
-    @attributes.key?(m.to_s.chomp("=").to_sym) || super
-  end
-end
-
-class Post < SimpleRecord
-end
-
-# Use it
-Post.reset_db
-post = Post.create(title: "Hello Rails", body: "Rails is great!")
-puts "Created: #{post.title} (id: #{post.id})"
-
-all_posts = Post.all
-puts "Total posts: #{all_posts.size}"
-
-found = Post.find(post.id)
-puts "Found: #{found.title}"
-
-Post.create(title: "Second Post", body: "More content")
-puts "Posts with 'Hello': #{Post.where(title: 'Hello Rails').size}"`,
-            },
-          ),
-          quiz(
-            "Which Active Record method finds records by a specific id?",
-            ["where", "find", "search", "filter"],
-            1,
-            "`find` retrieves a single record by its primary key (id)."
-          ),
-        ],
-        challenge: {
-          title: "Article CRUD",
-          description: "Create an Article model with title and body attributes. Implement CRUD operations: create 3 articles, find one by id, update one, and count remaining after deleting one.",
-          starterCode: `# Implement Article model with CRUD operations
-class Article < SimpleRecord
-end
-
-# Reset database
-Article.reset_db
-
-# Create 3 articles
-# Find article with id 2
-# Update article 1's title
-# Delete article 3
-# Print remaining count`,
-          solutionCode: `class Article < SimpleRecord
-end
-
-Article.reset_db
-
-a1 = Article.create(title: "Rails Basics", body: "Learn the fundamentals")
-a2 = Article.create(title: "Active Record", body: "ORM in Rails")
-a3 = Article.create(title: "Views", body: "ERB templates")
-
-found = Article.find(a2.id)
-puts "Found: #{found.title}"
-
-a1.title = "Rails Fundamentals"
-a1.save
-
-a3.destroy
-
-remaining = Article.all.size
-puts "Remaining articles: #{remaining}"`,
-          tests: [
-            { id: 1, label: "Creates articles", keywords: [{ pattern: "Article\\.create" }] },
-            { id: 2, label: "Finds article", keywords: [{ pattern: "Article\\.find" }] },
-            { id: 3, label: "Deletes article", keywords: [{ pattern: "destroy" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-5",
-        title: "Associations & Validations",
-        xp: 16,
-        theory: [
-          text(
-            "Active Record associations define relationships between models: `has_many`, `has_one`, `belongs_to`, and `has_and_belongs_to_many`. Validations ensure data integrity before saving.",
-            {
-              label: "Associations simulation",
-              content: `# Simulating Rails-style associations
-class Author
-  attr_accessor :id, :name
-
-  @@all = []
-
-  def initialize(attrs = {})
-    @id = attrs[:id]
-    @name = attrs[:name]
-  end
-
-  def save
-    @@all << self
-    true
-  end
-
-  def articles
-    Article.all.select { |a| a.author_id == @id }
-  end
-
-  def self.all
-    @@all
-  end
-end
-
-class Article
-  attr_accessor :id, :title, :author_id
-
-  @@all = []
-
-  def initialize(attrs = {})
-    @id = attrs[:id]
-    @title = attrs[:title]
-    @author_id = attrs[:author_id]
-  end
-
-  def save
-    @@all << self
-    true
-  end
-
-  def author
-    Author.all.find { |a| a.id == @author_id }
-  end
-
-  def self.all
-    @@all
-  end
-end
-
-# Create author and articles
-author = Author.new(id: 1, name: "Sarah")
-author.save
-
-a1 = Article.new(id: 1, title: "Rails Intro", author_id: 1)
-a2 = Article.new(id: 2, title: "Active Record", author_id: 1)
-a1.save
-a2.save
-
-puts "Author: #{author.name}"
-puts "Articles: #{author.articles.map(&:title).join(", ")}"`,
-            },
-          ),
-          callout("tip", "Always validate at the model level — never trust user input. Use `presence`, `uniqueness`, `format`, and `length` validators."),
-        ],
-        challenge: {
-          title: "Validated User Model",
-          description: "Create a User model with validations: name must be present, email must be present and match a valid email format, and password must be at least 8 characters. Create a `valid?` method that checks all validations.",
-          starterCode: `# Implement User model with validations
-class User
-  attr_accessor :name, :email, :password
-
-  def initialize(attrs = {})
-    @name = attrs[:name]
-    @email = attrs[:email]
-    @password = attrs[:password]
-    @errors = []
-  end
-
-  def valid?
-    @errors = []
-    # Check name presence
-    # Check email presence and format
-    # Check password length (min 8)
-    @errors.empty?
-  end
-
-  def errors
-    @errors
-  end
-end
-
-# Test cases
-u1 = User.new(name: "Alice", email: "alice@example.com", password: "secret123")
-puts "Valid user: #{u1.valid?}"
-
-u2 = User.new(name: "", email: "bad", password: "short")
-puts "Invalid user: #{u2.valid?}"
-puts "Errors: #{u2.errors.join(", ")}"`,
-          solutionCode: `class User
-  attr_accessor :name, :email, :password
-
-  def initialize(attrs = {})
-    @name = attrs[:name]
-    @email = attrs[:email]
-    @password = attrs[:password]
-    @errors = []
-  end
-
-  def valid?
-    @errors = []
-    @errors << "Name can't be blank" if @name.nil? || @name.strip.empty?
-    if @email.nil? || @email.strip.empty?
-      @errors << "Email can't be blank"
-    elsif @email !~ /^[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}$/i
-      @errors << "Email is invalid"
-    end
-    if @password.nil? || @password.length < 8
-      @errors << "Password is too short (minimum is 8 characters)"
-    end
-    @errors.empty?
-  end
-
-  def errors
-    @errors
-  end
-end
-
-u1 = User.new(name: "Alice", email: "alice@example.com", password: "secret123")
-puts "Valid user: #{u1.valid?}"
-
-u2 = User.new(name: "", email: "bad", password: "short")
-puts "Invalid user: #{u2.valid?}"
-puts "Errors: #{u2.errors.join(", ")}"`,
-          tests: [
-            { id: 1, label: "Validates name presence", keywords: [{ pattern: "Name" }] },
-            { id: 2, label: "Validates email format", keywords: [{ pattern: "Email" }] },
-            { id: 3, label: "Validates password length", keywords: [{ pattern: "password" }] },
-          ],
-        },
-      },
-    ],
-  },
-
-  {
-    id: "rails-views",
-    title: "Views & Forms — Intermediate",
-    stage: "intermediate",
-    icon: "🎨",
-    color: "#16a34a",
-    lessons: [
-      {
-        id: "rails-6",
-        title: "ERB Templates & Layouts",
-        xp: 14,
-        theory: [
-          text(
-            "ERB (Embedded Ruby) allows Ruby code in HTML. Use `<% %>` for logic and `<%= %>` for output. Layouts wrap views with common elements like headers and footers.",
-            {
-              label: "ERB simulation",
-              content: `require 'erb'
-require 'ostruct'
-
-# Simulate a view template
-template = <<~ERB
-  <h1><%= @article.title %></h1>
-  <p>By <%= @author.name %></p>
-  <div class="body"><%= @article.body %></div>
-  <% if @article.published %>
-    <span class="badge">Published</span>
-  <% else %>
-    <span class="badge draft">Draft</span>
-  <% end %>
-ERB
-
-# Simulate data
-@article = OpenStruct.new(title: "Rails Views", body: "ERB lets you embed Ruby in HTML.", published: true)
-@author = OpenStruct.new(name: "Sarah")
-
-# Render
-renderer = ERB.new(template)
-result = renderer.result(binding)
-
-puts result`,
-            },
-          ),
-          callout("info", "In real Rails, views go in app/views/controller_name/action_name.html.erb. Use partials (`render 'shared/header'`) for reusable components."),
-        ],
-        challenge: {
-          title: "ERB Article List",
-          description: "Use ERB to render a list showing only published articles with their titles.",
-          starterCode: `require 'erb'
-
-articles = [
-  { title: "Rails", published: true },
-  { title: "Draft Post", published: false },
-  { title: "Active Record", published: true },
-]
-
-template = <<~TPL
-  <ul>
-  <% articles.each do |article| %>
-    <% if article[:published] %>
-      <li><%= article[:title] %></li>
-    <% end %>
-  <% end %>
-  </ul>
-TPL
-
-# Render the template using ERB and print the result
-`,
-          solutionCode: `require 'erb'
-
-articles = [
-  { title: "Rails", published: true },
-  { title: "Draft Post", published: false },
-  { title: "Active Record", published: true },
-]
-
-template = <<~TPL
-  <ul>
-  <% articles.each do |article| %>
-    <% if article[:published] %>
-      <li><%= article[:title] %></li>
-    <% end %>
-  <% end %>
-  </ul>
-TPL
-
-puts ERB.new(template).result(binding)`,
-          tests: [
-            { id: 1, label: "Requires erb", keywords: [{ pattern: "require 'erb'" }] },
-            { id: 2, label: "Uses ERB.new", keywords: [{ pattern: "ERB\\.new" }] },
-            { id: 3, label: "Filters published articles", keywords: [{ pattern: "published" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-7",
-        title: "Form Helpers & CSRF",
-        xp: 14,
-        theory: [
-          text(
-            "Rails form helpers generate HTML forms with proper attributes. `form_with` is the modern helper. CSRF protection uses authenticity tokens to prevent cross-site request forgery.",
-            {
-              label: "Form helper simulation",
-              content: `require 'securerandom'
-
-# Simulating Rails form_with helper
-class FormBuilder
-  def initialize(scope, url, options = {})
-    @scope = scope
-    @url = url
-    @authenticity_token = options[:authenticity_token] || SecureRandom.hex(16)
-    @html = []
-  end
-
-  def text_field(method, options = {})
-    value = @scope && @scope.respond_to?(method) ? @scope.send(method) : ""
-    @html << "<input type=\\"text\\" name=\\"#{method}\\" value=\\"#{value}\\" />"
-    self
-  end
-
-  def submit(value = "Submit")
-    @html << "<input type=\\"submit\\" value=\\"#{value}\\" />"
-    self
-  end
-
-  def to_html
-    <<~HTML
-      <form action="#{@url}" method="post">
-        <input type="hidden" name="authenticity_token" value="#{@authenticity_token}" />
-        #{@html.join("\\n")}
-      </form>
-    HTML
-  end
-end
-
-def form_with(scope: nil, url:, **options)
-  builder = FormBuilder.new(scope, url, options)
-  yield(builder) if block_given?
-  builder.to_html
-end
-
-# Usage
-class UserForm
-  attr_accessor :name, :email
-end
-
-user = UserForm.new
-user.name = "Alice"
-user.email = "alice@example.com"
-
-html = form_with(scope: user, url: "/users") do |f|
-  f.text_field(:name)
-  f.text_field(:email)
-  f.submit("Create User")
-end
-
-puts html`,
-            },
-          ),
-          callout("warning", "Always include CSRF tokens in forms. Rails does this automatically with form helpers. Never disable CSRF protection unless you have a specific reason."),
-        ],
-        challenge: {
-          title: "Secure Form Builder",
-          description: "Create a form builder that generates a complete HTML form with CSRF token, text fields for name and email, and a submit button. The form should POST to /users.",
-          starterCode: `require 'securerandom'
-
-# Create a secure form builder
-class SecureFormBuilder
-  def initialize(url)
-    @url = url
-    @fields = []
-  end
-
-  def text_field(name, value = "")
-    @fields << { type: "text", name: name, value: value }
-    self
-  end
-
-  def email_field(name, value = "")
-    @fields << { type: "email", name: name, value: value }
-    self
-  end
-
-  def submit(text = "Submit")
-    @fields << { type: "submit", value: text }
-    self
-  end
-
-  def to_html
-    # Generate complete form with CSRF token
-  end
-end
-
-form = SecureFormBuilder.new("/users")
-form.text_field("user[name]", "Alice")
-form.email_field("user[email]", "alice@example.com")
-form.submit("Create")
-puts form.to_html`,
-          solutionCode: `require 'securerandom'
-
-class SecureFormBuilder
-  def initialize(url)
-    @url = url
-    @fields = []
-    @csrf_token = SecureRandom.hex(16)
-  end
-
-  def text_field(name, value = "")
-    @fields << { type: "text", name: name, value: value }
-    self
-  end
-
-  def email_field(name, value = "")
-    @fields << { type: "email", name: name, value: value }
-    self
-  end
-
-  def submit(text = "Submit")
-    @fields << { type: "submit", value: text }
-    self
-  end
-
-  def to_html
-    field_html = @fields.map do |f|
-      "<input type=\\"#{f[:type]}\\" name=\\"#{f[:name]}\\" value=\\"#{f[:value]}\\" />"
-    end.join("\\n")
-
-    <<~HTML
-<form action="#{@url}" method="post">
-  <input type="hidden" name="authenticity_token" value="#{@csrf_token}" />
-  #{field_html}
-</form>
-    HTML
-  end
-end
-
-form = SecureFormBuilder.new("/users")
-form.text_field("user[name]", "Alice")
-form.email_field("user[email]", "alice@example.com")
-form.submit("Create")
-puts form.to_html`,
-          tests: [
-            { id: 1, label: "Generates form tag", keywords: [{ pattern: "<form" }] },
-            { id: 2, label: "Includes CSRF token", keywords: [{ pattern: "authenticity_token" }] },
-            { id: 3, label: "Has submit button", keywords: [{ pattern: "submit" }] },
-          ],
-        },
-      },
-    ],
-  },
-  {
-    id: "rails-auth",
-    title: "Authentication & Authorization — Pro",
-    stage: "pro",
-    icon: "🔐",
-    color: "#7e22ce",
-    lessons: [
-      {
-        id: "rails-8",
-        title: "User Authentication",
-        xp: 18,
-        theory: [
-          text(
-            "Authentication verifies who a user is. Rails apps commonly use `has_secure_password` with BCrypt for password hashing. Sessions store authenticated user IDs across requests. Here we simulate the hashing with a simple digest so it runs anywhere.",
-            {
-              label: "Authentication simulation",
-              content: `require 'digest'
-
-# Simulating Rails authentication with has_secure_password
-class User
-  attr_accessor :email, :password_digest
-
-  def initialize(email:, password: nil)
-    @email = email
-    self.password = password if password
-  end
-
-  def password=(password)
-    @password_digest = Digest::SHA256.hexdigest(password)
-  end
-
-  def authenticate(password)
-    return false unless @password_digest
-    Digest::SHA256.hexdigest(password) == @password_digest
-  end
-end
-
-# Create users
-alice = User.new(email: "alice@example.com", password: "secret123")
-bob = User.new(email: "bob@example.com", password: "password")
-
-# Test authentication
-puts "Alice with correct password: #{alice.authenticate("secret123")}"
-puts "Alice with wrong password: #{alice.authenticate("wrong")}"
-puts "Bob: #{bob.authenticate("password")}"`,
-            },
-          ),
-          callout("tip", "Use `has_secure_password` in real Rails apps. It automatically adds password confirmation, secure hashing with BCrypt, and authentication methods."),
-        ],
-        challenge: {
-          title: "Session-based Auth",
-          description: "Create an AuthSystem with User model (email + password_digest), a SessionStore that manages sessions with tokens, and a `login`/`logout`/`current_user` interface.",
-          starterCode: `# Implement session-based authentication
-class User
-  attr_accessor :id, :email, :password_digest
-
-  def initialize(id:, email:, password:)
-    @id = id
-    @email = email
-    @password_digest = password
-  end
-
-  def authenticate(password)
-    @password_digest == password
-  end
-end
-
-class SessionStore
-  def initialize
-    @sessions = {}
-  end
-
-  def create(user)
-    # Generate token, store user_id, return token
-  end
-
-  def destroy(token)
-    # Remove session
-  end
-
-  def get_user(token)
-    # Return user for token or nil
-  end
-end
-
-class AuthSystem
-  def initialize
-    @users = []
-    @sessions = SessionStore.new
-  end
-
-  def register_user(email, password)
-    # Create user
-  end
-
-  def login(email, password)
-    # Find user, authenticate, create session
-  end
-
-  def logout(token)
-    # Destroy session
-  end
-
-  def current_user(token)
-    # Get current user from token
-  end
-end
-
-# Test
-auth = AuthSystem.new
-auth.register_user("alice@example.com", "secret123")
-token = auth.login("alice@example.com", "secret123")
-puts "Logged in as: #{auth.current_user(token)&.email}"`,
-          solutionCode: `class User
-  attr_accessor :id, :email, :password_digest
-
-  def initialize(id:, email:, password:)
-    @id = id
-    @email = email
-    @password_digest = password
-  end
-
-  def authenticate(password)
-    @password_digest == password
-  end
-end
-
-class SessionStore
-  def initialize
-    @sessions = {}
-  end
-
-  def create(user)
-    token = "token_#{rand(10000)}"
-    @sessions[token] = user.id
-    token
-  end
-
-  def destroy(token)
-    @sessions.delete(token)
-  end
-
-  def get_user(token)
-    @sessions[token]
-  end
-end
-
-class AuthSystem
-  def initialize
-    @users = []
-    @sessions = SessionStore.new
-    @next_id = 1
-  end
-
-  def register_user(email, password)
-    user = User.new(id: @next_id, email: email, password: password)
-    @users << user
-    @next_id += 1
-    user
-  end
-
-  def login(email, password)
-    user = @users.find { |u| u.email == email }
-    return nil unless user&.authenticate(password)
-    token = @sessions.create(user)
-    token
-  end
-
-  def logout(token)
-    @sessions.destroy(token)
-  end
-
-  def current_user(token)
-    user_id = @sessions.get_user(token)
-    @users.find { |u| u.id == user_id }
-  end
-end
-
-auth = AuthSystem.new
-auth.register_user("alice@example.com", "secret123")
-token = auth.login("alice@example.com", "secret123")
-puts "Logged in as: #{auth.current_user(token)&.email}"`,
-          tests: [
-            { id: 1, label: "Has User class", keywords: [{ pattern: "class User" }] },
-            { id: 2, label: "Has login method", keywords: [{ pattern: "def login" }] },
-            { id: 3, label: "Has current_user method", keywords: [{ pattern: "current_user" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-9",
-        title: "Authorization & Permissions",
-        xp: 16,
-        theory: [
-          text(
-            "Authorization determines what authenticated users can do. Use `before_action` filters and policy objects to enforce permissions. Never trust client-side checks alone.",
-            {
-              label: "Authorization simulation",
-              content: `require 'ostruct'
-
-class ApplicationController
-  attr_accessor :current_user
-
-  def initialize
-    @current_user = nil
-  end
-
-  def authorize(action, resource)
-    return true if allowed?(action, resource)
-    raise "Unauthorized: #{action} on #{resource.class}"
-  end
-
-  def allowed?(action, resource)
-    return false unless @current_user
-    return true if @current_user[:role] == :admin
-    return true if resource.respond_to?(:user_id) && resource.user_id == @current_user[:id]
-    action == :read
-  end
-
-  def require_login
-    raise "Login required" unless @current_user
-  end
-end
-
-class PostsController < ApplicationController
-  def destroy
-    post = OpenStruct.new(id: 1, user_id: 42)
-    authorize(:delete, post)
-    puts "Post deleted!"
-  end
-end
-
-# Test as regular user
-user = { id: 42, role: :user }
-controller = PostsController.new
-controller.current_user = user
-controller.destroy rescue puts "Blocked: #{$!}"
-
-# Test as admin
-admin = { id: 99, role: :admin }
-controller.current_user = admin
-controller.destroy`,
-            },
-          ),
-          callout("warning", "Always authorize at the controller level AND at the model level. Use a policy class (like Pundit) for complex authorization logic."),
-        ],
-        challenge: {
-          title: "Role-based Access Control",
-          description: "Create a RoleBasedAccess class with `can?(user, action, resource)` method. Admins can do everything, editors can edit posts they own, viewers can only read. Test with different user roles.",
-          starterCode: `# Implement role-based access control
-class Post
-  attr_accessor :id, :author_id, :title
-
-  def initialize(id:, author_id:, title:)
-    @id = id
-    @author_id = author_id
-    @title = title
-  end
-end
-
-class RoleBasedAccess
-  def can?(user, action, resource)
-    # Admin: can do anything
-    # Editor: can edit/delete their own posts, read all
-    # Viewer: can only read
-  end
-end
-
-access = RoleBasedAccess.new
-admin = { id: 1, role: :admin }
-editor = { id: 2, role: :editor }
-viewer = { id: 3, role: :viewer }
-
-post = Post.new(id: 1, author_id: 2, title: "Test Post")
-
-puts "Admin can delete: #{access.can?(admin, :delete, post)}"
-puts "Editor can delete own: #{access.can?(editor, :delete, post)}"
-puts "Viewer can read: #{access.can?(viewer, :read, post)}"
-puts "Viewer cannot delete: #{access.can?(viewer, :delete, post)}"`,
-          solutionCode: `class Post
-  attr_accessor :id, :author_id, :title
-
-  def initialize(id:, author_id:, title:)
-    @id = id
-    @author_id = author_id
-    @title = title
-  end
-end
-
-class RoleBasedAccess
-  def can?(user, action, resource)
-    return false unless user
-
-    case user[:role]
-    when :admin
-      true
-    when :editor
-      return true if action == :read
-      return resource.author_id == user[:id] if [:edit, :delete].include?(action)
-      false
-    when :viewer
-      action == :read
-    else
-      false
-    end
-  end
-end
-
-access = RoleBasedAccess.new
-admin = { id: 1, role: :admin }
-editor = { id: 2, role: :editor }
-viewer = { id: 3, role: :viewer }
-
-post = Post.new(id: 1, author_id: 2, title: "Test Post")
-
-puts "Admin can delete: #{access.can?(admin, :delete, post)}"
-puts "Editor can delete own: #{access.can?(editor, :delete, post)}"
-puts "Viewer can read: #{access.can?(viewer, :read, post)}"
-puts "Viewer cannot delete: #{access.can?(viewer, :delete, post)}"`,
-          tests: [
-            { id: 1, label: "Handles admin role", keywords: [{ pattern: ":admin" }] },
-            { id: 2, label: "Handles editor role", keywords: [{ pattern: ":editor" }] },
-            { id: 3, label: "Handles viewer role", keywords: [{ pattern: ":viewer" }] },
-          ],
-        },
-      },
-    ],
-  },
-
-  {
-    id: "rails-apis",
-    title: "REST APIs & JSON — Pro",
-    stage: "pro",
-    icon: "🔌",
-    color: "#0ea5e9",
-    lessons: [
-      {
-        id: "rails-10",
-        title: "Building REST APIs",
-        xp: 18,
-        theory: [
-          text(
-            "Rails APIs return JSON instead of HTML. Use `render json:` to serialize data. Follow REST conventions: GET for reads, POST for creates, PUT/PATCH for updates, DELETE for removals.",
-            {
-              label: "API simulation",
-              content: `require 'json'
-
-class APIResponse
-  def self.json(data, status: 200)
-    {
-      status: status,
-      headers: { "Content-Type" => "application/json" },
-      body: JSON.pretty_generate(data)
-    }
-  end
-
-  def self.error(message, status: 400)
-    json({ error: message }, status: status)
-  end
-end
-
-class ArticlesController
-  attr_accessor :params
-
-  def initialize
-    @articles = [
-      { id: 1, title: "Rails API", body: "Building APIs with Rails", author: "Sarah" },
-      { id: 2, title: "JSON", body: "JavaScript Object Notation", author: "Bob" },
-    ]
-    @params = {}
-  end
-
-  def index
-    APIResponse.json({ articles: @articles, count: @articles.size })
-  end
-
-  def show
-    article = @articles.find { |a| a[:id] == params[:id].to_i }
-    return APIResponse.error("Not found", status: 404) unless article
-    APIResponse.json({ article: article })
-  end
-
-  def create
-    new_article = {
-      id: @articles.size + 1,
-      title: params[:title] || "Untitled",
-      body: params[:body] || "",
-      author: params[:author] || "Anonymous"
-    }
-    @articles << new_article
-    APIResponse.json({ article: new_article }, status: 201)
-  end
-end
-
-controller = ArticlesController.new
-puts "=== INDEX ==="
-puts controller.index[:body]
-
-controller.params = { id: "1" }
-puts "\\n=== SHOW ==="
-puts controller.show[:body]
-
-controller.params = { title: "New Post", body: "Content", author: "Alice" }
-puts "\\n=== CREATE ==="
-puts controller.create[:body]`,
-            },
-          ),
-          callout("info", "Use `rails new api --api` to generate an API-only Rails app with minimal middleware and no views."),
-        ],
-        challenge: {
-          title: "JSON API Endpoint",
-          description: "Create an API controller that handles CRUD for a Product model. Implement index (returns all products), show (returns one by id), create (adds product), and destroy (removes product). All responses should be JSON.",
-          starterCode: `require 'json'
-
-# Implement a JSON API for products
-class Product
-  attr_accessor :id, :name, :price
-
-  def initialize(id:, name:, price:)
-    @id = id
+dog = Dog.new("Rover", "Golden Retriever")
+puts dog.bark`,
+          solutionCode: `class Dog
+  attr_accessor :name, :breed
+
+  def initialize(name, breed)
     @name = name
-    @price = price
+    @breed = breed
   end
 
-  def to_h
-    { id: @id, name: @name, price: @price }
-  end
-end
-
-class ProductsController
-  attr_accessor :params
-
-  def initialize
-    @products = [
-      Product.new(id: 1, name: "Laptop", price: 999),
-      Product.new(id: 2, name: "Mouse", price: 29),
-    ]
-    @params = {}
-  end
-
-  def index
-    # Return all products as JSON
-  end
-
-  def show
-    # Return one product by id
-  end
-
-  def create
-    # Add new product, return it
-  end
-
-  def destroy
-    # Remove product by id
+  def bark
+    "Woof! My name is #{@name}."
   end
 end
 
-controller = ProductsController.new
-puts controller.index
-controller.params = { id: 1 }
-puts controller.show
-controller.params = { name: "Keyboard", price: 79 }
-puts controller.create
-controller.params = { id: 1 }
-puts controller.destroy`,
-          solutionCode: `require 'json'
+dog = Dog.new("Rover", "Golden Retriever")
+puts dog.bark`,
+          tests: [
+            { id: 1, label: "Has Dog class", keywords: [{ pattern: "class Dog" }] },
+            { id: 2, label: "Has initialize method", keywords: [{ pattern: "def initialize" }] },
+            { id: 3, label: "Has bark method", keywords: [{ pattern: "def bark" }] },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "oop-inheritance",
+    title: "Inheritance & Polymorphism — Intermediate",
+    stage: "intermediate",
+    icon: "🧬",
+    color: "#059669",
+    lessons: [
+      {
+        id: "oop-1",
+        title: "Class Inheritance and Super",
+        xp: 15,
+        theory: [
+          text(
+            "Inheritance allows a child class to inherit methods and attributes from a parent class using the `<` symbol. The `super` keyword passes arguments up to the parent class.",
+            {
+              label: "Inheritance Example",
+              content: `# Parent (Superclass)
+class Animal
+  attr_reader :name
 
-class Product
-  attr_accessor :id, :name, :price
-
-  def initialize(id:, name:, price:)
-    @id = id
+  def initialize(name)
     @name = name
-    @price = price
   end
 
-  def to_h
-    { id: @id, name: @name, price: @price }
-  end
-end
-
-class ProductsController
-  attr_accessor :params
-
-  def initialize
-    @products = [
-      Product.new(id: 1, name: "Laptop", price: 999),
-      Product.new(id: 2, name: "Mouse", price: 29),
-    ]
-    @params = {}
-    @next_id = 3
-  end
-
-  def index
-    JSON.generate({ products: @products.map(&:to_h), count: @products.size })
-  end
-
-  def show
-    product = @products.find { |p| p.id == @params[:id] }
-    return JSON.generate({ error: "Not found" }) unless product
-    JSON.generate({ product: product.to_h })
-  end
-
-  def create
-    product = Product.new(id: @next_id, name: @params[:name], price: @params[:price])
-    @products << product
-    @next_id += 1
-    JSON.generate({ product: product.to_h })
-  end
-
-  def destroy
-    @products.reject! { |p| p.id == @params[:id] }
-    JSON.generate({ message: "Deleted" })
+  def speak
+    "#{@name} makes a sound."
   end
 end
 
-controller = ProductsController.new
-puts controller.index
-controller.params = { id: 1 }
-puts controller.show
-controller.params = { name: "Keyboard", price: 79 }
-puts controller.create
-controller.params = { id: 1 }
-puts controller.destroy`,
-          tests: [
-            { id: 1, label: "Returns JSON", keywords: [{ pattern: "JSON" }] },
-            { id: 2, label: "Has index action", keywords: [{ pattern: "def index" }] },
-            { id: 3, label: "Has create action", keywords: [{ pattern: "def create" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-11",
-        title: "API Authentication (JWT)",
-        xp: 16,
-        theory: [
-          text(
-            "JSON Web Tokens (JWT) authenticate API requests. Unlike sessions, JWTs are stateless and can be validated by any service. The token is sent in the Authorization header.",
-            {
-              label: "JWT simulation",
-              content: `require 'base64'
-require 'json'
-
-class SimpleJWT
-  def self.encode(payload, secret)
-    header = Base64.urlsafe_encode64({ typ: "JWT", alg: "HS256" }.to_json)
-    payload_b64 = Base64.urlsafe_encode64(payload.to_json)
-    signature = Base64.urlsafe_encode64("#{secret}:#{payload_b64}")
-    "#{header}.#{payload_b64}.#{signature}"
-  end
-
-  def self.decode(token, secret)
-    parts = token.split(".")
-    return nil if parts.length != 3
-    header, payload_b64, signature = parts
-    expected = Base64.urlsafe_encode64("#{secret}:#{payload_b64}")
-    return nil unless signature == expected
-    JSON.parse(Base64.urlsafe_decode64(payload_b64))
+# Child (Subclass) inheriting from Animal
+class Cat < Animal
+  def speak
+    # Call parent's speak method using super and append text
+    super + " Meow!"
   end
 end
 
-# Create token
-payload = { user_id: 42, exp: Time.now.to_i + 3600 }
-secret = "my_secret_key"
-token = SimpleJWT.encode(payload, secret)
-puts "Token: #{token[0..50]}..."
-
-# Verify token
-decoded = SimpleJWT.decode(token, secret)
-puts "Decoded: #{decoded}"
-
-# Tamper detection
-tampered = token.sub("42", "99")
-puts "Tampered: #{SimpleJWT.decode(tampered, secret).inspect}"`,
-            },
+cat = Cat.new("Whiskers")
+puts cat.speak`,
+            }
           ),
-          callout("tip", "In production, use the `jwt` gem and store secrets in environment variables, never in code."),
         ],
         challenge: {
-          title: "Token-protected API",
-          description: "Create an APIGateway class that accepts requests with a Bearer token, validates it, and returns either the requested data or an unauthorized error.",
-          starterCode: `require 'json'
-
-class SimpleJWT
-  def self.encode(payload, secret)
-    "#{secret}_#{payload.to_json}_#{secret}"
-  end
-
-  def self.decode(token, secret)
-    parts = token.split("_")
-    return nil unless parts[0] == secret && parts[2] == secret
-    JSON.parse(parts[1])
+          title: "Manager Subclass",
+          description: "Create an `Employee` base class and a `Manager` subclass that inherits from `Employee` using `super` to initialize department.",
+          starterCode: `class Employee
+  attr_accessor :name, :salary
+  def initialize(name, salary)
+    @name = name
+    @salary = salary
   end
 end
 
-class APIGateway
-  def initialize(secret)
-    @secret = secret
-    @data = { users: ["Alice", "Bob", "Charlie"] }
-  end
-
-  def handle_request(path:, auth_header: nil)
-    # Check token, return data or error
-  end
-end
-
-gateway = APIGateway.new("secret123")
-puts gateway.handle_request(path: "/users")
-puts gateway.handle_request(path: "/users", auth_header: "Bearer #{SimpleJWT.encode({user_id: 1}, 'secret123')}")`,
-          solutionCode: `require 'json'
-
-class SimpleJWT
-  def self.encode(payload, secret)
-    "#{secret}_#{payload.to_json}_#{secret}"
-  end
-
-  def self.decode(token, secret)
-    parts = token.split("_")
-    return nil unless parts[0] == secret && parts[2] == secret
-    JSON.parse(parts[1])
+class Manager < Employee
+  # TODO: Add department and call super
+end`,
+          solutionCode: `class Employee
+  attr_accessor :name, :salary
+  def initialize(name, salary)
+    @name = name
+    @salary = salary
   end
 end
 
-class APIGateway
-  def initialize(secret)
-    @secret = secret
-    @data = { users: ["Alice", "Bob", "Charlie"] }
-  end
+class Manager < Employee
+  attr_accessor :department
 
-  def handle_request(path:, auth_header: nil)
-    token = auth_header&.sub("Bearer ", "")
-    return { error: "Unauthorized", status: 401 } unless token
-
-    payload = SimpleJWT.decode(token, @secret)
-    return { error: "Invalid token", status: 401 } unless payload
-
-    { data: @data, status: 200 }
+  def initialize(name, salary, department)
+    super(name, salary) # Passes name and salary to Employee
+    @department = department
   end
 end
 
-gateway = APIGateway.new("secret123")
-puts gateway.handle_request(path: "/users")
-puts gateway.handle_request(path: "/users", auth_header: "Bearer #{SimpleJWT.encode({user_id: 1}, 'secret123')}")`,
+mgr = Manager.new("Alice", 80000, "Engineering")
+puts "#{mgr.name} manages #{mgr.department}"`,
           tests: [
-            { id: 1, label: "Validates token", keywords: [{ pattern: "decode" }] },
-            { id: 2, label: "Returns unauthorized", keywords: [{ pattern: "401" }] },
-            { id: 3, label: "Returns data on valid token", keywords: [{ pattern: "data" }] },
+            { id: 1, label: "Manager inherits from Employee", keywords: [{ pattern: "class Manager < Employee" }] },
+            { id: 2, label: "Passes name and salary up with super(...)", keywords: [{ pattern: "super\\s*\\(" }] },
+            { id: 3, label: "Stores the department", keywords: [{ pattern: "@department\\s*=" }] },
           ],
         },
       },
     ],
   },
   {
-    id: "rails-deployment",
-    title: "Deployment & Performance — Advanced",
-    stage: "advanced",
-    icon: "🚀",
-    color: "#dc2626",
+    id: "oop-equality",
+    title: "Equality & Comparison — Intermediate",
+    stage: "intermediate",
+    icon: "⚖️",
+    color: "#0d9488",
     lessons: [
       {
-        id: "rails-12",
-        title: "Production Setup & Environment",
-        xp: 18,
-        theory: [
-          text(
-            "Rails environments: development (local), test (CI), production (live). Use environment variables for secrets. Configure asset pipelines, caching, and logging per environment.",
-            {
-              label: "Environment configuration simulation",
-              content: `# Simulating Rails-style environment configuration
-class AppConfig
-  class Configuration
-    attr_accessor :cache_store, :log_level, :precompile_assets, :secret_key_base
-
-    def initialize
-      @cache_store = :memory_store
-      @log_level = :info
-      @precompile_assets = false
-      @secret_key_base = nil
-    end
-  end
-
-  class << self
-    def environments
-      @environments ||= {}
-    end
-
-    def configure(env)
-      settings = Configuration.new
-      yield(settings)
-      environments[env] = settings
-    end
-
-    def env
-      @current_env ||= :development
-    end
-
-    def env=(e)
-      @current_env = e
-    end
-
-    def settings
-      environments[env] || Configuration.new
-    end
-  end
-end
-
-# Configure environments
-AppConfig.configure(:development) do |config|
-  config.log_level = :debug
-  config.precompile_assets = false
-end
-
-AppConfig.configure(:production) do |config|
-  config.log_level = :warn
-  config.precompile_assets = true
-  config.cache_store = :redis_store
-  config.secret_key_base = ENV["SECRET_KEY_BASE"] || "fallback_secret"
-end
-
-AppConfig.env = :production
-puts "Cache: #{AppConfig.settings.cache_store}"
-puts "Log: #{AppConfig.settings.log_level}"`,
-            },
-          ),
-          callout("info", "Use `RAILS_ENV=production rails server` to run in production mode. Always set SECRET_KEY_BASE for production."),
-        ],
-        challenge: {
-          title: "Environment Config",
-          description: "Create a ConfigManager that loads environment-specific settings. It should have development (debug logging, localhost DB), production (warn logging, real DB URL from env), and test environments.",
-          starterCode: `require 'ostruct'
-
-# Implement environment-specific configuration
-class ConfigManager
-  def initialize
-    @env = ENV['RAILS_ENV'] || 'development'
-    @configs = {}
-  end
-
-  def configure(env, &block)
-    # Store configuration for env
-  end
-
-  def current
-    # Return current env config
-  end
-
-  def [](key)
-    # Get config value
-  end
-end
-
-manager = ConfigManager.new
-
-manager.configure(:development) do |c|
-  c.db_url = "postgres://localhost/myapp_dev"
-  c.log_level = :debug
-  c.secret = "dev_secret_123"
-end
-
-manager.configure(:production) do |c|
-  c.db_url = ENV['DATABASE_URL']
-  c.log_level = :warn
-  c.secret = ENV['SECRET_KEY_BASE']
-end
-
-# Test
-ENV['RAILS_ENV'] = 'production'
-config = ConfigManager.new
-puts "DB: #{config[:db_url]}"
-puts "Log: #{config[:log_level]}"`,
-          solutionCode: `require 'ostruct'
-
-class ConfigManager
-  def initialize
-    @env = ENV['RAILS_ENV'] || 'development'
-    @configs = {}
-  end
-
-  def configure(env, &block)
-    config = OpenStruct.new
-    yield(config)
-    @configs[env] = config
-  end
-
-  def current
-    @configs[@env.to_sym]
-  end
-
-  def [](key)
-    current&.send(key)
-  end
-end
-
-manager = ConfigManager.new
-
-manager.configure(:development) do |c|
-  c.db_url = "postgres://localhost/myapp_dev"
-  c.log_level = :debug
-  c.secret = "dev_secret_123"
-end
-
-manager.configure(:production) do |c|
-  c.db_url = ENV.fetch('DATABASE_URL', 'postgres://prod/db')
-  c.log_level = :warn
-  c.secret = ENV.fetch('SECRET_KEY_BASE', 'missing')
-end
-
-manager.configure(:test) do |c|
-  c.db_url = "postgres://localhost/myapp_test"
-  c.log_level = :error
-  c.secret = "test_secret"
-end
-
-ENV['RAILS_ENV'] = 'production'
-config = ConfigManager.new
-puts "DB: #{config[:db_url]}"
-puts "Log: #{config[:log_level]}"`,
-          tests: [
-            { id: 1, label: "Configures environments", keywords: [{ pattern: "configure" }] },
-            { id: 2, label: "Uses environment variables", keywords: [{ pattern: "ENV" }] },
-            { id: 3, label: "Returns current config", keywords: [{ pattern: "current" }] },
-          ],
-        },
-      },
-      {
-        id: "rails-13",
-        title: "Caching & Performance",
-        xp: 16,
-        theory: [
-          text(
-            "Rails provides page, action, and fragment caching. Use `cache` helper in views. For more control, use ActiveSupport::Cache with Redis or Memcached stores.",
-            {
-              label: "Caching simulation",
-              content: `# Simulating Rails caching
-class CacheStore
-  def initialize
-    @store = {}
-  end
-
-  def fetch(key, expires_in: nil)
-    if @store.key?(key)
-      data = @store[key]
-      if data[:expires_at] && Time.now > data[:expires_at]
-        @store.delete(key)
-      else
-        return data[:value]
-      end
-    end
-    value = yield
-    @store[key] = {
-      value: value,
-      expires_at: expires_in ? Time.now + expires_in : nil
-    }
-    value
-  end
-
-  def read(key)
-    return nil unless @store.key?(key)
-    @store[key][:value]
-  end
-
-  def write(key, value, expires_in: nil)
-    @store[key] = {
-      value: value,
-      expires_at: expires_in ? Time.now + expires_in : nil
-    }
-  end
-
-  def delete(key)
-    @store.delete(key)
-  end
-
-  def clear
-    @store.clear
-  end
-end
-
-cache = CacheStore.new
-
-# First call - executes block
-result1 = cache.fetch("articles") { ["Article 1", "Article 2"] }
-puts "First call: #{result1}"
-
-# Second call - from cache
-result2 = cache.fetch("articles") { ["Should not run"] }
-puts "Cached: #{result2}"
-
-# With expiry
-cache.write("temp", "data", expires_in: 0.01)
-sleep 0.02
-puts "Expired: #{cache.read("temp").inspect}"`,
-            },
-          ),
-          callout("tip", "Use Russian Doll caching (nested fragment caches) for complex pages. Combine with `touch: true` on associations to auto-expire parent caches."),
-        ],
-        challenge: {
-          title: "Cache with Sweeping",
-          description: "Create a CacheManager with `fetch(key, &block)` that caches results, `expire(key)` to manually invalidate, and `expire_all` to clear everything. Also implement automatic expiry based on TTL.",
-          starterCode: `# Implement a cache manager with TTL
-class CacheManager
-  def initialize
-    @store = {}
-  end
-
-  def fetch(key, ttl: nil, &block)
-    # Return cached if fresh, otherwise execute block and cache
-  end
-
-  def expire(key)
-    # Remove specific key
-  end
-
-  def expire_all
-    # Clear all cache
-  end
-end
-
-cache = CacheManager.new
-
-# First call
-r1 = cache.fetch("user:1") { "Alice" }
-puts "First: #{r1}"
-
-# Second call (cached)
-r2 = cache.fetch("user:1") { "Bob" }
-puts "Cached: #{r2}"
-
-# With TTL
-r3 = cache.fetch("session", ttl: 0.01) { "session_data" }
-sleep 0.02
-r4 = cache.fetch("session") { "new_session" }
-puts "TTL expired: #{r4}"`,
-          solutionCode: `class CacheManager
-  def initialize
-    @store = {}
-  end
-
-  def fetch(key, ttl: nil, &block)
-    entry = @store[key]
-    if entry && (!entry[:expires_at] || Time.now < entry[:expires_at])
-      return entry[:value]
-    end
-    value = block.call
-    expires_at = ttl ? Time.now + ttl : nil
-    @store[key] = { value: value, expires_at: expires_at }
-    value
-  end
-
-  def expire(key)
-    @store.delete(key)
-  end
-
-  def expire_all
-    @store.clear
-  end
-end
-
-cache = CacheManager.new
-
-r1 = cache.fetch("user:1") { "Alice" }
-puts "First: #{r1}"
-
-r2 = cache.fetch("user:1") { "Bob" }
-puts "Cached: #{r2}"
-
-r3 = cache.fetch("session", ttl: 0.01) { "session_data" }
-sleep 0.02
-r4 = cache.fetch("session") { "new_session" }
-puts "TTL expired: #{r4}"`,
-          tests: [
-            { id: 1, label: "Caches results", keywords: [{ pattern: "@store" }] },
-            { id: 2, label: "Has expire method", keywords: [{ pattern: "def expire" }] },
-            { id: 3, label: "Supports TTL", keywords: [{ pattern: "ttl" }] },
-          ],
-        },
-      },
-    ],
-  },
-
-  {
-    id: "rails-advanced-patterns",
-    title: "Advanced Rails Patterns — Advanced",
-    stage: "advanced",
-    icon: "⚙️",
-    color: "#1d4ed8",
-    lessons: [
-      {
-        id: "rails-14",
-        title: "Background Jobs & Active Job",
+        id: "oop-3",
+        title: "to_s and inspect",
         xp: 20,
         theory: [
           text(
-            "Background jobs move slow tasks out of the request cycle. Rails Active Job provides a unified interface for job libraries like Sidekiq, Resque, or DelayedJob. Here we simulate a simple synchronous queue.",
+            "Every Ruby object can describe itself in two ways, and both methods come from `Object`. `to_s` is the **friendly** version, meant for people reading your program's output. `inspect` is the **developer** version, meant for debugging. `puts` and string interpolation call `to_s`; `p` calls `inspect`.",
+          ),
+          text(
+            "Without your own versions, Ruby prints the class name and a memory address, which tells a reader almost nothing. Overriding both methods gives each object a clear voice.",
             {
-              label: "Job queue simulation",
-              content: `# Simulating a simple Active-Job-style queue
-class JobBase
-  def self.perform_later(*args)
-    puts "Job enqueued: #{self}"
-    new.perform(*args)
-  end
+              label: "Default output vs custom to_s and inspect",
+              content: `class Weight
+  attr_reader :kilograms
 
-  def perform(*args)
-    raise "Not implemented"
+  def initialize(kilograms)
+    @kilograms = kilograms
   end
 end
 
-class SendWelcomeEmailJob < JobBase
-  def perform(user_email)
-    puts "Sending email to #{user_email}..."
-    puts "Email sent to #{user_email}!"
+bag = Weight.new(2.5)
+puts bag.to_s.start_with?("#<Weight")  # true - the default looks like #<Weight:0x...>
+
+class Weight
+  def to_s
+    "#{kilograms} kg"
+  end
+
+  def inspect
+    "#<Weight kilograms=#{kilograms}>"
   end
 end
 
-class GenerateReportJob < JobBase
-  def perform(report_id)
-    puts "Generating report #{report_id}..."
-    puts "Report #{report_id} ready!"
-  end
-end
-
-SendWelcomeEmailJob.perform_later("alice@example.com")
-GenerateReportJob.perform_later("report_42")`,
+puts bag            # uses to_s
+p bag               # uses inspect
+puts "Pack #{bag}"  # interpolation uses to_s too`,
             },
           ),
-          callout("info", "In production, use Sidekiq with Redis for reliable background job processing. It persists jobs in Redis and has a great web UI."),
+          text(
+            "Collections lean on the same two methods. `p` on an array calls `inspect` on every element, and so does interpolating an array, because `Array#to_s` is an alias of `inspect`. `puts` with an array is the odd one out: it prints each element on its own line using `to_s`.",
+            {
+              label: "How arrays print their elements",
+              content: `class Weight
+  attr_reader :kilograms
+
+  def initialize(kilograms)
+    @kilograms = kilograms
+  end
+
+  def to_s
+    "#{kilograms} kg"
+  end
+
+  def inspect
+    "#<Weight kilograms=#{kilograms}>"
+  end
+end
+
+weights = [Weight.new(1), Weight.new(3.2)]
+puts weights            # one line per element, each via to_s
+p weights               # inspect on every element
+puts "All: #{weights}"  # Array#to_s is inspect`,
+            },
+          ),
+          callout(
+            "tip",
+            "Write `to_s` for your users and `inspect` for future you. A good `inspect` shows the class name and the fields that identify the object, so a debugging line like `p order` tells the whole story.",
+          ),
+          callout(
+            "info",
+            "`p` returns the object it printed, while `puts` returns `nil`. That makes `p` handy in the middle of an expression when you are debugging.",
+          ),
+          quiz(
+            "Which method does `puts invoice` call to turn `invoice` into text?",
+            ["inspect", "to_s", "to_str", "display"],
+            1,
+            "`puts` (and string interpolation) call `to_s`. `p` is the one that calls `inspect`.",
+          ),
+          quiz(
+            "What does `p [item]` use to show `item`?",
+            ["item.to_s", "item.inspect", "item.name", "Nothing: it prints the array's memory address"],
+            1,
+            "`p` calls `inspect` on the array, and an array's `inspect` calls `inspect` on every element.",
+          ),
         ],
         challenge: {
-          title: "Job Queue System",
-          description: "Create a SimpleJobQueue with `enqueue(job_class, *args)` that queues jobs, and `process_all` that runs all queued jobs. Jobs should be classes with a `perform(*args)` method.",
-          starterCode: `# Implement a simple job queue
-class SimpleJobQueue
-  def initialize
-    @jobs = []
+          title: "Readable Prices",
+          description:
+            "The `Price` class stores an amount in **cents** plus a currency code. Give it a `to_s` that returns the amount with two decimals and the currency (`12.50 USD`), and an `inspect` that returns `#<Price 1250 USD>`. The program prints the price once with `puts` and once with `p`.",
+          starterCode: `class Price
+  attr_reader :cents, :currency
+
+  def initialize(cents, currency)
+    @cents = cents
+    @currency = currency
   end
 
-  def enqueue(job_class, *args)
-    # Add job to queue
+  # Add to_s and inspect below
+end
+
+lunch = Price.new(1250, "USD")
+puts lunch
+p lunch`,
+          solutionCode: `class Price
+  attr_reader :cents, :currency
+
+  def initialize(cents, currency)
+    @cents = cents
+    @currency = currency
   end
 
-  def process_all
-    # Process all jobs in order
+  def to_s
+    format("%.2f %s", cents / 100.0, currency)
+  end
+
+  def inspect
+    "#<Price #{cents} #{currency}>"
   end
 end
 
-class SendEmailJob
-  def self.perform(recipient, subject)
-    puts "Email sent: #{subject} to #{recipient}"
-  end
-end
-
-class ProcessPaymentJob
-  def self.perform(order_id, amount)
-    puts "Payment processed: ##{order_id} - $#{amount}"
-  end
-end
-
-queue = SimpleJobQueue.new
-queue.enqueue(SendEmailJob, "alice@example.com", "Welcome!")
-queue.enqueue(ProcessPaymentJob, "ORD-123", 99.99)
-queue.process_all`,
-          solutionCode: `class SimpleJobQueue
-  def initialize
-    @jobs = []
-  end
-
-  def enqueue(job_class, *args)
-    @jobs << { class: job_class, args: args }
-  end
-
-  def process_all
-    while @jobs.any?
-      job = @jobs.shift
-      job[:class].perform(*job[:args])
-    end
-  end
-end
-
-class SendEmailJob
-  def self.perform(recipient, subject)
-    puts "Email sent: #{subject} to #{recipient}"
-  end
-end
-
-class ProcessPaymentJob
-  def self.perform(order_id, amount)
-    puts "Payment processed: ##{order_id} - $#{amount}"
-  end
-end
-
-queue = SimpleJobQueue.new
-queue.enqueue(SendEmailJob, "alice@example.com", "Welcome!")
-queue.enqueue(ProcessPaymentJob, "ORD-123", 99.99)
-queue.process_all`,
+lunch = Price.new(1250, "USD")
+puts lunch
+p lunch`,
           tests: [
-            { id: 1, label: "Has enqueue method", keywords: [{ pattern: "def enqueue" }] },
-            { id: 2, label: "Processes jobs", keywords: [{ pattern: "perform" }] },
-            { id: 3, label: "Stores job args", keywords: [{ pattern: "args" }] },
+            { id: 1, label: "Defines to_s", keywords: [{ pattern: "def\\s+to_s\\b" }] },
+            { id: 2, label: "Defines inspect", keywords: [{ pattern: "def\\s+inspect\\b" }] },
+            { id: 3, label: "Formats the amount with two decimals", keywords: [{ pattern: "%\\.2f" }] },
+            { id: 4, label: "Prints with puts and with p", keywords: [{ pattern: "puts\\s+lunch[\\s\\S]*\\bp\\s+lunch" }] },
           ],
         },
       },
       {
-        id: "rails-15",
-        title: "Service Objects & DDD",
-        xp: 18,
+        id: "oop-4",
+        title: "==, eql? and hash",
+        xp: 20,
         theory: [
           text(
-            "Service objects encapsulate complex business logic outside controllers and models. They follow Single Responsibility Principle and make code testable and reusable.",
+            "Ruby has several ways to ask \"are these the same?\", and they answer different questions. `equal?` asks whether two variables point at the **very same object**. `==` asks whether two objects have the **same value**. Out of the box, `Object#==` behaves just like `equal?`, so two objects built from identical data are *not* equal until you say what equality means for your class.",
+          ),
+          text(
+            "Define `==` by comparing the fields that give the object its identity. Checking the class first stops a `GridPoint` from matching some unrelated object that happens to have `x` and `y` methods.",
             {
-              label: "Service object pattern",
-              content: `# Simulating Rails service objects
-class ApplicationService
-  def self.call(*args)
-    new(*args).execute
+              label: "Value equality with ==",
+              content: `class GridPoint
+  attr_reader :x, :y
+
+  def initialize(x, y)
+    @x = x
+    @y = y
+  end
+
+  def ==(other)
+    other.is_a?(GridPoint) && x == other.x && y == other.y
   end
 end
 
-class OrderPlacementService < ApplicationService
-  def initialize(order_data, user)
-    @order_data = order_data
-    @user = user
-  end
+a = GridPoint.new(2, 3)
+b = GridPoint.new(2, 3)
 
-  def execute
-    return failure("No items") if @order_data[:items].empty?
-    return failure("Invalid user") unless @user[:active]
-
-    order = create_order
-    charge_payment(order)
-    send_confirmation(order)
-    success(order)
-  rescue => e
-    failure(e.message)
-  end
-
-  private
-
-  def create_order
-    { id: rand(1000), user: @user[:email], items: @order_data[:items], total: 99.99 }
-  end
-
-  def charge_payment(order)
-    puts "Charging card..."
-  end
-
-  def send_confirmation(order)
-    puts "Email sent to #{order[:user]}"
-  end
-
-  def success(order)
-    { success: true, order: order }
-  end
-
-  def failure(message)
-    { success: false, error: message }
-  end
-end
-
-# Use it
-user = { email: "alice@example.com", active: true }
-order_data = { items: [{ name: "Book", price: 20 }] }
-
-result = OrderPlacementService.call(order_data, user)
-puts result[:success] ? "Order ##{result[:order][:id]} placed!" : "Error: #{result[:error]}"`,
+puts a == b        # true  - same value
+puts a.equal?(b)   # false - still two separate objects
+puts a == "2,3"    # false - a different kind of object`,
             },
           ),
-          callout("tip", "Use service objects for operations involving multiple models or complex business rules. Keep controllers thin — they should only orchestrate, not contain business logic."),
+          text(
+            "`==` alone is not enough for hashes. `Hash` lookups, `Set` and `Array#uniq` group objects with `hash` (to pick a bucket) and `eql?` (to confirm a match). If you only define `==`, duplicates slip through and lookups miss. Build `hash` from the same fields that `==` compares.",
+            {
+              label: "Making objects work as hash keys",
+              content: `require "set"
+
+class GridPoint
+  attr_reader :x, :y
+
+  def initialize(x, y)
+    @x = x
+    @y = y
+  end
+
+  def ==(other)
+    other.is_a?(GridPoint) && x == other.x && y == other.y
+  end
+  alias eql? ==
+
+  def hash
+    [GridPoint, x, y].hash
+  end
+end
+
+visited = Set.new
+visited << GridPoint.new(0, 0)
+visited << GridPoint.new(0, 0)
+puts visited.size                                        # 1
+
+labels = { GridPoint.new(1, 1) => "start" }
+puts labels[GridPoint.new(1, 1)]                         # start
+
+puts [GridPoint.new(4, 4), GridPoint.new(4, 4)].uniq.size  # 1`,
+            },
+          ),
+          diagram("Three kinds of sameness", [
+            {
+              id: "identity",
+              label: "equal?",
+              items: ["Same object in memory", "Never override it", "a.equal?(a.dup) is false"],
+            },
+            {
+              id: "value",
+              label: "==",
+              items: ["Same meaningful value", "Used by include? and comparisons", "Override it for value objects"],
+            },
+            {
+              id: "hashing",
+              label: "eql? and hash",
+              items: ["Used by Hash, Set and uniq", "eql? objects must share a hash", "Build hash from the fields == uses"],
+            },
+          ]),
+          text(
+            "Ruby's own numbers show the difference: `1 == 1.0` is `true`, but `1.eql?(1.0)` is `false`, because `eql?` also requires the same type. That is why `{ 1 => :a }[1.0]` returns `nil`.",
+          ),
+          callout(
+            "warning",
+            "Keep `hash` and `eql?` in step: whenever `a.eql?(b)` is true, `a.hash` must equal `b.hash`. And don't change an object's fields after using it as a hash key. Its `hash` changes, and the hash can no longer find it until you call `rehash`.",
+          ),
+          quiz(
+            "Which pair of methods does a `Hash` use to find a key?",
+            ["== and equal?", "hash and eql?", "<=> and ==", "to_s and inspect"],
+            1,
+            "A hash computes `hash` to find the right bucket, then uses `eql?` to confirm the key matches.",
+          ),
+          quiz(
+            "You defined `==` on `Card` but not `eql?` or `hash`. Two cards have equal values. What does `[card_a, card_b].uniq.size` return?",
+            ["1", "2", "It raises NoMethodError", "0"],
+            1,
+            "`uniq` relies on `hash` and `eql?`, which still compare object identity, so both cards are kept.",
+          ),
         ],
         challenge: {
-          title: "User Registration Service",
-          description: "Create a RegisterUserService that handles the full registration flow: validates input, checks for existing email, hashes password, creates user, and sends welcome email. Return success or failure.",
-          starterCode: `# Implement user registration service
-class ApplicationService
-  def self.call(*args)
-    new(*args).execute
+          title: "Deduplicate Library Books",
+          description:
+            "Two `LibraryBook` objects describe the same book when their **ISBN** matches, even if the titles are written differently. Define `==` to compare ISBNs, make `eql?` behave the same way, and define `hash` from the ISBN so `uniq` and hash lookups treat matching books as one. The program should print `2` and `Amina`.",
+          starterCode: `class LibraryBook
+  attr_reader :isbn, :title
+
+  def initialize(isbn, title)
+    @isbn = isbn
+    @title = title
+  end
+
+  # Define equality based on the ISBN below
+end
+
+shelf = [
+  LibraryBook.new("978-1-4028-9462-6", "The Quiet Compiler"),
+  LibraryBook.new("978-1-4028-9462-6", "The Quiet Compiler (reprint)"),
+  LibraryBook.new("978-0-3064-0615-7", "Gardens of Syntax")
+]
+
+puts shelf.uniq.size
+loans = { shelf[0] => "Amina" }
+puts loans[shelf[1]] || "not on loan"`,
+          solutionCode: `class LibraryBook
+  attr_reader :isbn, :title
+
+  def initialize(isbn, title)
+    @isbn = isbn
+    @title = title
+  end
+
+  def ==(other)
+    other.is_a?(LibraryBook) && isbn == other.isbn
+  end
+  alias eql? ==
+
+  def hash
+    isbn.hash
   end
 end
 
-class RegisterUserService < ApplicationService
-  def initialize(params)
-    @params = params
-  end
+shelf = [
+  LibraryBook.new("978-1-4028-9462-6", "The Quiet Compiler"),
+  LibraryBook.new("978-1-4028-9462-6", "The Quiet Compiler (reprint)"),
+  LibraryBook.new("978-0-3064-0615-7", "Gardens of Syntax")
+]
 
-  def execute
-    # 1. Validate presence of name, email, password
-    # 2. Check email uniqueness (simulate with existing_users array)
-    # 3. Hash password (simple simulation)
-    # 4. Create user
-    # 5. Send welcome email (simulate)
-    # Return success or failure
-  end
-
-  private
-
-  def success(user)
-    { success: true, user: user }
-  end
-
-  def failure(message)
-    { success: false, error: message }
-  end
-end
-
-# Test
-result = RegisterUserService.call(name: "Alice", email: "alice@example.com", password: "secret123")
-puts result[:success] ? "Registered: #{result[:user][:email]}" : "Error: #{result[:error]}"`,
-          solutionCode: `class ApplicationService
-  def self.call(*args)
-    new(*args).execute
-  end
-end
-
-class RegisterUserService < ApplicationService
-  def initialize(params)
-    @params = params
-    @existing_users = ["bob@example.com"]
-  end
-
-  def execute
-    return failure("Name is required") if @params[:name].nil? || @params[:name].strip.empty?
-    return failure("Email is required") if @params[:email].nil? || @params[:email].strip.empty?
-    return failure("Password is required") if @params[:password].nil? || @params[:password].length < 8
-    return failure("Email already taken") if @existing_users.include?(@params[:email])
-
-    password_hash = "hashed_#{@params[:password].reverse}"
-    user = { name: @params[:name], email: @params[:email], password_hash: password_hash }
-    send_welcome_email(user)
-    success(user)
-  end
-
-  private
-
-  def send_welcome_email(user)
-    puts "Welcome email sent to #{user[:email]}"
-  end
-
-  def success(user)
-    { success: true, user: user }
-  end
-
-  def failure(message)
-    { success: false, error: message }
-  end
-end
-
-result = RegisterUserService.call(name: "Alice", email: "alice@example.com", password: "secret123")
-puts result[:success] ? "Registered: #{result[:user][:email]}" : "Error: #{result[:error]}"`,
+puts shelf.uniq.size
+loans = { shelf[0] => "Amina" }
+puts loans[shelf[1]] || "not on loan"`,
           tests: [
-            { id: 1, label: "Validates input", keywords: [{ pattern: "failure" }] },
-            { id: 2, label: "Checks email uniqueness", keywords: [{ pattern: "existing" }] },
-            { id: 3, label: "Creates user", keywords: [{ pattern: "user" }] },
+            { id: 1, label: "Defines ==", keywords: [{ pattern: "def\\s+==" }] },
+            {
+              id: 2,
+              label: "Makes eql? behave like ==",
+              keywords: [{ pattern: "alias\\s+:?eql\\?\\s+:?==|alias_method\\s+:eql\\?|def\\s+eql\\?" }],
+            },
+            { id: 3, label: "Defines hash from the ISBN", keywords: [{ pattern: "def\\s+hash\\b[\\s\\S]*?isbn" }] },
+            {
+              id: 4,
+              label: "Compares ISBNs",
+              keywords: [{ pattern: "isbn\\s*==\\s*other\\.isbn|other\\.isbn\\s*==\\s*isbn" }],
+            },
+          ],
+        },
+      },
+      {
+        id: "oop-5",
+        title: "<=> and Comparable",
+        xp: 20,
+        theory: [
+          text(
+            "Sorting needs one question answered over and over: *which of these two comes first?* Ruby asks it with the **spaceship operator** `<=>`. It returns a negative number when the left side is smaller, `0` when the two are equal, a positive number when the left side is larger, and `nil` when they can't be compared at all.",
+            {
+              label: "The spaceship on built-in values",
+              content: `puts 3 <=> 7            # -1
+puts "b" <=> "a"        # 1
+puts [1, 2] <=> [1, 2]  # 0
+p 5 <=> "five"          # nil - not comparable`,
+            },
+          ),
+          text(
+            "Define `<=>` on your own class and `sort`, `min` and `max` start working. Mix in the `Comparable` module as well and you get `<`, `<=`, `==`, `>`, `>=`, `between?` and `clamp` for free, all built on your one method. Arrays compare element by element, which makes them handy for multi-part values like version numbers. Sorting the raw strings would wrongly put `1.10.0` first.",
+            {
+              label: "A comparable version number",
+              content: `class AppVersion
+  include Comparable
+  attr_reader :major, :minor, :patch
+
+  def initialize(text)
+    @major, @minor, @patch = text.split(".").map(&:to_i)
+  end
+
+  def <=>(other)
+    return nil unless other.is_a?(AppVersion)
+
+    [major, minor, patch] <=> [other.major, other.minor, other.patch]
+  end
+
+  def to_s
+    [major, minor, patch].join(".")
+  end
+end
+
+releases = %w[1.10.0 1.2.5 1.2.10].map { |t| AppVersion.new(t) }
+puts releases.sort.join(", ")  # 1.2.5, 1.2.10, 1.10.0
+puts releases.max              # 1.10.0
+puts AppVersion.new("2.0.0") > AppVersion.new("1.9.9")
+puts AppVersion.new("1.5.0").between?(releases.min, releases.max)
+
+begin
+  AppVersion.new("1.0.0") < "1.0.0"
+rescue ArgumentError => e
+  puts e.message
+end`,
+            },
+          ),
+          text(
+            "Returning `nil` for unrelated objects matters. `Comparable` turns that `nil` into a clear `ArgumentError` naming both sides, instead of a confusing crash deep inside your method when it calls `other.major` on a string.",
+          ),
+          callout(
+            "tip",
+            "`Comparable` gives you `==` too, based on `<=>` returning `0`. It does **not** give you `eql?` or `hash`, so objects you keep in a `Hash` or `Set` still need those from the previous lesson.",
+          ),
+          quiz(
+            "What should `a <=> b` return when `a` should be sorted before `b`?",
+            ["A negative number such as -1", "0", "true", "nil"],
+            0,
+            "Negative means the left side comes first, 0 means equal, positive means it comes after, and nil means the two can't be compared.",
+          ),
+          quiz(
+            "After `include Comparable` and defining `<=>`, which method do you get for free?",
+            ["sort_by", "between?", "each", "uniq"],
+            1,
+            "`Comparable` adds `<`, `<=`, `==`, `>`, `>=`, `between?` and `clamp`. `sort_by`, `each` and `uniq` come from `Enumerable` or `Array`.",
+          ),
+        ],
+        challenge: {
+          title: "Sortable Durations",
+          description:
+            "A `Duration` stores a length of time in seconds and prints itself as `m:ss`. Make durations comparable: include `Comparable` and define `<=>` using the seconds. Then the program sorts the track lengths, prints the longest, and checks whether 3:30 falls between the shortest and the longest.",
+          starterCode: `class Duration
+  attr_reader :seconds
+
+  def initialize(seconds)
+    @seconds = seconds
+  end
+
+  def to_s
+    format("%d:%02d", seconds / 60, seconds % 60)
+  end
+end
+
+tracks = [Duration.new(245), Duration.new(187), Duration.new(302)]
+puts tracks.sort.join(", ")
+puts tracks.max
+puts Duration.new(210).between?(tracks.min, tracks.max)`,
+          solutionCode: `class Duration
+  include Comparable
+  attr_reader :seconds
+
+  def initialize(seconds)
+    @seconds = seconds
+  end
+
+  def <=>(other)
+    return nil unless other.is_a?(Duration)
+
+    seconds <=> other.seconds
+  end
+
+  def to_s
+    format("%d:%02d", seconds / 60, seconds % 60)
+  end
+end
+
+tracks = [Duration.new(245), Duration.new(187), Duration.new(302)]
+puts tracks.sort.join(", ")
+puts tracks.max
+puts Duration.new(210).between?(tracks.min, tracks.max)`,
+          tests: [
+            { id: 1, label: "Includes Comparable", keywords: [{ pattern: "include\\s+Comparable" }] },
+            { id: 2, label: "Defines <=>", keywords: [{ pattern: "def\\s+<=>" }] },
+            {
+              id: 3,
+              label: "Compares durations by seconds",
+              keywords: [{ pattern: "seconds\\s*<=>\\s*other\\.seconds|other\\.seconds\\s*<=>\\s*seconds" }],
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "oop-class-design",
+    title: "Class-Level Design — Pro",
+    stage: "pro",
+    icon: "🏛️",
+    color: "#7c3aed",
+    lessons: [
+      {
+        id: "oop-6",
+        title: "Class Methods & Factory Constructors",
+        xp: 25,
+        theory: [
+          text(
+            "Instance methods run on one object. **Class methods** run on the class itself, which is an object too. Define one with `def self.method_name`: inside a class body `self` refers to the class, so `self.` attaches the method to it. You have already used class methods such as `Time.now`, `File.read` and `Integer.sqrt`.",
+          ),
+          text(
+            "A common use is a **factory**: a named constructor that converts some input and then calls `new`. The name tells readers what kind of input it expects, which `new` alone can't do.",
+            {
+              label: "Named constructors",
+              content: `class Temperature
+  attr_reader :celsius
+
+  def initialize(celsius)
+    @celsius = celsius
+  end
+
+  def self.from_fahrenheit(degrees)
+    new((degrees - 32) * 5 / 9.0)
+  end
+
+  def self.freezing
+    new(0)
+  end
+
+  def to_s
+    format("%.1f°C", celsius)
+  end
+end
+
+puts Temperature.new(21)
+puts Temperature.from_fahrenheit(98.6)
+puts Temperature.freezing`,
+            },
+          ),
+          text(
+            "When a class has several class methods, `class << self` opens the class's **singleton class**, so you can write them as ordinary `def`s. `private_class_method :new` goes one step further and forces callers through your factories, which is useful when every instance must pass validation.",
+            {
+              label: "class << self and a private new",
+              content: `class InviteCode
+  ALPHABET = ("A".."Z").to_a
+
+  attr_reader :value
+
+  def initialize(value)
+    @value = value
+  end
+  private_class_method :new
+
+  class << self
+    def generate(length = 6)
+      new(Array.new(length) { ALPHABET.sample }.join)
+    end
+
+    def parse(text)
+      cleaned = text.strip.upcase
+      raise ArgumentError, "invite codes are 6 letters" unless cleaned.match?(/\\A[A-Z]{6}\\z/)
+
+      new(cleaned)
+    end
+  end
+end
+
+puts InviteCode.parse("  qwerty ").value
+puts InviteCode.generate.value.length
+
+begin
+  InviteCode.new("HELLO!")
+rescue NoMethodError => e
+  puts "Blocked: #{e.message}"
+end`,
+            },
+          ),
+          callout(
+            "tip",
+            "Inside a class method, a bare `new(...)` means `self.new(...)`. Because `self` is whichever class received the call, a subclass that calls an inherited factory gets an instance of the subclass, not of the parent.",
+          ),
+          quiz(
+            "Inside `class Report ... end` but outside any method, what does `self` refer to?",
+            ["The first Report instance", "The Report class itself", "The main object", "nil"],
+            1,
+            "In the class body `self` is the class, which is why `def self.build` defines a method on the class.",
+          ),
+          quiz(
+            "What does `private_class_method :new` do?",
+            [
+              "Makes every instance method private",
+              "Stops outside code from calling ClassName.new directly",
+              "Deletes the initialize method",
+              "Prevents the class from being subclassed",
+            ],
+            1,
+            "Afterwards only code inside the class, such as its factory methods, can call `new`. Outside callers get a NoMethodError.",
+          ),
+        ],
+        challenge: {
+          title: "Colours from Hex Codes",
+          description:
+            "Add a class method `HexColor.from_hex` that takes a string like `\"#ff8800\"`, removes the `#`, converts each pair of hex digits to a number with `to_i(16)`, and returns a new `HexColor`. The program should print `rgb(255, 136, 0)`.",
+          starterCode: `class HexColor
+  attr_reader :red, :green, :blue
+
+  def initialize(red, green, blue)
+    @red = red
+    @green = green
+    @blue = blue
+  end
+
+  def to_s
+    "rgb(#{red}, #{green}, #{blue})"
+  end
+end
+
+puts HexColor.from_hex("#ff8800")`,
+          solutionCode: `class HexColor
+  attr_reader :red, :green, :blue
+
+  def initialize(red, green, blue)
+    @red = red
+    @green = green
+    @blue = blue
+  end
+
+  def self.from_hex(hex)
+    digits = hex.delete_prefix("#")
+    red, green, blue = digits.scan(/../).map { |pair| pair.to_i(16) }
+    new(red, green, blue)
+  end
+
+  def to_s
+    "rgb(#{red}, #{green}, #{blue})"
+  end
+end
+
+puts HexColor.from_hex("#ff8800")`,
+          tests: [
+            {
+              id: 1,
+              label: "Defines the from_hex class method",
+              keywords: [{ pattern: "def\\s+self\\.from_hex|class\\s*<<\\s*self[\\s\\S]*def\\s+from_hex" }],
+            },
+            { id: 2, label: "Converts hex pairs with to_i(16)", keywords: [{ pattern: "to_i\\(\\s*16\\s*\\)|\\.hex\\b" }] },
+            { id: 3, label: "Builds the colour with new", keywords: [{ pattern: "\\bnew\\(" }] },
+          ],
+        },
+      },
+      {
+        id: "oop-7",
+        title: "Class Variables vs Class Instance Variables",
+        xp: 25,
+        theory: [
+          text(
+            "Some data belongs to a class as a whole rather than to one object: how many instances exist, a registry of names, a default setting. Ruby has two places to keep it, and they behave very differently once inheritance enters the picture.",
+          ),
+          text(
+            "A **class variable** starts with `@@`. It is shared by the class, all its instances **and every subclass**. There is only ever one copy, so subclasses all count into the same total.",
+            {
+              label: "@@ is shared across the whole hierarchy",
+              content: `class Ticket
+  @@issued = 0
+
+  def initialize
+    @@issued += 1
+  end
+
+  def self.issued
+    @@issued
+  end
+end
+
+class ConcertTicket < Ticket; end
+class TrainTicket < Ticket; end
+
+2.times { ConcertTicket.new }
+TrainTicket.new
+
+puts ConcertTicket.issued  # 3
+puts TrainTicket.issued    # 3 - the same shared counter
+puts Ticket.issued         # 3`,
+            },
+          ),
+          text(
+            "A **class instance variable** is an ordinary `@variable` that belongs to the class object itself. Each class, parent and subclasses alike, gets its own copy, so the counts stay separate. Read and write it through class-level methods, and use `self.class` to reach them from inside an instance.",
+            {
+              label: "One counter per class",
+              content: `class Ticket
+  class << self
+    attr_writer :issued
+
+    def issued
+      @issued ||= 0
+    end
+  end
+
+  def initialize
+    self.class.issued += 1
+  end
+end
+
+class ConcertTicket < Ticket; end
+class TrainTicket < Ticket; end
+
+2.times { ConcertTicket.new }
+TrainTicket.new
+
+puts ConcertTicket.issued  # 2
+puts TrainTicket.issued    # 1
+puts Ticket.issued         # 0 - no plain Ticket was created`,
+            },
+          ),
+          diagram("Where class-level data lives", [
+            {
+              id: "classvar",
+              label: "@@count",
+              items: ["One copy for the class", "Shared with every subclass", "Visible inside instance methods"],
+            },
+            {
+              id: "classivar",
+              label: "@count in class methods",
+              items: ["Belongs to one class object", "Each subclass gets its own", "Reach it with self.class.count"],
+            },
+            {
+              id: "ivar",
+              label: "@count in instance methods",
+              items: ["Belongs to one object", "Usually set in initialize", "Different for every instance"],
+            },
+          ]),
+          callout(
+            "warning",
+            "Because `@@` variables are shared with subclasses, a subclass that assigns one silently changes it for the parent and every sibling. Many teams avoid them: RuboCop's `Style/ClassVars` cop flags them and suggests class instance variables instead.",
+          ),
+          quiz(
+            "`ConcertTicket` and `TrainTicket` both inherit from `Ticket`, which uses `@@issued`. How many `@@issued` variables exist?",
+            ["One, shared by all three classes", "Two, one per subclass", "Three, one per class", "None until an instance is created"],
+            0,
+            "A class variable is shared by the class that defines it and every subclass.",
+          ),
+          quiz(
+            "Inside an instance method, how do you reach a class instance variable that the class exposes as `issued`?",
+            ["@issued", "@@issued", "self.class.issued", "super.issued"],
+            2,
+            "`@issued` inside an instance method is that object's own variable. Go through the class instead: `self.class.issued`.",
+          ),
+        ],
+        challenge: {
+          title: "Per-Plugin Registries",
+          description:
+            "Every plugin records its name when it is created. Right now `@@names` is shared, so both plugin types report all three names. Rewrite `Plugin` to use a **class instance variable**: give the class a `names` method that returns `@names ||= []`, append to `self.class.names` in `initialize`, and remove every `@@` variable. `Exporter` should report `[\"csv\", \"pdf\"]` and `Importer` `[\"json\"]`.",
+          starterCode: `class Plugin
+  @@names = []
+
+  def self.names
+    @@names
+  end
+
+  def initialize(name)
+    @name = name
+    @@names << name
+  end
+end
+
+class Exporter < Plugin; end
+class Importer < Plugin; end
+
+Exporter.new("csv")
+Exporter.new("pdf")
+Importer.new("json")
+
+p Exporter.names
+p Importer.names`,
+          solutionCode: `class Plugin
+  def self.names
+    @names ||= []
+  end
+
+  def initialize(name)
+    @name = name
+    self.class.names << name
+  end
+end
+
+class Exporter < Plugin; end
+class Importer < Plugin; end
+
+Exporter.new("csv")
+Exporter.new("pdf")
+Importer.new("json")
+
+p Exporter.names
+p Importer.names`,
+          tests: [
+            { id: 1, label: "No @@ class variables left", keywords: [{ pattern: "^(?![\\s\\S]*@@)" }] },
+            {
+              id: 2,
+              label: "Stores the names in a class instance variable",
+              keywords: [{ pattern: "@names\\s*\\|\\|=" }],
+            },
+            {
+              id: 3,
+              label: "Appends to self.class.names",
+              keywords: [{ pattern: "self\\.class\\.names\\s*(<<|\\.push)" }],
+            },
+          ],
+        },
+      },
+      {
+        id: "oop-8",
+        title: "Abstract Classes & Duck Typing",
+        xp: 25,
+        theory: [
+          text(
+            "Ruby has no `abstract` keyword. When a parent class declares a method that every subclass must fill in, the convention is for the parent's version to raise `NotImplementedError` with a message saying what is missing. The parent still holds the shared logic (here `render`) and calls the missing piece.",
+            {
+              label: "A template with one required method",
+              content: `class Report
+  def render
+    "== #{title} ==\\n#{body}"
+  end
+
+  def title
+    self.class.name
+  end
+
+  def body
+    raise NotImplementedError, "#{self.class.name} must implement body"
+  end
+end
+
+class SalesReport < Report
+  def body
+    "Total sales: 42"
+  end
+end
+
+puts SalesReport.new.render
+
+begin
+  Report.new.render
+rescue NotImplementedError => e
+  puts "Error: #{e.message}"
+end`,
+            },
+          ),
+          text(
+            "One surprise: `NotImplementedError` inherits from `ScriptError`, not `StandardError`. A bare `rescue => e` only catches `StandardError`, so this error passes straight through it. That is usually what you want, because a missing method is a programming mistake rather than something to skip quietly. Name the class when you really do need to rescue it.",
+          ),
+          text(
+            "**Duck typing** takes the idea further: code cares about what an object can *do*, not which class it belongs to. If an object responds to `deliver`, it can act as a channel, with no shared parent class required. `respond_to?` lets you check before calling.",
+            {
+              label: "Any object with deliver will do",
+              content: `class EmailChannel
+  def deliver(message)
+    "Email sent: #{message}"
+  end
+end
+
+class SmsChannel
+  def deliver(message)
+    "SMS sent: #{message[0, 20]}"
+  end
+end
+
+class Notifier
+  def initialize(channels)
+    @channels = channels
+  end
+
+  def broadcast(message)
+    @channels.map do |channel|
+      if channel.respond_to?(:deliver)
+        channel.deliver(message)
+      else
+        "Skipped #{channel.class}"
+      end
+    end
+  end
+end
+
+notifier = Notifier.new([EmailChannel.new, SmsChannel.new, "not a channel"])
+puts notifier.broadcast("Your order has shipped today")`,
+            },
+          ),
+          callout(
+            "tip",
+            "Use a base class with `NotImplementedError` when subclasses genuinely share code, like `render` above. When they only share a method *name*, duck typing is lighter: no parent class is needed at all.",
+          ),
+          quiz(
+            "Why doesn't `rescue => e` catch a `NotImplementedError`?",
+            [
+              "It is raised before the program runs",
+              "It inherits from ScriptError, not StandardError",
+              "Ruby never allows it to be rescued",
+              "It is a warning, not an exception",
+            ],
+            1,
+            "A bare `rescue` only catches `StandardError` and its subclasses. `NotImplementedError` sits under `ScriptError`, so you must name it to rescue it.",
+          ),
+          quiz(
+            "With duck typing, what decides whether an object can be passed to `broadcast`?",
+            [
+              "It inherits from a Channel class",
+              "It includes a Channel module",
+              "It responds to the methods broadcast calls",
+              "Its class name ends in Channel",
+            ],
+            2,
+            "Duck typing only cares about behaviour: if the object responds to `deliver`, it works.",
+          ),
+        ],
+        challenge: {
+          title: "Shape Area Report",
+          description:
+            "`Shape#describe` prints a shape's name and area, but `area` has no real implementation yet. Make `Shape#area` raise `NotImplementedError`, then give `Circle` (π × r²) and `Rectangle` (width × height) their own `area` methods. The report prints each shape and the total area.",
+          starterCode: `class Shape
+  def area
+    # Subclasses should provide this
+  end
+
+  def describe
+    format("%s with area %.2f", self.class.name, area)
+  end
+end
+
+class Circle < Shape
+  def initialize(radius)
+    @radius = radius
+  end
+end
+
+class Rectangle < Shape
+  def initialize(width, height)
+    @width = width
+    @height = height
+  end
+end
+
+shapes = [Circle.new(1.5), Rectangle.new(2, 3)]
+shapes.each { |shape| puts shape.describe }
+puts format("Total area: %.2f", shapes.sum(&:area))`,
+          solutionCode: `class Shape
+  def area
+    raise NotImplementedError, "#{self.class.name} must implement area"
+  end
+
+  def describe
+    format("%s with area %.2f", self.class.name, area)
+  end
+end
+
+class Circle < Shape
+  def initialize(radius)
+    @radius = radius
+  end
+
+  def area
+    Math::PI * @radius**2
+  end
+end
+
+class Rectangle < Shape
+  def initialize(width, height)
+    @width = width
+    @height = height
+  end
+
+  def area
+    @width * @height
+  end
+end
+
+shapes = [Circle.new(1.5), Rectangle.new(2, 3)]
+shapes.each { |shape| puts shape.describe }
+puts format("Total area: %.2f", shapes.sum(&:area))`,
+          tests: [
+            {
+              id: 1,
+              label: "Shape#area raises NotImplementedError",
+              keywords: [{ pattern: "raise\\s+NotImplementedError" }],
+            },
+            { id: 2, label: "Circle uses Math::PI", keywords: [{ pattern: "Math::PI" }] },
+            {
+              id: 3,
+              label: "Rectangle multiplies width by height",
+              keywords: [{ pattern: "@width\\s*\\*\\s*@height|@height\\s*\\*\\s*@width" }],
+            },
+            {
+              id: 4,
+              label: "Shape, Circle and Rectangle each define area",
+              keywords: [{ pattern: "(def\\s+area\\b[\\s\\S]*){3}" }],
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "oop-modules",
+    title: "Modules & Mixins — Advanced",
+    stage: "advanced",
+    icon: "🧩",
+    color: "#047857",
+    lessons: [
+      {
+        id: "oop-2",
+        title: "Mixins with Include",
+        xp: 20,
+        theory: [
+          text(
+            "Modules package methods and constants together. By using `include`, a module's methods become available as instance methods to any class that mixes it in.",
+            {
+              label: "Module Mixin Example",
+              content: `# Define a module for logging behavior
+module Loggable
+  def log(message)
+    puts "[LOG]: #{message}"
+  end
+end
+
+class User
+  # Mixin the module using include
+  include Loggable
+end
+
+User.new.log("User logged in successfully.")`,
+            }
+          ),
+        ],
+        challenge: {
+          title: "Walkable Module",
+          description: "Create a `Walkable` module with a `walk` method, and include it in a `Robot` class.",
+          starterCode: `module Walkable
+  def walk
+    "#{@name} is walking."
+  end
+end
+
+class Robot
+  # TODO: Include Walkable module
+end`,
+          solutionCode: `module Walkable
+  def walk
+    "#{@name} is walking."
+  end
+end
+
+class Robot
+  include Walkable
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+end
+
+bot = Robot.new("Unit-7")
+puts bot.walk`,
+          tests: [
+            { id: 1, label: "Defines Walkable module", keywords: [{ pattern: "module Walkable" }] },
+            { id: 2, label: "Includes module", keywords: [{ pattern: "include Walkable" }] },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "oop-composition",
+    title: "Composition & Value Objects — Advanced",
+    stage: "advanced",
+    icon: "🧱",
+    color: "#b45309",
+    lessons: [
+      {
+        id: "oop-9",
+        title: "Composition over Inheritance",
+        xp: 30,
+        theory: [
+          text(
+            "Inheritance says an object **is a** kind of its parent. Composition says an object **has** other objects and hands them work. Inheritance fits when a subclass really is a specialised version of its parent and reuses most of its code. It gets awkward when behaviour varies in two independent directions.",
+          ),
+          text(
+            "Picture a notifier that can format messages plainly or in capitals, and send them to the console or to a log. With inheritance you'd need a subclass for every pairing (`PlainConsoleNotifier`, `ShoutConsoleNotifier`, `PlainLogNotifier`, and so on), and every new format adds another row. With composition, the notifier **receives** a formatter and a sender and simply combines them.",
+            {
+              label: "Swapping parts instead of subclassing",
+              content: `class PlainFormatter
+  def render(order)
+    "Order #{order[:id]} is #{order[:status]}"
+  end
+end
+
+class ShoutFormatter
+  def render(order)
+    "ORDER #{order[:id]} IS #{order[:status].upcase}!"
+  end
+end
+
+class ConsoleSender
+  def deliver(text)
+    puts text
+  end
+end
+
+class OrderNotifier
+  def initialize(formatter:, sender:)
+    @formatter = formatter
+    @sender = sender
+  end
+
+  def notify(order)
+    @sender.deliver(@formatter.render(order))
+  end
+end
+
+order = { id: 1042, status: "shipped" }
+OrderNotifier.new(formatter: PlainFormatter.new, sender: ConsoleSender.new).notify(order)
+OrderNotifier.new(formatter: ShoutFormatter.new, sender: ConsoleSender.new).notify(order)`,
+            },
+          ),
+          text(
+            "Because the parts arrive from outside (a technique called **dependency injection**), a test can pass in a fake. The fake below just records what it was asked to send, so a test can check the message without printing or emailing anything.",
+            {
+              label: "A fake sender for testing",
+              content: `class PlainFormatter
+  def render(order)
+    "Order #{order[:id]} is #{order[:status]}"
+  end
+end
+
+class FakeSender
+  attr_reader :sent
+
+  def initialize
+    @sent = []
+  end
+
+  def deliver(text)
+    @sent << text
+  end
+end
+
+class OrderNotifier
+  def initialize(formatter:, sender:)
+    @formatter = formatter
+    @sender = sender
+  end
+
+  def notify(order)
+    @sender.deliver(@formatter.render(order))
+  end
+end
+
+fake = FakeSender.new
+OrderNotifier.new(formatter: PlainFormatter.new, sender: fake).notify({ id: 7, status: "packed" })
+pp fake.sent`,
+            },
+          ),
+          diagram("Two ways to vary behaviour", [
+            {
+              id: "inherit",
+              label: "Inheritance",
+              items: ["One subclass per combination", "3 formats x 3 senders = 9 classes", "Behaviour is fixed by the class you pick"],
+            },
+            {
+              id: "compose",
+              label: "Composition",
+              items: ["One small class per part", "3 formats + 3 senders = 6 parts", "Swap parts at runtime or in tests"],
+            },
+          ]),
+          callout(
+            "tip",
+            "A quick test: if you would describe the relationship with \"has a\" or \"uses a\" (a notifier *uses a* sender), reach for composition. Keep inheritance for true \"is a\" relationships where the subclass reuses most of the parent's code.",
+          ),
+          quiz(
+            "A report can be exported in 3 formats and sent to 3 destinations. With one subclass per combination, how many subclasses do you need?",
+            ["3", "6", "9", "27"],
+            2,
+            "Every format pairs with every destination: 3 × 3 = 9. With composition you write 3 formatters and 3 senders and combine them freely.",
+          ),
+          quiz(
+            "What does passing a `FakeSender` into `OrderNotifier.new` let a test do?",
+            [
+              "Run Ruby faster",
+              "Check what would be sent without really sending it",
+              "Skip the formatter",
+              "Turn OrderNotifier into a subclass of FakeSender",
+            ],
+            1,
+            "Injected collaborators can be swapped for fakes, so tests can inspect the output without side effects.",
+          ),
+        ],
+        challenge: {
+          title: "Pluggable Discounts",
+          description:
+            "`Checkout` shouldn't know how discounts are calculated. Give its `initialize` a `discount:` keyword argument and store it in `@discount`, then make `total` subtract `@discount.apply(subtotal)` from the subtotal. The program checks out the same basket with no discount (`50`) and with 10% off (`45.0`).",
+          starterCode: `class NoDiscount
+  def apply(_subtotal)
+    0
+  end
+end
+
+class PercentOff
+  def initialize(percent)
+    @percent = percent
+  end
+
+  def apply(subtotal)
+    subtotal * @percent / 100.0
+  end
+end
+
+class Checkout
+  def initialize
+    # Accept and store a discount object
+  end
+
+  def total(prices)
+    prices.sum
+  end
+end
+
+basket = [20, 30]
+puts Checkout.new(discount: NoDiscount.new).total(basket)
+puts Checkout.new(discount: PercentOff.new(10)).total(basket)`,
+          solutionCode: `class NoDiscount
+  def apply(_subtotal)
+    0
+  end
+end
+
+class PercentOff
+  def initialize(percent)
+    @percent = percent
+  end
+
+  def apply(subtotal)
+    subtotal * @percent / 100.0
+  end
+end
+
+class Checkout
+  def initialize(discount:)
+    @discount = discount
+  end
+
+  def total(prices)
+    subtotal = prices.sum
+    subtotal - @discount.apply(subtotal)
+  end
+end
+
+basket = [20, 30]
+puts Checkout.new(discount: NoDiscount.new).total(basket)
+puts Checkout.new(discount: PercentOff.new(10)).total(basket)`,
+          tests: [
+            {
+              id: 1,
+              label: "Takes a discount: keyword argument",
+              keywords: [{ pattern: "def\\s+initialize\\s*\\(\\s*discount:" }],
+            },
+            { id: 2, label: "Stores it in @discount", keywords: [{ pattern: "@discount\\s*=\\s*discount\\b" }] },
+            {
+              id: 3,
+              label: "Asks the discount object for the amount",
+              keywords: [{ pattern: "@discount\\.apply\\(" }],
+            },
+          ],
+        },
+      },
+      {
+        id: "oop-10",
+        title: "Delegation with Forwardable",
+        xp: 30,
+        theory: [
+          text(
+            "Often one object wraps another (a playlist wraps an array of songs) and should expose *some* of the inner object's methods. Writing each pass-through by hand (`def size = @songs.size`) gets tedious. The standard library's `Forwardable` module writes them for you.",
+          ),
+          text(
+            "Load it with `require \"forwardable\"`, then `extend Forwardable` in the class. It is `extend`, not `include`, because `def_delegators` is a method you call on the class while defining it. `def_delegators` forwards several methods to the same target; `def_delegator` forwards one and can give it a new name. Forward `each` and include `Enumerable`, and the wrapper gains `map`, `select`, `sort` and the rest.",
+            {
+              label: "A playlist that forwards to its array",
+              content: `require "forwardable"
+
+class Playlist
+  extend Forwardable
+  include Enumerable
+
+  def_delegators :@songs, :size, :each, :empty?
+  def_delegator :@songs, :first, :now_playing
+
+  def initialize(name)
+    @name = name
+    @songs = []
+  end
+
+  def add(title)
+    raise ArgumentError, "title can't be blank" if title.strip.empty?
+
+    @songs << title
+    self
+  end
+end
+
+mix = Playlist.new("Focus")
+mix.add("Low Tide").add("Blue Hour").add("Night Drive")
+
+puts mix.size          # 3
+puts mix.now_playing   # Low Tide
+puts mix.map(&:upcase).join(" | ")
+p mix.select { |title| title.include?("i") }`,
+            },
+          ),
+          text(
+            "Why not subclass `Array` instead? A subclass inherits **every** array method, including `push`, `<<` and `clear`, which would bypass the check in `add`. Delegation exposes only the methods you list, so the wrapper stays in charge of its own rules.",
+          ),
+          callout(
+            "info",
+            "For a wrapper that should forward *everything* except a few methods, such as a decorator, the standard library also offers `SimpleDelegator` (`require \"delegate\"`). `Forwardable` fits better when you want a short, explicit list.",
+          ),
+          quiz(
+            "What does `def_delegator :@songs, :first, :now_playing` create?",
+            [
+              "A method now_playing that returns @songs.first",
+              "A method first that calls now_playing",
+              "An alias for the @songs variable",
+              "A class method on Playlist",
+            ],
+            0,
+            "`def_delegator` forwards one method to the target and can rename it: `now_playing` calls `@songs.first`.",
+          ),
+          quiz(
+            "Why does the class use `extend Forwardable` rather than `include Forwardable`?",
+            [
+              "Standard-library modules can't be included",
+              "def_delegators is called on the class itself, so the class object needs the module's methods",
+              "extend makes the forwarded methods private",
+              "There is no difference",
+            ],
+            1,
+            "`extend` adds the module's methods to the class object, and that is what you are calling when you write `def_delegators` in the class body.",
+          ),
+        ],
+        challenge: {
+          title: "Inventory Wrapper",
+          description:
+            "`Inventory` keeps a private array of item names and ignores duplicates in `add`. Use `Forwardable` to forward `size`, `include?` and `each` to `@items`, and include `Enumerable` so `sort` works. The program should print `3`, `true` and `bolt, nut, washer`.",
+          starterCode: `class Inventory
+  def initialize
+    @items = []
+  end
+
+  def add(name)
+    @items << name unless @items.include?(name)
+    self
+  end
+end
+
+stock = Inventory.new
+stock.add("washer").add("bolt").add("nut").add("bolt")
+
+puts stock.size
+puts stock.include?("nut")
+puts stock.sort.join(", ")`,
+          solutionCode: `require "forwardable"
+
+class Inventory
+  extend Forwardable
+  include Enumerable
+
+  def_delegators :@items, :size, :include?, :each
+
+  def initialize
+    @items = []
+  end
+
+  def add(name)
+    @items << name unless @items.include?(name)
+    self
+  end
+end
+
+stock = Inventory.new
+stock.add("washer").add("bolt").add("nut").add("bolt")
+
+puts stock.size
+puts stock.include?("nut")
+puts stock.sort.join(", ")`,
+          tests: [
+            { id: 1, label: "Requires forwardable", keywords: [{ pattern: "require\\s+[\"']forwardable[\"']" }] },
+            { id: 2, label: "Extends Forwardable", keywords: [{ pattern: "extend\\s+Forwardable" }] },
+            {
+              id: 3,
+              label: "Forwards size, include? and each to @items",
+              keywords: [
+                { pattern: "def_delegators?\\s+:@items" },
+                { pattern: ":size\\b" },
+                { pattern: ":include\\?" },
+                { pattern: ":each\\b" },
+              ],
+            },
+            { id: 4, label: "Includes Enumerable", keywords: [{ pattern: "include\\s+Enumerable" }] },
+          ],
+        },
+      },
+      {
+        id: "oop-11",
+        title: "Immutable Value Objects",
+        xp: 30,
+        theory: [
+          text(
+            "A **value object** is defined entirely by its data: an amount of money, a map coordinate, a date range. Two value objects with the same data are interchangeable. They are safest when **immutable**: instead of changing themselves, their methods return new objects, so nothing holding a reference gets surprised by a change it didn't make.",
+          ),
+          text(
+            "`freeze` makes an object immutable: any later attempt to change its instance variables raises `FrozenError`. Calling it at the end of `initialize` locks the object as soon as it is built.",
+            {
+              label: "Freezing in initialize",
+              content: `class Distance
+  attr_reader :meters
+
+  def initialize(meters)
+    @meters = meters
+    freeze
+  end
+
+  def +(other)
+    Distance.new(meters + other.meters)
+  end
+
+  def stretch!
+    @meters *= 2
+  end
+end
+
+run = Distance.new(5000)
+total = run + Distance.new(1200)
+puts total.meters  # 6200
+puts run.frozen?   # true
+
+begin
+  run.stretch!
+rescue FrozenError => e
+  puts "Refused: #{e.class}"
+end`,
+            },
+          ),
+          text(
+            "Copying a frozen object shows how `dup` and `clone` differ. Both make a **shallow** copy, but `clone` keeps the frozen state while `dup` returns an unfrozen copy. Shallow also means freezing an object does not freeze the array or hash inside it, so freeze those too if they must not change.",
+            {
+              label: "dup, clone and shallow freezing",
+              content: `class Route
+  attr_reader :stops
+
+  def initialize(stops)
+    @stops = stops
+    freeze
+  end
+end
+
+route = Route.new(["Depot", "Market"])
+puts route.dup.frozen?    # false
+puts route.clone.frozen?  # true
+
+route.stops << "Harbor"   # allowed: the array itself isn't frozen
+p route.stops
+
+safe = Route.new(["Depot", "Market"].freeze)
+begin
+  safe.stops << "Harbor"
+rescue FrozenError
+  puts "The frozen array refused the change"
+end`,
+            },
+          ),
+          text(
+            "Ruby 3.2 added `Data.define`, which builds an immutable value class in one line. Unlike `Struct`, it has no setter methods, its instances are frozen, every field is required, and `with` returns a copy with some fields replaced. Value equality (`==`, `eql?` and `hash`) is built in, so instances work as hash keys straight away.",
+            {
+              label: "Struct vs Data.define",
+              content: `MutablePoint = Struct.new(:lat, :lng)
+spot = MutablePoint.new(51.5, -0.12)
+spot.lat = 0                         # Struct allows this
+p spot
+
+Coordinate = Data.define(:lat, :lng) do
+  def to_s
+    format("(%.2f, %.2f)", lat, lng)
+  end
+end
+
+home = Coordinate.new(lat: 51.5, lng: -0.12)
+puts home
+puts home.frozen?                    # true
+puts home.with(lat: 48.86)           # a new Coordinate
+puts home == Coordinate.new(51.5, -0.12)  # true - positional arguments work too
+puts home.respond_to?(:lat=)         # false - no setters
+
+begin
+  Coordinate.new(lat: 1)
+rescue ArgumentError => e
+  puts e.message
+end`,
+            },
+          ),
+          callout(
+            "info",
+            "`Data.define` needs Ruby 3.2 or newer. On older versions, a hand-written class that calls `freeze` at the end of `initialize` gives you the same guarantee.",
+          ),
+          quiz(
+            "`copy = frozen_object.dup`: is `copy` frozen?",
+            [
+              "Yes, dup always keeps the frozen state",
+              "No, dup returns an unfrozen copy; clone keeps it",
+              "Only if the object is a String",
+              "dup raises FrozenError on frozen objects",
+            ],
+            1,
+            "`clone` copies the frozen state and `dup` does not. Both are shallow copies.",
+          ),
+          quiz(
+            "How do you get a copy of a `Data` object with one field changed?",
+            [
+              "Assign to the field with a setter",
+              "Call with and pass the new value",
+              "Call dup, then change the field",
+              "You can't: Data objects can't be copied",
+            ],
+            1,
+            "`Data` objects have no setters. `with(lat: 48.86)` returns a new instance with that field replaced.",
+          ),
+        ],
+        challenge: {
+          title: "Immutable Money",
+          description:
+            "Replace the mutable `Struct` with `Data.define(:cents, :currency)` and keep the `to_s` method. Add a `+` method that raises `ArgumentError` when the currencies differ, and otherwise returns a **new** Money built with `with`. The program should print `30.49 USD`, `true`, `true` and the mismatch message.",
+          starterCode: `Money = Struct.new(:cents, :currency) do
+  def to_s
+    format("%.2f %s", cents / 100.0, currency)
+  end
+end
+
+lunch = Money.new(1050, "USD")
+dinner = Money.new(1999, "USD")
+
+puts lunch + dinner
+puts lunch.frozen?
+puts lunch == Money.new(1050, "USD")
+
+begin
+  lunch + Money.new(500, "EUR")
+rescue ArgumentError => e
+  puts e.message
+end`,
+          solutionCode: `Money = Data.define(:cents, :currency) do
+  def +(other)
+    raise ArgumentError, "can't add #{other.currency} to #{currency}" unless other.currency == currency
+
+    with(cents: cents + other.cents)
+  end
+
+  def to_s
+    format("%.2f %s", cents / 100.0, currency)
+  end
+end
+
+lunch = Money.new(1050, "USD")
+dinner = Money.new(1999, "USD")
+
+puts lunch + dinner
+puts lunch.frozen?
+puts lunch == Money.new(1050, "USD")
+
+begin
+  lunch + Money.new(500, "EUR")
+rescue ArgumentError => e
+  puts e.message
+end`,
+          tests: [
+            {
+              id: 1,
+              label: "Uses Data.define(:cents, :currency)",
+              keywords: [{ pattern: "Data\\.define\\(\\s*:cents\\s*,\\s*:currency\\s*\\)" }],
+            },
+            { id: 2, label: "Defines +", keywords: [{ pattern: "def\\s+\\+" }] },
+            { id: 3, label: "Raises ArgumentError on a currency mismatch", keywords: [{ pattern: "raise\\s+ArgumentError" }] },
+            { id: 4, label: "Returns a new value with with(...)", keywords: [{ pattern: "\\bwith\\(\\s*cents:" }] },
           ],
         },
       },
@@ -2296,13 +1720,13 @@ puts result[:success] ? "Registered: #{result[:user][:email]}" : "Error: #{resul
   },
 ];
 
-export const RUBY_ON_RAILS_LESSONS = RUBY_ON_RAILS_CHAPTERS.flatMap((ch) =>
+export const RUBY_OOP_LESSONS = RUBY_OOP_CHAPTERS.flatMap((ch) =>
   ch.lessons.map((l) => ({
     ...l,
     chapterId: ch.id,
     chapterTitle: ch.title,
     chapterColor: ch.color,
-  })),
+  }))
 );
 
-export const RUBY_ON_RAILS_TOTAL_XP = RUBY_ON_RAILS_LESSONS.reduce((s, l) => s + l.xp, 0);
+export const RUBY_OOP_TOTAL_XP = RUBY_OOP_LESSONS.reduce((s, l) => s + l.xp, 0);
