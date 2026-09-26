@@ -11793,6 +11793,18 @@ body {
   border: 0;
 }
 
+/* Full-width video at the bottom of a lesson article */
+.lesson-video--article {
+  max-width: 100%;
+  margin: 24px 0 0;
+}
+
+.lesson-video--article .lesson-video-frame {
+  height: 0;
+  max-height: none;
+  padding-top: 56.25%;
+}
+
 .lesson-annotator {
   position: relative;
 }
