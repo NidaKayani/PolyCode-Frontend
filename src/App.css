@@ -11800,9 +11800,10 @@ body {
 }
 
 .lesson-video--article .lesson-video-frame {
-  height: 0;
+  height: auto;
   max-height: none;
-  padding-top: 56.25%;
+  padding-top: 0;
+  aspect-ratio: 16 / 9;
 }
 
 .lesson-annotator {
