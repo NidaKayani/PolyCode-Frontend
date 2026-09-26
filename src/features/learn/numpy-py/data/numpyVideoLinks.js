@@ -44,30 +44,30 @@ export const NUMPY_VIDEO_LINKS = {
   "numpy-19": "https://youtu.be/KxQQNC5FuqY?si=_ukURwPj8KZZcZVH", // NaN & Percentiles
 
   // ── Ch 7: Reshape & Combine ────────────────────────────────────────────
-  "numpy-13": "", // reshape
-  "numpy-13b": "", // transpose & ravel
-  "numpy-14": "", // stack & concatenate
+  "numpy-13": "https://youtu.be/8cPSWCamrkc", // reshape
+  "numpy-13b": "https://youtu.be/7pe217PEKB4", // transpose & ravel
+  "numpy-14": "https://youtu.be/l9YBKGD0Yhc", // stack & concatenate
 
   // ── Ch 8: Random Numbers ─────────────────────────────────────────────
-  "numpy-20": "", // Random Numbers & Seed
-  "numpy-21": "", // choice, shuffle & permutation
-  "numpy-21b": "", // Random Simulations
+  "numpy-20": "https://youtu.be/-81ARfv6cxg", // Random Numbers & Seed
+  "numpy-21": "https://youtu.be/q-NK-LXOW3M", // choice, shuffle & permutation
+  "numpy-21b": "https://youtu.be/yyWFZTNRv2Q", // Random Simulations
 
   // ── Ch 9: Data Skills ────────────────────────────────────────────────
-  "numpy-22": "", // Cleaning NaN Values
-  "numpy-23": "", // sort, argsort & unique
-  "numpy-24": "", // Save & Load .npy
+  "numpy-22": "https://youtu.be/DNPcfMu5kOo", // Cleaning NaN Values
+  "numpy-23": "https://youtu.be/ce7AvVY7J8A", // sort, argsort & unique
+  "numpy-24": "https://youtu.be/olQweAgTNDM", // Save & Load .npy
 
   // ── Ch 10: Mastery ───────────────────────────────────────────────────
-  "numpy-25": "", // Views vs Copy
-  "numpy-26": "", // ufuncs & vectorization
-  "numpy-26b": "", // Speed & Memory Efficiency
+  "numpy-25": "https://youtu.be/fzdUlGtJcN0", // Views vs Copy
+  "numpy-26": "https://youtu.be/dXqTt_97D7I", // ufuncs & vectorization
+  "numpy-26b": "https://youtu.be/1-kM8Q_Ctc0", // Speed & Memory Efficiency
 
   // ── Ch 11: Capstone Projects ───────────────────────────────────────────
-  "numpy-15": "", // Normalize a Vector (Z-Score)
-  "numpy-16": "", // Weighted Average
-  "numpy-27": "", // Mini Project: Grade Report
-  "numpy-28": "", // Mini Project: Score Pipeline
-  "numpy-29": "", // Mini Project: Temperature Stats
-  "numpy-30": "", // Final Boss: Combine All Skills
+  "numpy-15": "https://youtu.be/ztdZPgxsqnM", // Normalize a Vector (Z-Score)
+  "numpy-16": "https://youtu.be/4uleNgIqGn0", // Weighted Average
+  "numpy-27": "https://youtu.be/slUUY3-iofI", // Mini Project: Grade Report
+  "numpy-28": "https://youtu.be/pjHaVS0Q408", // Mini Project: Score Pipeline
+  "numpy-29": "https://youtu.be/RAUQJXSvKHY", // Mini Project: Temperature Stats
+  "numpy-30": "https://youtu.be/RivxCSq49UY", // Final Boss: Combine All Skills
 };
