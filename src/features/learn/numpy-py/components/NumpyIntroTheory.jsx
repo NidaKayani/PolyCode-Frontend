@@ -2,7 +2,6 @@ import React from "react";
 import { AlertTriangle, Info, Lightbulb, Sparkles } from "lucide-react";
 import RunnableCodeBlock from "../../shared/RunnableCodeBlock";
 import LessonReadGate from "../../shared/LessonReadGate";
-import LessonVideo from "../../shared/LessonVideo";
 import LessonQuizSlider from "../../shared/LessonQuizSlider";
 import LessonTopicOverview from "../../shared/LessonTopicOverview";
 import { lessonUsesW3Overview } from "../../shared/buildAutoW3TopicOverview";
@@ -816,13 +815,6 @@ export default function NumpyIntroTheory({
         quizzesRequired={quizStoragePrefix ? quizCount : 0}
         quizzesAttempted={attemptedCount}
       />
-      {lesson?.videoUrl ? (
-        <LessonVideo
-          url={lesson.videoUrl}
-          title={`${lesson.title} — NumPy`}
-          placement="article"
-        />
-      ) : null}
     </div>
   );
 }

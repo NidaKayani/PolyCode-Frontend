@@ -38,6 +38,8 @@ export default function LessonContentShell({
   children,
 }) {
   const { token, isAuthenticated } = useAuth();
+  // Video sits at the bottom of the article, not under the code challenge.
+  const showVideo = Boolean(videoUrl) && tab !== "challenge";
   const { courseId, lessonId } = useMemo(
     () => resolveCourseAndLesson(storageKey),
     [storageKey],
@@ -76,7 +78,7 @@ export default function LessonContentShell({
 
   return (
     <ChallengeTelemetryContext.Provider value={reportChallengeResult}>
-      <div className={`oops-lesson-content${videoUrl ? " has-lesson-video" : ""}`}>
+      <div className={`oops-lesson-content${showVideo ? " has-lesson-video" : ""}`}>
         <LessonAnnotator
           storageKey={annotationKey}
           courseId={courseId}
@@ -85,8 +87,8 @@ export default function LessonContentShell({
         >
           {children}
         </LessonAnnotator>
-        {videoUrl ? (
-          <LessonVideo url={videoUrl} title={videoTitle} placement="end" />
+        {showVideo ? (
+          <LessonVideo url={videoUrl} title={videoTitle} placement="article" />
         ) : null}
       </div>
     </ChallengeTelemetryContext.Provider>
