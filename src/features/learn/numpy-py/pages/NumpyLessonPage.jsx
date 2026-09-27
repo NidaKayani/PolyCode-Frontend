@@ -184,6 +184,8 @@ export default function NumpyLessonPage() {
         <LessonContentShell
           tab={tab}
           storageKey={`numpy-py:${lessonId}`}
+          videoUrl={lesson.videoUrl}
+          videoTitle={`${lesson.title} — NumPy`}
         >
           {tab === "theory" ? (
             <NumpyIntroTheory
