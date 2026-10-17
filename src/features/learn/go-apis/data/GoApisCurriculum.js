@@ -59,7 +59,7 @@ export const GO_APIS_CHAPTERS = [
       ["go-apis-3-2", "Request Logging", 21, "Request logging records method and path. Middleware can observe every request without duplicating code in endpoints.", goProgram('    method := "GET"\n    path := "/items"\n    fmt.Println(method, path)'), "Log a request", "Print GET /items as a request log line.", challenge('fmt.Println("GET /items")'), goProgram('    fmt.Println("GET /items")'), [["Logs method", "GET"], ["Logs path", "/items"]], "Where is request logging commonly implemented?", ["Middleware", "A JSON tag", "A struct field", "go.mod"], 0, "Middleware can observe every request."],
     ]),
   },
-  {
+  { 
     id: "go-apis-security", title: "Authentication and Security", stage: "pro", icon: "🔐", color: "#f59e0b",
     lessons: definitions("Authentication and Security", "#f59e0b", [
       ["go-apis-4-0", "API Keys", 23, "API keys are credentials sent by clients. Read them from a header and reject missing or invalid keys with 401.", goProgram('    key := "secret"\n    if key == "secret" { fmt.Println("authorized") }'), "Check an API key", "Print authorized after checking the expected API key.", challenge('key := "secret"\n    if key == "secret" { fmt.Println("authorized") }'), goProgram('    key := "secret"\n    if key == "secret" { fmt.Println("authorized") }'), [["Checks key", "key =="], ["Authorizes", "authorized"]], "What should happen for missing credentials?", ["Reject the request", "Grant admin access", "Ignore it", "Print it to clients"], 0, "Missing or invalid credentials should be rejected."],
