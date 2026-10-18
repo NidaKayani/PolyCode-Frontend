@@ -23,6 +23,7 @@ import {
   Bot,
   Workflow,
   Smartphone,
+  Cloud,
 } from "lucide-react";
 
 export function languageKey(value = "") {
@@ -66,6 +67,7 @@ export const languageCourses = {
     { title: "Quantum Gates", tag: "Core Gates Course", icon: Cpu, description: "Deep dive into Pauli gates (X, Y, Z), rotation gates, phase gates, CNOT, CZ, SWAP, and Toffoli gates.", href: "/learn/qsharp-quantum-gates", accent: "#e11d48" },
     { title: "Quantum Algorithms", tag: "Algorithms Course", icon: Brain, description: "Implement Deutsch-Jozsa, Bernstein-Vazirani, Grover's Search, and Quantum Phase Estimation in Q#.", href: "/learn/qsharp-quantum-algorithms", accent: "#a855f7" },
     { title: "Quantum Projects", tag: "Projects Course", icon: Boxes, description: "Build end-to-end Q# quantum applications: Quantum Key Distribution (BB84), Teleportation, QRNG, and VQE Capstone.", href: "/learn/qsharp-quantum-projects", accent: "#ec4899" },
+    { title: "Q# Error Correction & Noise", tag: "Reliability Course", icon: Workflow, description: "Model bit-flip and phase-flip noise, diagnose errors with syndromes, and build a simple repetition-code workflow in Q#.", href: "/learn/qsharp-error-correction", accent: "#7c3aed" },
   ],
   sql: [
     { title: "SQL Fundamentals", tag: "Core Course", icon: Database, description: "Learn database basics, tables, and standard SQL syntax.", href: "/learn/sql-fundamentals", accent: "#00758f" },
@@ -956,6 +958,22 @@ export const languageCourses = {
       href: "/learn/powershell-projects",
       accent: "#5391fe",
     },
+    {
+      title: "PowerShell Security & Compliance",
+      tag: "Security Course",
+      icon: HardDrive,
+      description: "Protect credentials, apply least privilege, audit changes, and secure remoting.",
+      href: "/learn/powershell-security",
+      accent: "#5391fe",
+    },
+    {
+      title: "PowerShell Cloud Automation",
+      tag: "Cloud Course",
+      icon: Cloud,
+      description: "Automate Azure sign-in, resource operations, and repeatable cloud workflows.",
+      href: "/learn/powershell-cloud-automation",
+      accent: "#5391fe",
+    },
   ],
   quantum: [
     {
@@ -1095,6 +1113,24 @@ export const languageCourses = {
         "Apply everything to four real tools — a system info reporter, a file organizer, a backup utility, and a capstone menu toolkit.",
       href: "/learn/batchfile-projects",
       accent: "#c5c5c5",
+    },
+    {
+      title: "Batchfile Security & Reliability",
+      tag: "Security Course",
+      icon: FileText,
+      description:
+        "Make scripts safer with robust input validation, reliable error handling, defensive file operations, and audit-friendly logs.",
+      href: "/learn/batchfile-security",
+      accent: "#f59e0b",
+    },
+    {
+      title: "Batchfile Enterprise Deployment",
+      tag: "Enterprise Course",
+      icon: Workflow,
+      description:
+        "Plan repeatable Windows deployments with configuration, staged rollouts, scheduled jobs, recovery steps, and operational handoffs.",
+      href: "/learn/batchfile-enterprise",
+      accent: "#0ea5e9",
     },
   ],
   // ─── ADD SOFTWARE ENGINEERING TRACK DEFINITION ─────────────────────────────
@@ -1359,6 +1395,8 @@ export const learnNavByLanguage = {
     { label: "Scripting", to: "/learn/powershell-scripting" },
     { label: "Administration", to: "/learn/powershell-administration" },
     { label: "Projects", to: "/learn/powershell-projects" },
+    { label: "Security & Compliance", to: "/learn/powershell-security" },
+    { label: "Cloud Automation", to: "/learn/powershell-cloud-automation" },
   ],
   quantum: [
     { label: "Fundamentals", to: "/learn/quantum-computing-fundamentals" },
@@ -1378,6 +1416,8 @@ export const learnNavByLanguage = {
     { label: "Automation", to: "/learn/batchfile-automation" },
     { label: "Projects", to: "/learn/batchfile-projects" },
     { label: "Windows Scripting", to: "/learn/windows-scripting" },
+    { label: "Security & Reliability", to: "/learn/batchfile-security" },
+    { label: "Enterprise Deployment", to: "/learn/batchfile-enterprise" },
   ],
   qsharp: [
     { label: "Q# Fundamentals", to: "/learn/qsharp-fundamentals" },
@@ -1385,6 +1425,7 @@ export const learnNavByLanguage = {
     { label: "Quantum Gates", to: "/learn/qsharp-quantum-gates" },
     { label: "Quantum Algorithms", to: "/learn/qsharp-quantum-algorithms" },
     { label: "Quantum Projects", to: "/learn/qsharp-quantum-projects" },
+    { label: "Error Correction & Noise", to: "/learn/qsharp-error-correction" },
   ],
   softwareengineering: [
     { label: "Overview", to: "/learn/software-engineering-fundamentals" },
@@ -1520,7 +1561,9 @@ export function inferLanguageFromLearnPath(pathname = "") {
     pathname.startsWith("/learn/powershell-fundamentals") ||
     pathname.startsWith("/learn/powershell-scripting") ||
     pathname.startsWith("/learn/powershell-administration") ||
-    pathname.startsWith("/learn/powershell-projects")
+    pathname.startsWith("/learn/powershell-projects") ||
+    pathname.startsWith("/learn/powershell-security") ||
+    pathname.startsWith("/learn/powershell-cloud-automation")
   ) {
     return "powershell";
   }

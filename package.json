@@ -30,8 +30,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "prestart": "node scripts/copy-ruby-wasm.js",
-    "prebuild": "node scripts/copy-ruby-wasm.js",
+    "prestart": "node scripts/check-required-deps.js && node scripts/copy-ruby-wasm.js",
+    "prebuild": "node scripts/check-required-deps.js && node scripts/copy-ruby-wasm.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

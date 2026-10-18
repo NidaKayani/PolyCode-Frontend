@@ -54,6 +54,8 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "powershell-scripting", storagePrefix: "powershellscripting", scoped: false, notes: false },
   { courseId: "powershell-administration", storagePrefix: "powershelladministration", scoped: false, notes: false },
   { courseId: "powershell-projects", storagePrefix: "powershellprojects", scoped: false, notes: false },
+  { courseId: "powershell-security", storagePrefix: "powershellsecurity", scoped: false, notes: false },
+  { courseId: "powershell-cloud-automation", storagePrefix: "powershellcloudautomation", scoped: false, notes: false },
   { courseId: "ruby-fundamentals", storagePrefix: "ruby_fundamentals", scoped: false, notes: false },
   { courseId: "ruby-gems", storagePrefix: "ruby_gems", scoped: false, notes: false },
   { courseId: "ruby-file-handling", storagePrefix: "ruby_file_handling", scoped: false, notes: false },
@@ -113,12 +115,15 @@ export const COURSE_PROGRESS_REGISTRY = [
   { courseId: "batchfile-automation", storagePrefix: "batchfile-automation", scoped: false, notes: false },
   { courseId: "batchfile-projects", storagePrefix: "batchfile-projects", scoped: false, notes: false },
   { courseId: "windows-scripting", storagePrefix: "windows-scripting", scoped: false, notes: false },
+  { courseId: "batchfile-security", storagePrefix: "batchfile-security", scoped: false, notes: false },
+  { courseId: "batchfile-enterprise", storagePrefix: "batchfile-enterprise", scoped: false, notes: false },
   // ─── ADD Q# COURSES ────────────────────────────────────────────────────────
   { courseId: "qsharp-fundamentals", storagePrefix: "qsharp_fundamentals", scoped: true, notes: false },
   { courseId: "qsharp-quantum-programming-basics", storagePrefix: "qsharp_quantum_programming_basics", scoped: true, notes: false },
   { courseId: "qsharp-quantum-gates", storagePrefix: "qsharp_quantum_gates", scoped: true, notes: false },
   { courseId: "qsharp-quantum-algorithms", storagePrefix: "qsharp_quantum_algorithms", scoped: true, notes: false },
   { courseId: "qsharp-quantum-projects", storagePrefix: "qsharp_quantum_projects", scoped: true, notes: false },
+  { courseId: "qsharp-error-correction", storagePrefix: "qsharp_error_correction", scoped: true, notes: false },
   // ─── ADD SOFTWARE ENGINEERING COURSES ──────────────────────────────────────
   { courseId: "software-engineering-fundamentals", storagePrefix: "software_engineering_fundamentals", scoped: false, notes: false },
 ];
