@@ -1,8 +1,10 @@
 {
   "/learn/ai_ml-py": "ai-ml-py",
   "/learn/batchfile-automation": "batchfile-automation",
+  "/learn/batchfile-enterprise": "batchfile-enterprise",
   "/learn/batchfile-fundamentals": "batchfile-fundamentals",
   "/learn/batchfile-projects": "batchfile-projects",
+  "/learn/batchfile-security": "batchfile-security",
   "/learn/c-data-structures": "c-data-structures",
   "/learn/c-file-handling": "c-file-handling",
   "/learn/c-functions": "c-functions",
@@ -75,6 +77,7 @@
   "/learn/python-fundamentals": "python-fundamentals",
   "/learn/python-oop-py": "python-oop-py",
   "/learn/pytorch-py": "pytorch-py",
+  "/learn/qsharp-error-correction": "qsharp-error-correction",
   "/learn/qsharp-fundamentals": "qsharp-fundamentals",
   "/learn/qsharp-quantum-algorithms": "qsharp-quantum-algorithms",
   "/learn/qsharp-quantum-gates": "qsharp-quantum-gates",

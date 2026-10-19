@@ -74,6 +74,21 @@
       "bfa-11"
     ]
   },
+  "batchfile-enterprise": {
+    "name": "Batchfile Enterprise Deployment",
+    "basePath": "/learn/batchfile-enterprise",
+    "hub": "src/features/learn/batchfile-enterprise/pages/BatchfileEnterpriseHub.jsx",
+    "source": "src/features/learn/batchfile-enterprise/data/batchfileEnterpriseCurriculum.js#BATCHFILE_ENTERPRISE_LESSONS",
+    "totalXp": 120,
+    "lessonIds": [
+      "batchfile-enterprise-configuration",
+      "batchfile-enterprise-preflight",
+      "batchfile-enterprise-robocopy-rollout",
+      "batchfile-enterprise-scheduled-run",
+      "batchfile-enterprise-rollback",
+      "batchfile-enterprise-handoff"
+    ]
+  },
   "batchfile-fundamentals": {
     "name": "Batchfile Fundamentals",
     "basePath": "/learn/batchfile-fundamentals",
@@ -114,6 +129,20 @@
       "bfp-9",
       "bfp-10",
       "bfp-11"
+    ]
+  },
+  "batchfile-security": {
+    "name": "Batchfile Security & Reliability",
+    "basePath": "/learn/batchfile-security",
+    "hub": "src/features/learn/batchfile-security/pages/BatchfileSecurityHub.jsx",
+    "source": "src/features/learn/batchfile-security/data/batchfileSecurityCurriculum.js#BATCHFILE_SECURITY_LESSONS",
+    "totalXp": 100,
+    "lessonIds": [
+      "batchfile-security-input-boundaries",
+      "batchfile-security-quote-paths",
+      "batchfile-security-check-errorlevel",
+      "batchfile-security-cleanup-temporary",
+      "batchfile-security-audit-logs"
     ]
   },
   "c-data-structures": {
@@ -2238,6 +2267,21 @@
       "pytorch-22",
       "pytorch-23",
       "pytorch-24"
+    ]
+  },
+  "qsharp-error-correction": {
+    "name": "Q# Error Correction & Noise",
+    "basePath": "/learn/qsharp-error-correction",
+    "hub": "src/features/learn/qsharp-error-correction/pages/QsharpErrorCorrectionHub.jsx",
+    "source": "src/features/learn/qsharp-error-correction/data/qsharpErrorCorrectionCurriculum.js#QSHARP_ERROR_CORRECTION_LESSONS",
+    "totalXp": 120,
+    "lessonIds": [
+      "qsharp-error-correction-noise-models",
+      "qsharp-error-correction-bit-flip",
+      "qsharp-error-correction-phase-flip",
+      "qsharp-error-correction-repetition-code",
+      "qsharp-error-correction-syndrome",
+      "qsharp-error-correction-logical-boundaries"
     ]
   },
   "qsharp-fundamentals": {

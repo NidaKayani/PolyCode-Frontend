@@ -50,6 +50,8 @@ function normalizeLang(lang = "python") {
 function monacoLanguage(lang) {
   if (lang === "cpp") return "cpp";
   if (lang === "c") return "c";
+  if (lang === "batch" || lang === "bat") return "bat";
+  if (lang === "qsharp") return "csharp";
   if (lang === "javascript") return "javascript";
   if (lang === "html") return "html";
   if (lang === "css") return "css";
@@ -179,7 +181,8 @@ export default function RunnableCodeBlock({
 }) {
   const { loading: authLoading, isAuthenticated } = useAuth();
   const { monacoTheme, beforeMount } = useSiteMonacoTheme();
-  const canRun = isAuthenticated && !authLoading;
+  const isRunnable = block.runnable !== false;
+  const canRun = isRunnable && isAuthenticated && !authLoading;
 
   const lang = normalizeLang(block.lang || language);
   const editorLang = monacoLanguage(lang);
@@ -298,22 +301,24 @@ export default function RunnableCodeBlock({
           <button type="button" className="oops-copy-btn" onClick={copyCode}>
             {copied ? "✓ Copied" : "Copy"}
           </button>
-          <button
-            type="button"
-            className="oops-run-code-btn"
-            style={{ "--accent": accentColor }}
-            onClick={handleRun}
-            disabled={!canRun || running}
-            title={!canRun ? "Sign in or sign up to run code" : undefined}
-          >
-            {authLoading
-              ? "…"
-              : running
-                ? "⟳ Running…"
-                : canRun
-                  ? "▶ Run"
-                  : "Sign in to run"}
-          </button>
+          {isRunnable ? (
+            <button
+              type="button"
+              className="oops-run-code-btn"
+              style={{ "--accent": accentColor }}
+              onClick={handleRun}
+              disabled={!canRun || running}
+              title={!canRun ? "Sign in or sign up to run code" : undefined}
+            >
+              {authLoading
+                ? "…"
+                : running
+                  ? "⟳ Running…"
+                  : canRun
+                    ? "▶ Run"
+                    : "Sign in to run"}
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -337,7 +342,7 @@ export default function RunnableCodeBlock({
         />
       </div>
 
-      {!canRun && !authLoading && (
+      {isRunnable && !canRun && !authLoading && (
         <div className="oops-auth-gate oops-auth-gate-theory">
           <p>
             Sign in or create an account to run examples and see output here.
@@ -356,94 +361,102 @@ export default function RunnableCodeBlock({
         </div>
       )}
 
-      <div
-        className={`oops-theory-output oops-output-panel ${
-          output?.status ? `oops-output-${output.status}` : ""
-        } ${previewHTML ? "oops-output-preview" : ""}`}
-      >
-        <div className="oops-output-head">
-          <span>{previewHTML ? "Preview" : "Output"}</span>
-          <div className="oops-output-head-actions">
-            <small>
-              {output || previewHTML
-                ? "after last run"
-                : "run the example to see output"}
-            </small>
-            {(output || previewHTML) && (
-              <button
-                type="button"
-                className="oops-clear-output-btn"
-                onClick={clearOutput}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
-        {previewHTML ? (
-          <div className="oops-preview-frame">
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                alignItems: "center",
-                padding: "0 1rem 0 1rem",
-              }}
-            >
-              <small style={{ color: "#666" }}>Theme:</small>
-              <div>
+      {!isRunnable ? (
+        <p className="numpy-step-text">
+          Reference example — run it in a{" "}
+          {lang === "batch" ? "Windows Command Prompt" : "Q# project"}{" "}
+          environment.
+        </p>
+      ) : (
+        <div
+          className={`oops-theory-output oops-output-panel ${
+            output?.status ? `oops-output-${output.status}` : ""
+          } ${previewHTML ? "oops-output-preview" : ""}`}
+        >
+          <div className="oops-output-head">
+            <span>{previewHTML ? "Preview" : "Output"}</span>
+            <div className="oops-output-head-actions">
+              <small>
+                {output || previewHTML
+                  ? "after last run"
+                  : "run the example to see output"}
+              </small>
+              {(output || previewHTML) && (
                 <button
                   type="button"
-                  onClick={() => setPreviewTheme("light")}
-                  style={{
-                    marginRight: 6,
-                    padding: "4px 8px",
-                    borderRadius: 4,
-                    border:
-                      previewTheme === "light"
-                        ? "1px solid #111"
-                        : "1px solid #ccc",
-                  }}
+                  className="oops-clear-output-btn"
+                  onClick={clearOutput}
                 >
-                  Light
+                  Clear
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewTheme("dark")}
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: 4,
-                    border:
-                      previewTheme === "dark"
-                        ? "1px solid #111"
-                        : "1px solid #ccc",
-                  }}
-                >
-                  Dark
-                </button>
-              </div>
+              )}
             </div>
-            <iframe
-              title="html-preview"
-              srcDoc={themedPreviewHtml(previewHTML, previewTheme)}
-              sandbox=""
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                minHeight: 300,
-                border: "1px solid #e5e7eb",
-                borderRadius: 6,
-              }}
-            />
           </div>
-        ) : (
-          <PythonRunOutput
-            stdout={output?.stdout}
-            plotImages={output?.plotImages}
-            emptyHint="Output will appear here after you run the code."
-          />
-        )}
-      </div>
+          {previewHTML ? (
+            <div className="oops-preview-frame">
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  alignItems: "center",
+                  padding: "0 1rem 0 1rem",
+                }}
+              >
+                <small style={{ color: "#666" }}>Theme:</small>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewTheme("light")}
+                    style={{
+                      marginRight: 6,
+                      padding: "4px 8px",
+                      borderRadius: 4,
+                      border:
+                        previewTheme === "light"
+                          ? "1px solid #111"
+                          : "1px solid #ccc",
+                    }}
+                  >
+                    Light
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewTheme("dark")}
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: 4,
+                      border:
+                        previewTheme === "dark"
+                          ? "1px solid #111"
+                          : "1px solid #ccc",
+                    }}
+                  >
+                    Dark
+                  </button>
+                </div>
+              </div>
+              <iframe
+                title="html-preview"
+                srcDoc={themedPreviewHtml(previewHTML, previewTheme)}
+                sandbox=""
+                referrerPolicy="no-referrer"
+                style={{
+                  width: "100%",
+                  minHeight: 300,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 6,
+                }}
+              />
+            </div>
+          ) : (
+            <PythonRunOutput
+              stdout={output?.stdout}
+              plotImages={output?.plotImages}
+              emptyHint="Output will appear here after you run the code."
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

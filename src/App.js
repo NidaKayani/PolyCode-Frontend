@@ -841,6 +841,26 @@ const LEARN_COURSE_ROUTES = [
     ),
   },
   {
+    slug: "batchfile-security",
+    language: "Batchfile",
+    Hub: lazyWithChunkRetry(
+        () => import("./features/learn/batchfile-security/pages/BatchfileSecurityHub"),
+    ),
+    Lesson: lazyWithChunkRetry(
+        () => import("./features/learn/batchfile-security/pages/BatchfileSecurityLessonPage"),
+    ),
+  },
+  {
+    slug: "batchfile-enterprise",
+    language: "Batchfile",
+    Hub: lazyWithChunkRetry(
+        () => import("./features/learn/batchfile-enterprise/pages/BatchfileEnterpriseHub"),
+    ),
+    Lesson: lazyWithChunkRetry(
+        () => import("./features/learn/batchfile-enterprise/pages/BatchfileEnterpriseLessonPage"),
+    ),
+  },
+  {
     slug: "php-projects",
     language: "PHP",
     Hub: lazyWithChunkRetry(
@@ -1076,6 +1096,38 @@ const LEARN_COURSE_ROUTES = [
     ),
   },
   {
+    slug: "powershell-security",
+    language: "PowerShell",
+    Hub: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/shared/powershell-specializations/pages/PowershellSpecializationHub"
+        ),
+    ),
+    Lesson: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/shared/powershell-specializations/pages/PowershellSpecializationLessonPage"
+        ),
+    ),
+  },
+  {
+    slug: "powershell-cloud-automation",
+    language: "PowerShell",
+    Hub: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/shared/powershell-specializations/pages/PowershellSpecializationHub"
+        ),
+    ),
+    Lesson: lazyWithChunkRetry(
+      () =>
+        import(
+          "./features/learn/shared/powershell-specializations/pages/PowershellSpecializationLessonPage"
+        ),
+    ),
+  },
+  {
     slug: "quantum-computing-fundamentals",
     language: "Quantum",
     Hub: lazyWithChunkRetry(
@@ -1227,6 +1279,16 @@ const LEARN_COURSE_ROUTES = [
         import(
           "./features/learn/qsharp-quantum-projects/pages/QsharpQuantumProjectsLessonPage"
         ),
+    ),
+  },
+  {
+    slug: "qsharp-error-correction",
+    language: "Q#",
+    Hub: lazyWithChunkRetry(
+        () => import("./features/learn/qsharp-error-correction/pages/QsharpErrorCorrectionHub"),
+    ),
+    Lesson: lazyWithChunkRetry(
+        () => import("./features/learn/qsharp-error-correction/pages/QsharpErrorCorrectionLessonPage"),
     ),
   },
   {
