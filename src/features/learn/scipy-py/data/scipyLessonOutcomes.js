@@ -112,18 +112,18 @@ export const SCIPY_LESSON_OUTCOMES = {
     "Connect eigen ideas to vibration or stretch examples",
   ],
   "scipy-22": [
-    "Explain FFT as splitting a signal into frequencies",
-    "Run a small FFT on a sine wave",
-    "Read which frequency is strongest",
+    "Fit a trend line to data with stats.linregress",
+    "Read slope and intercept in plain words",
+    "Predict a future value with slope * x + intercept",
   ],
   "scipy-23": [
-    "Find peaks in a simple signal array",
-    "Use SciPy signal helpers carefully",
-    "Connect peaks to heartbeats or music notes",
+    "Fill a missing reading with interp1d",
+    "Pass the interp1d function into integrate.quad",
+    "Find a total from incomplete real-world readings",
   ],
   "scipy-24": [
-    "Combine integrate, optimize, and stats in one mini lab",
-    "Build a short science report with SciPy",
-    "Know what to practice next after this course",
+    "Chain stats.describe, linregress, and root_scalar in one project",
+    "Turn a trend line into a 'when do we hit the target?' answer",
+    "Check a forecast by eye before trusting it",
   ],
 };

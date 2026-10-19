@@ -2128,59 +2128,59 @@ print(linalg.eigvals(A))`,
     ],
   },
   {
-    id: "signal",
-    title: "Signal, FFT & Capstone",
-    icon: "radio",
+    id: "projects",
+    title: "Real-World Projects",
+    icon: "rocket",
     color: "#7c3aed",
     lessons: [
       {
         id: "scipy-22",
-        title: "FFT — Hearing the Frequencies",
+        title: "Find the Trend in Your Data",
         xp: 15,
         theory: [
           {
             type: "text",
             content:
-              "**Introduction:** A **signal** is just a list of numbers over time — like volume samples of a sound, or readings from a sensor.\n\nAn **FFT** (Fast Fourier Transform) answers a friendly question: **“Which repeating patterns (frequencies) are hiding inside this signal?”**\n\nIn simple words:\n\n• Time view = how the number changes step by step\n• Frequency view = which “notes” or speeds are strong inside it\n• FFT is the tool that switches from time view → frequency view\n\n**Real-life example:** A guitar-tuner app shows which pitch a string is playing. FFT ideas power that kind of view: the phone hears a wiggly wave and reports the strongest note.",
+              "**Introduction:** In the Statistics chapter you **summarized** data with `describe`. In Linear Algebra you met equations like **y = m·x + b**. Now we join those two ideas.\n\nA **trend line** is the straight line that best follows your data points. SciPy finds it for you with **`stats.linregress(x, y)`**.\n\nIn simple words:\n\n• **x** — the thing you control or count (day, hour, week)\n• **y** — the thing you measure (sales, score, temperature)\n• **slope** — how much y goes up (or down) each time x goes up by 1\n• **intercept** — where the line starts when x is 0\n\n**Real-life example:** A small shop writes down sales each week: 20, 25, 29, 35, 40. The numbers are not perfectly even, but they clearly grow. `linregress` says: “about **+5 sales every week**.”",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• What a signal is in beginner words\n• What FFT means without heavy math\n• How to build a tiny sine wave with NumPy\n• How to run `scipy.fft.fft` and spot a strong frequency",
+              "**In this topic you will learn:**\n\n• What a trend line is in plain words\n• How to call `stats.linregress(x, y)`\n• How to read `slope` and `intercept`\n• How to **predict** a future value with `slope * x + intercept`",
           },
           {
             type: "scenario",
             title: "Think of it like this",
             content:
-              "Imagine a smoothie made of banana, mango, and strawberry. You taste one blended drink (the signal). FFT is like a magic blender that separates the flavors and tells you “lots of mango, a little banana.” You still have one drink — but now you know what went into it.",
+              "Imagine dots on a wall and a long ruler. You tilt the ruler until it sits as close as possible to all the dots. `linregress` does that tilting for you and tells you the ruler’s steepness (slope) and where it starts (intercept).",
           },
           {
             type: "table",
-            title: "Words you will see",
-            columns: ["Word", "Plain meaning", "Beginner tip"],
+            title: "linregress in three steps",
+            columns: ["Step", "What you write", "What it means"],
             rows: [
               {
                 label: "1",
                 values: [
-                  "Signal",
-                  "A list of numbers over time",
-                  "Start with a short NumPy array",
+                  "Make x and y",
+                  "`weeks = np.array([...])`",
+                  "Your two lists of numbers, same length",
                 ],
               },
               {
                 label: "2",
                 values: [
-                  "FFT",
-                  "Splits the signal into frequencies",
-                  "Use `from scipy.fft import fft`",
+                  "Fit the line",
+                  "`res = stats.linregress(weeks, sales)`",
+                  "SciPy finds the best straight line",
                 ],
               },
               {
                 label: "3",
                 values: [
-                  "Magnitude",
-                  "How strong each frequency is",
-                  "Often use `np.abs(fft(sig))`",
+                  "Read & predict",
+                  "`res.slope * 6 + res.intercept`",
+                  "Use the line to guess week 6",
                 ],
               },
             ],
@@ -2188,208 +2188,215 @@ print(linalg.eigvals(A))`,
           {
             type: "code",
             lang: "python",
-            label: "Try it: tiny FFT demo",
+            label: "Try it: weekly sales trend",
             content: `import numpy as np
-from scipy.fft import fft, fftfreq
+from scipy import stats
 
-n = 64
-t = np.arange(n)
-# a simple wave that repeats 3 times across the window
-sig = np.sin(2 * np.pi * 3 * t / n)
+weeks = np.array([1, 2, 3, 4, 5])
+sales = np.array([20, 25, 29, 35, 40])
 
-spec = np.abs(fft(sig))
-freqs = fftfreq(n, d=1)
-peak = np.argmax(spec[: n // 2])
-print("Peak bin:", peak)
-print("Peak freq:", freqs[peak])`,
+res = stats.linregress(weeks, sales)
+print("Slope (growth per week):", res.slope)
+print("Intercept (start):", res.intercept)
+
+# Predict week 6 using y = slope * x + intercept
+print("Week 6 guess:", res.slope * 6 + res.intercept)`,
           },
           {
             type: "callout",
             variant: "info",
             content:
-              "**Remember:** You usually look at the first half of the FFT result (`[: n // 2]`). That is enough to see the useful positive frequencies for many beginner demos.",
+              "**Remember:** A **positive** slope means the data is going **up**. A **negative** slope means it is going **down**. A slope near **0** means “no clear trend.”",
           },
           {
             type: "callout",
             variant: "tip",
             content:
-              "**Tip:** Keep your first signals short and clean (like one sine wave). Once that works, add noise or mix two tones.",
+              "**Tip:** Test with perfect data first, like x = [1, 2, 3] and y = [2, 4, 6]. The slope must be exactly 2 — if it is, your code is right.",
           },
           quiz(
-            "FFT helps you see…",
+            "Weekly sales are [20, 25, 29, 35, 40]. `linregress` gives slope = 5. What does that mean?",
             [
-              "Frequency content of a signal",
-              "Only file permissions",
-              "CSS grids",
-              "Git commits",
+              "Sales grow by about 5 each week",
+              "There were 5 weeks of data",
+              "The average sale is 5",
+              "Sales will stop after week 5",
             ],
             0,
-            "FFT reveals which frequencies are strong inside a signal — like hearing the notes in a sound.",
+            "The slope is the change in y for each +1 step in x — here, about 5 more sales per week.",
           ),
         ],
         challenge: challenge(
-          "FFT magnitude",
-          "Create sig = np.array([0,1,0,-1]). Print np.abs(fft(sig)) using scipy.fft.fft.",
+          "Trend slope",
+          "Make x = [1, 2, 3, 4] and y = [3, 5, 7, 9]. Use stats.linregress and print the slope.",
           `import numpy as np
-from scipy.fft import fft
+from scipy import stats
+# build x and y, run linregress, then print the slope
 `,
           `import numpy as np
-from scipy.fft import fft
-sig = np.array([0.0, 1.0, 0.0, -1.0])
-print(np.abs(fft(sig)))`,
+from scipy import stats
+x = np.array([1, 2, 3, 4])
+y = np.array([3, 5, 7, 9])
+res = stats.linregress(x, y)
+print(res.slope)`,
           [
-            kw(1, "Uses fft", "fft(", "fft\\s*\\("),
-            kw(2, "Uses abs", "np.abs", "np\\.abs\\s*\\("),
+            kw(1, "Uses linregress", "stats.linregress", "linregress\\s*\\("),
+            kw(2, "Reads slope", ".slope", "\\.slope"),
             kw(3, "Prints", "print(...)", "print\\s*\\("),
           ],
         ),
       },
       {
         id: "scipy-23",
-        title: "Simple Signal Peaks",
+        title: "Fill Missing Readings, Then Find the Total",
         xp: 15,
         theory: [
           {
             type: "text",
             content:
-              "**Introduction:** Sometimes you do not need every sample — you only need the **high points**.\n\n**Peak finding** means: look along a signal and mark the local highs (places that are taller than their neighbors).\n\nIn simple words:\n\n• A peak is a local maximum — a bump that sticks up\n• SciPy’s `find_peaks` returns the **indexes** of those bumps\n• You can then read `sig[peaks]` to get the values\n\n**Real-life example:** A fitness watch looks at a noisy light sensor. The pulse is the repeating high points. Finding those peaks helps estimate heartbeats.",
+              "**Introduction:** Real data is often **incomplete**. A sensor skips a reading, or someone forgets to write a number down. This lesson joins two tools you already know:\n\n1. **Interpolation** (`interp1d`) — fills the missing reading\n2. **Integration** (`integrate.quad`) — finds the **total** under the curve\n\nIn simple words: **fix the gaps first, then add everything up.**\n\n**Real-life example:** A water pipe’s flow is checked every hour (liters per hour). The reading at hour 2 is missing. We guess hour 2 from its neighbors, then find the **total liters** that flowed from hour 0 to hour 4.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• What a peak means in plain words\n• How to call `scipy.signal.find_peaks`\n• How to print peak indexes and peak values\n• Why short practice signals are easier to check by eye",
+              "**In this topic you will learn:**\n\n• How to turn known points into a function with `interp1d`\n• How to read a missing value like `f(2)`\n• How to pass that same function into `integrate.quad`\n• Why tools from different chapters fit together so easily",
           },
           {
             type: "scenario",
             title: "Think of it like this",
             content:
-              "Walk along a row of hills. You only write down the hilltops, not every step of the path. `find_peaks` does the same for a list of numbers: it points to the tops so you can study the important moments.",
+              "You are on a car trip and your speed log has one blank line. First you fill the blank with a sensible guess (between the speed before and after). Then you work out the total distance driven. Fill first, total second.",
           },
           {
-            type: "table",
-            title: "Peak-finding checklist",
-            columns: ["Step", "What you do", "Why it helps"],
-            rows: [
+            type: "diagram",
+            title: "Two chapters, one job",
+            nodes: [
               {
-                label: "1",
-                values: [
-                  "Make a short signal",
-                  "`sig = np.array([...])`",
-                  "Easy to check by hand",
-                ],
+                id: "raw",
+                label: "Readings with a gap",
+                color: "#6366f1",
+                items: ["hours = [0, 1, 3, 4]", "hour 2 is missing"],
               },
               {
-                label: "2",
-                values: [
-                  "Call find_peaks",
-                  "`peaks, _ = find_peaks(sig)`",
-                  "Gets indexes of local highs",
-                ],
+                id: "fill",
+                label: "Fill the gap",
+                color: "#06b6d4",
+                items: ["interp1d(hours, flow)", "f(2) → estimate"],
               },
               {
-                label: "3",
-                values: [
-                  "Read the values",
-                  "`sig[peaks]`",
-                  "Shows how tall each peak is",
-                ],
+                id: "total",
+                label: "Find the total",
+                color: "#8b5cf6",
+                items: ["integrate.quad(f, 0, 4)", "Area = total liters"],
               },
             ],
           },
           {
             type: "code",
             lang: "python",
-            label: "Try it: find peaks",
+            label: "Try it: fill the gap, then total",
             content: `import numpy as np
-from scipy.signal import find_peaks
+from scipy.interpolate import interp1d
+from scipy import integrate
 
-sig = np.array([0, 1, 0, 2, 0, 3, 0])
-peaks, _ = find_peaks(sig)
-print("Peak indexes:", peaks)
-print("Peak values:", sig[peaks])`,
+hours = np.array([0, 1, 3, 4])       # hour 2 is missing
+flow = np.array([10, 12, 16, 18])     # liters per hour
+
+f = interp1d(hours, flow)             # a function that fills gaps
+print("Flow at hour 2:", f(2))
+
+total, _ = integrate.quad(f, 0, 4)    # area under the flow curve
+print("Total liters:", total)`,
           },
           {
             type: "callout",
             variant: "info",
             content:
-              "**Remember:** `find_peaks` returns two things. Beginners usually keep the first one — the peak indexes — and ignore the second with `_`.",
+              "**Remember:** `interp1d` gives you back a **function**. That is why you can hand it straight to `quad` — `quad` just needs “something you can call with x.”",
           },
           {
             type: "callout",
             variant: "tip",
             content:
-              "**Tip:** Start with clear bumps like `[0, 1, 0, 2, 0]`. Later you can add options (height, distance) when real data is noisy.",
+              "**Tip:** Only ask for values **inside** your known range (here 0 to 4). Asking for hour 10 would be guessing outside the data and raises an error.",
           },
           quiz(
-            "A watch signal looks like [0, 1, 0, 2, 0, 3, 0]. What does `find_peaks(sig)` help you find?",
+            "A flow log is missing hour 2. What is the right order of steps to get total liters?",
             [
-              "The positions of local highs — useful for heartbeats or drum hits",
-              "The monthly average rainfall for a city",
-              "Duplicate rows in a SQL table",
-              "Which font size looks best in the app",
+              "Fill the gap with interp1d, then integrate with quad",
+              "Integrate first, then delete the missing hour",
+              "Use eigvals on the flow list",
+              "Sort the readings and print the largest",
             ],
             0,
-            "find_peaks locates local maximum indexes in a signal — the peaks you care about in sensor data.",
+            "Interpolation fills the missing reading; integration then adds up the area to give the total.",
           ),
         ],
         challenge: challenge(
-          "Peak indexes",
-          "On sig = np.array([1,3,1,4,1]), print find_peaks(sig)[0].",
+          "Fill and total",
+          "With x = [0, 2, 4] and y = [0, 4, 8], build f = interp1d(x, y). Print f(1), then print integrate.quad(f, 0, 4)[0].",
           `import numpy as np
-from scipy.signal import find_peaks
+from scipy.interpolate import interp1d
+from scipy import integrate
+# build f, print f(1), then print the total area from 0 to 4
 `,
           `import numpy as np
-from scipy.signal import find_peaks
-sig = np.array([1, 3, 1, 4, 1])
-print(find_peaks(sig)[0])`,
+from scipy.interpolate import interp1d
+from scipy import integrate
+x = np.array([0, 2, 4])
+y = np.array([0, 4, 8])
+f = interp1d(x, y)
+print(f(1))
+print(integrate.quad(f, 0, 4)[0])`,
           [
-            kw(1, "Uses find_peaks", "find_peaks", "find_peaks\\s*\\("),
-            kw(2, "Prints", "print(...)", "print\\s*\\("),
+            kw(1, "Uses interp1d", "interp1d(", "interp1d\\s*\\("),
+            kw(2, "Uses quad", "integrate.quad", "integrate\\.quad\\s*\\("),
+            kw(3, "Prints", "print(...)", "print\\s*\\("),
           ],
         ),
       },
       {
         id: "scipy-24",
-        title: "Capstone Lab — Science Toolkit",
+        title: "Capstone — Sales Forecast Report",
         xp: 20,
         theory: [
           {
             type: "text",
             content:
-              "**Introduction:** This **capstone** is your mini science report. You already met the tools one by one. Now you **combine** three of them in one short script:\n\n1. **Describe** a small data set (`stats.describe`)\n2. **Integrate** a simple curve (`integrate.quad`) — find area under it\n3. **Optimize** a cost (`optimize.minimize`) — find a best value\n\nIn simple words: summarize → total → improve → print.\n\n**Real-life example:** A lab notebook page. First you write the average of today’s measurements. Then you total a quantity under a curve. Then you find the best setting for a machine. That is a tiny science toolkit.",
+              "**Introduction:** This **capstone** is one small, real project that uses three chapters in a row. You answer one business question:\n\n**“Our sales are growing. In which week will we reach 60 sales?”**\n\nYou solve it in three steps:\n\n1. **Summarize** the data — `stats.describe` (Statistics chapter)\n2. **Find the trend** — `stats.linregress` (previous lesson)\n3. **Find the target week** — `optimize.root_scalar` (Optimization chapter)\n\n**Real-life example:** A shop owner wants to know when to hire extra help. If sales reach 60 a week by week 9, they can plan ahead.",
           },
           {
             type: "text",
             content:
-              "**In this topic you will learn:**\n\n• How to chain stats + integrate + optimize in one file\n• How to print a tiny readable report\n• A simple habit: NumPy data → right SciPy tool → print checks\n• A clear finish line for SciPy Mastery",
+              "**In this topic you will learn:**\n\n• How to chain three SciPy tools to answer one question\n• How to turn a trend line into a “when do we hit the target?” question\n• How root finding solves `trend(week) − 60 = 0`\n• How to print a short, readable report",
           },
           {
             type: "scenario",
             title: "Think of it like this",
             content:
-              "Cooking dinner from leftover ingredients. You already practiced chopping, simmering, and seasoning alone. The capstone is making one plate that uses all three skills — still simple food, just combined on purpose.",
+              "Planning a road trip: first you check where you are (summary), then how fast you are going (trend), then you work out when you will reach the city (target). Each step uses a tool you already practiced.",
           },
           {
             type: "diagram",
             title: "Capstone pipeline",
             nodes: [
               {
-                id: "data",
-                label: "Describe data",
+                id: "summary",
+                label: "1. Summarize",
                 color: "#6366f1",
-                items: ["stats.describe", "Mean & spread"],
+                items: ["stats.describe", "Average sales"],
               },
               {
-                id: "area",
-                label: "Integrate",
+                id: "trend",
+                label: "2. Trend",
                 color: "#06b6d4",
-                items: ["integrate.quad", "Area under curve"],
+                items: ["stats.linregress", "Growth per week"],
               },
               {
-                id: "best",
-                label: "Optimize",
+                id: "target",
+                label: "3. Target week",
                 color: "#8b5cf6",
-                items: ["optimize.minimize", "Best setting"],
+                items: ["optimize.root_scalar", "When sales = 60"],
               },
               {
                 id: "report",
@@ -2401,31 +2408,23 @@ print(find_peaks(sig)[0])`,
           },
           {
             type: "table",
-            title: "Your three tools",
-            columns: ["Tool", "Job in plain words", "What you print"],
+            title: "Which chapter each step comes from",
+            columns: ["Step", "Tool", "Chapter you learned it in"],
             rows: [
               {
                 label: "1",
-                values: [
-                  "`stats.describe`",
-                  "Summarize the numbers",
-                  "Mean (and more)",
-                ],
+                values: ["Summarize", "`stats.describe`", "Statistics"],
               },
               {
                 label: "2",
-                values: [
-                  "`integrate.quad`",
-                  "Find area under a curve",
-                  "Area value",
-                ],
+                values: ["Find the trend", "`stats.linregress`", "Real-World Projects"],
               },
               {
                 label: "3",
                 values: [
-                  "`optimize.minimize`",
-                  "Find a best input value",
-                  "`best.x[0]`",
+                  "Find the target week",
+                  "`optimize.root_scalar`",
+                  "Optimization",
                 ],
               },
             ],
@@ -2433,65 +2432,71 @@ print(find_peaks(sig)[0])`,
           {
             type: "code",
             lang: "python",
-            label: "Try it: mini science toolkit",
+            label: "Try it: sales forecast report",
             content: `import numpy as np
-from scipy import stats, integrate, optimize
+from scipy import stats, optimize
 
-# 1) Describe
-data = np.array([2.0, 3.0, 4.0, 5.0])
-print("Mean:", stats.describe(data).mean)
+weeks = np.array([1, 2, 3, 4, 5])
+sales = np.array([20, 25, 29, 35, 40])
 
-# 2) Integrate (area under y = x from 0 to 2)
-def f(x):
-    return x
-area, _ = integrate.quad(f, 0, 2)
-print("Area:", area)
+# 1) Summarize
+print("Average sales:", stats.describe(sales).mean)
 
-# 3) Optimize (lowest point of (x - 1)^2 is near x = 1)
-def cost(x):
-    return (x - 1) ** 2
-best = optimize.minimize(cost, x0=0.0)
-print("Best x:", best.x[0])`,
+# 2) Find the trend line
+res = stats.linregress(weeks, sales)
+print("Growth per week:", res.slope)
+
+# 3) When does the trend reach 60?
+def gap(week):
+    return res.slope * week + res.intercept - 60
+
+sol = optimize.root_scalar(gap, bracket=[1, 20])
+print("Reach 60 sales in week:", round(sol.root, 1))`,
           },
           {
             type: "callout",
             variant: "success",
             content:
-              "**Key takeaways:** SciPy extends NumPy with integrate, optimize, interpolate, stats, linalg, and signal/FFT tools. Start from a clear question, try a tiny example, then combine tools into small pipelines.",
+              "**Key takeaways:** SciPy tools work best **together**. Summarize with `stats`, fill gaps with `interpolate`, total with `integrate`, find best values and targets with `optimize`, and solve equations with `linalg`. Start from a clear question, then pick the right tool for each step.",
           },
           {
             type: "callout",
             variant: "tip",
             content:
-              "**Tip:** Always print a check. A short `print(...)` after each step catches mistakes early — that habit matters more than memorizing every function name.",
+              "**Tip:** Check the answer by eye. Sales grow by about 5 a week and are 40 at week 5, so 60 should come about 4 weeks later — around week 9. If SciPy agrees, you can trust the report.",
           },
           quiz(
-            "A strong SciPy habit is…",
+            "To find the week when sales reach 60, why do we use root_scalar on `trend(week) − 60`?",
             [
-              "Skip checking results",
-              "Use NumPy data + the right SciPy module + print checks",
-              "Never use arrays",
-              "Only memorize theory with no code",
+              "Because that expression equals 0 exactly at the target week",
+              "Because root_scalar sorts the sales list",
+              "Because it removes missing weeks from the data",
+              "Because it draws the trend line as a picture",
             ],
-            1,
-            "Combine clear NumPy data, the right SciPy tool, and readable print checks.",
+            0,
+            "Root finding looks for where a function crosses zero. trend(week) − 60 is zero at the week sales hit 60.",
           ),
         ],
         challenge: challenge(
-          "Toolkit trio",
-          "Print stats.describe(np.array([1.0,2.0,3.0])).mean, then integrate.quad(lambda x: x, 0, 1)[0], then optimize.minimize(lambda x: (x-2)**2, x0=0).x[0].",
+          "Forecast report",
+          "With weeks = [1, 2, 3, 4] and sales = [10, 20, 30, 40]: print stats.describe(sales).mean, then the linregress slope, then use optimize.root_scalar (bracket=[0, 20]) to print the week sales reach 100.",
           `import numpy as np
-from scipy import stats, integrate, optimize
+from scipy import stats, optimize
+# 1) summarize  2) trend  3) target week for 100 sales
 `,
           `import numpy as np
-from scipy import stats, integrate, optimize
-print(stats.describe(np.array([1.0, 2.0, 3.0])).mean)
-print(integrate.quad(lambda x: x, 0, 1)[0])
-print(optimize.minimize(lambda x: (x - 2) ** 2, x0=0.0).x[0])`,
+from scipy import stats, optimize
+weeks = np.array([1, 2, 3, 4])
+sales = np.array([10, 20, 30, 40])
+print(stats.describe(sales).mean)
+res = stats.linregress(weeks, sales)
+print(res.slope)
+sol = optimize.root_scalar(lambda w: res.slope * w + res.intercept - 100, bracket=[0, 20])
+print(sol.root)`,
           [
             kw(1, "Uses describe", "stats.describe", "stats\\.describe\\s*\\("),
-            kw(2, "Uses quad", "integrate.quad", "integrate\\.quad\\s*\\("),
-            kw(3, "Uses minimize", "optimize.minimize", "optimize\\.minimize\\s*\\("),
+            kw(2, "Uses linregress", "stats.linregress", "linregress\\s*\\("),
+            kw(3, "Uses root_scalar", "optimize.root_scalar", "root_scalar\\s*\\("),
           ],
         ),
       },

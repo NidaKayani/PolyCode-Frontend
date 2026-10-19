@@ -49,8 +49,8 @@ export const SCIPY_VIDEO_LINKS = {
   "scipy-20": "", // Solve Equations & Inverses
   "scipy-21": "", // Eigenvalues Made Simple
 
-  // ── Ch 8: Signal, FFT & Capstone ─────────────────────────────────────
-  "scipy-22": "", // FFT — Hearing the Frequencies
-  "scipy-23": "", // Simple Signal Peaks
-  "scipy-24": "", // Capstone Lab — Science Toolkit
+  // ── Ch 8: Real-World Projects ────────────────────────────────────────
+  "scipy-22": "", // Find the Trend in Your Data
+  "scipy-23": "", // Fill Missing Readings, Then Find the Total
+  "scipy-24": "", // Capstone — Sales Forecast Report
 };

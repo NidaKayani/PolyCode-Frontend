@@ -34,9 +34,9 @@ const LEARNING_PATH = [
   },
   {
     level: "Capstone",
-    chapters: ["signal"],
+    chapters: ["projects"],
     color: "#7c3aed",
-    summary: "FFT, peaks, and a final science-toolkit lab.",
+    summary: "Trend lines, filling gaps, and a sales-forecast capstone that combines earlier tools.",
   },
 ];
 
@@ -123,8 +123,8 @@ export default function ScipyHub() {
         </h1>
         <p className="oops-hero-sub scipy-hero-sub">
           Learn why SciPy exists, then build skills for integration,
-          optimization, interpolation, stats, linear algebra, FFT, and a
-          hands-on capstone — 8 clear chapters.
+          optimization, interpolation, stats, linear algebra, and
+          real-world projects — 8 clear chapters.
         </p>
 
         <div className="scipy-module-strip" aria-label="SciPy modules you will meet">
@@ -135,8 +135,6 @@ export default function ScipyHub() {
             "interpolate",
             "stats",
             "linalg",
-            "fft",
-            "signal",
           ].map((name) => (
             <span key={name} className="scipy-module-pill">
               {name}
@@ -212,7 +210,7 @@ export default function ScipyHub() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search integrate, optimize, FFT, stats..."
+              placeholder="Search integrate, optimize, stats, trend..."
               aria-label="Search SciPy lessons"
             />
             <div className="oops-filter-tabs" aria-label="Filter SciPy lessons">
