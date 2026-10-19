@@ -2,39 +2,47 @@ import React, { useState, useEffect } from "react";
 import { Play, CheckCircle, XCircle } from "lucide-react";
 import Editor from "@monaco-editor/react";
 
-export default function PowershellFundamentalsCodeChallenge({ lesson, onSuccess, isCompleted }) {
-  const [code, setCode] = useState(lesson.challenge.starterCode || "");
+export default function PowershellFundamentalsCodeChallenge({
+  challenge,
+  onComplete,
+  isCompleted,
+  initialCode,
+  onCodeChange,
+}) {
+  const [code, setCode] = useState(
+    initialCode || challenge.starterCode || "",
+  );
   const [results, setResults] = useState(null);
 
   useEffect(() => {
-    setCode(lesson.challenge.starterCode || "");
+    setCode(initialCode || challenge.starterCode || "");
     setResults(null);
-  }, [lesson.id, lesson.challenge.starterCode]);
+  }, [challenge, challenge.starterCode, initialCode]);
 
   const runCode = () => {
-    const tests = lesson.challenge.tests;
-    const newResults = [];
-    let allPassed = true;
-
-    tests.forEach((test) => {
-      const passed = test.keywords.every((kw) =>
-        new RegExp(kw, "i").test(code)
-      );
-      if (!passed) allPassed = false;
-      newResults.push({ ...test, passed });
-    });
-
+    const newResults = challenge.tests.map((test) => ({
+      ...test,
+      passed: test.keywords.every((keyword) =>
+        code.toLowerCase().includes(keyword.toLowerCase()),
+      ),
+    }));
     setResults(newResults);
-    if (allPassed) {
-      onSuccess();
-    }
+    if (newResults.every((test) => test.passed)) onComplete();
   };
+
+  function handleCodeChange(value) {
+    const nextCode = value || "";
+    setCode(nextCode);
+    onCodeChange?.(nextCode);
+  }
 
   return (
     <div className="oops-code-challenge">
       <div className="oops-editor-toolbar">
         <span>script.ps1</span>
+        {isCompleted && <span>Completed</span>}
         <button
+          type="button"
           className="oops-run-btn"
           onClick={runCode}
           disabled={!code.trim()}
@@ -47,7 +55,7 @@ export default function PowershellFundamentalsCodeChallenge({ lesson, onSuccess,
           defaultLanguage="powershell"
           theme="vs-dark"
           value={code}
-          onChange={(val) => setCode(val || "")}
+          onChange={handleCodeChange}
           options={{
             minimap: { enabled: false },
             fontSize: 14,

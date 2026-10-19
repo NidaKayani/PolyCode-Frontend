@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LEARN_ACCENT } from "../../shared/learnAccent";
 import { useNavigate, useParams } from "react-router-dom";
 import NumpyIntroTheory from "../../numpy-py/components/NumpyIntroTheory";
 import OopsSidebar from "../../oops-cpp/components/OopsSidebar";
@@ -201,8 +200,7 @@ export default function PowershellProjectsLessonPage() {
             />
           ) : (
             <PowershellProjectsCodeChallenge
-              challenge={lesson.challenge || lesson.challenges?.[0] || { id: 'c1', title: 'No challenge', description: 'N/A', starterCode: '', tests: [] }}
-              accentColor={LEARN_ACCENT}
+              challenge={lesson.challenge}
               isCompleted={isCompleted}
               onComplete={handleChallengeComplete}
               initialCode={savedCodeMap[lessonId]}

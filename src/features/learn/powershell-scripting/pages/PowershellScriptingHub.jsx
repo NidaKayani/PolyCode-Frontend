@@ -37,6 +37,18 @@ const LEARNING_PATH = [
     color: "#d35400",
     summary: "Mastery through advanced scenarios and real-world projects.",
   },
+  {
+    level: "Production",
+    chapters: ["ch-5"],
+    color: "#8e44ad",
+    summary: "Build tested functions and reusable PowerShell modules.",
+  },
+  {
+    level: "Expert",
+    chapters: ["ch-6"],
+    color: "#34495e",
+    summary: "Analyze, optimize, package, and release reliable scripts.",
+  },
 ];
 
 function lessonPlainText(lesson) {

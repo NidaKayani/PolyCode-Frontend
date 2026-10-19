@@ -29,7 +29,7 @@ export default function PowerShellSpecializationChallenge({
     const nextResults = lesson.challenge.tests.map((test) => ({
       ...test,
       passed: test.keywords.every((keyword) =>
-        new RegExp(keyword, "i").test(code),
+        code.toLowerCase().includes(keyword.toLowerCase()),
       ),
     }));
     setResults(nextResults);
