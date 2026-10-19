@@ -14,7 +14,7 @@
 5. Interpolation — `interp1d`, splines
 6. Statistics — distributions, describe, gentle tests
 7. Linear Algebra — solve, inverse, eigenvalues
-8. Signal, FFT & Capstone — FFT, peaks, toolkit lab
+8. Real-World Projects — trend lines (`linregress`), fill gaps + total (`interp1d` + `quad`), sales-forecast capstone
 
 ## Files
 | File | Role |
