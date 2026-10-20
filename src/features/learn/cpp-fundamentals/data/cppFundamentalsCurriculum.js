@@ -1,15 +1,13 @@
 // PolyCode — C++ Fundamentals interactive course
 // 10 chapters · 32 lessons · server/browser C++ challenges
 // YouTube links: edit cppFundamentalsVideoLinks.js
+// MCQs: edit cppFundamentalsQuizzes.js (two per lesson)
 
 import { applyLessonVideoLinks } from "../../shared/applyLessonVideoLinks";
 import { CPP_FUNDAMENTALS_VIDEO_LINKS } from "./cppFundamentalsVideoLinks";
+import { CPP_FUNDAMENTALS_QUIZZES } from "./cppFundamentalsQuizzes";
 
 const ACCENT = "#f34b7d";
-
-function quiz(question, options, answer, explanation) {
-  return { type: "quiz", question, options, answer, explanation };
-}
 
 function callout(variant, content) {
   return { type: "callout", variant, content };
@@ -98,12 +96,6 @@ int main() {
             "info",
             "C++ is **compiled**, not interpreted. You write source code (`.cpp` files), compile them into an executable, then run it — similar to baking a cake from a recipe before serving it.",
           ),
-          quiz(
-            "What is the entry point where every C++ program begins?",
-            ["start()", "main()", "run()", "init()"],
-            1,
-            "Execution starts inside int main().",
-          ),
         ],
         challenge: {
           title: "Hello, PolyCode",
@@ -177,12 +169,6 @@ cout << 3 + 4 << endl;  // prints 7`,
             "warning",
             "C++ is **case-sensitive**: `cout` works, `Cout` and `COUT` do not.",
           ),
-          quiz(
-            "Which header do you include for cout and cin?",
-            ["<string>", "<iostream>", "<vector>", "<cmath>"],
-            1,
-            "<iostream> provides cin, cout, and endl.",
-          ),
         ],
         challenge: {
           title: "Score Board",
@@ -242,22 +228,11 @@ g++ lesson.cpp -o lesson
           ),
           callout(
             "tip",
-            "Read error messages **bottom-up** — the first error often causes a cascade of confusing follow-ups.",
+            "Read error messages **top-down** — fix the first error first, since it often causes a cascade of confusing follow-ups.",
           ),
           callout(
             "info",
             "`return 0` from `main()` tells the operating system the program finished successfully. Non-zero values can signal failure in larger projects.",
-          ),
-          quiz(
-            "What happens if you forget a semicolon?",
-            [
-              "The program runs faster",
-              "The compiler reports an error",
-              "cout stops working forever",
-              "main() is renamed automatically",
-            ],
-            1,
-            "Missing semicolons are syntax errors caught at compile time.",
           ),
         ],
         challenge: {
@@ -335,12 +310,6 @@ cout << health << endl;  // 75`,
             "info",
             "`bool` values are great for flags: `bool gameOver = false`, `bool hasKey = true`.",
           ),
-          quiz(
-            "Which type stores whole numbers like 0, 42, or -7?",
-            ["double", "int", "char", "string"],
-            1,
-            "int stores integers without fractional parts.",
-          ),
         ],
         challenge: {
           title: "Bank Balance",
@@ -403,17 +372,6 @@ cout << 99 << endl;     // literal`,
               items: ["Current score", "Wallet balance", "Temperature now"],
             },
           ]),
-          quiz(
-            "What happens if you try to reassign a const variable?",
-            [
-              "It silently succeeds",
-              "Compilation error",
-              "It becomes a double",
-              "Only works at night",
-            ],
-            1,
-            "const prevents reassignment; the compiler enforces it.",
-          ),
         ],
         challenge: {
           title: "Speed Limit",
@@ -483,12 +441,6 @@ int leftover = minutes % 60;   // 13`,
             "info",
             "`++` and `--` add or subtract 1. `score++` is shorthand when a game awards a point.",
           ),
-          quiz(
-            "What is the result of 17 % 5?",
-            ["3", "3.4", "2", "5"],
-            2,
-            "17 ÷ 5 = 3 remainder 2. The modulo operator % returns the remainder.",
-          ),
         ],
         challenge: {
           title: "Cart Total",
@@ -556,12 +508,6 @@ cout << a + b << endl;`,
             "warning",
             "If the user types text when you expect `int`, `cin` can fail. Advanced courses cover clearing error states; for now, type matching values.",
           ),
-          quiz(
-            "Which operator reads into a variable with cin?",
-            [">>", "<<", "==", "&&"],
-            0,
-            "cin >> variable pulls the next input token into variable.",
-          ),
         ],
         challenge: {
           title: "Temperature Reader",
@@ -623,12 +569,6 @@ else cout << "Cool" << endl;`,
           ]),
           callout("tip", "Use **braces** `{}` even for one-line blocks while learning — they prevent bugs when you add a second line later."),
           callout("info", "C++ treats `0` as false and non-zero as true, but prefer explicit comparisons like `count > 0` for readability."),
-          quiz(
-            "When does the else block run?",
-            ["Always", "When the if condition is false", "Only on Sundays", "Before the if check"],
-            1,
-            "else executes when the if condition evaluates to false.",
-          ),
         ],
         challenge: {
           title: "Game Over Check",
@@ -676,12 +616,6 @@ switch (choice) {
           ]),
           callout("tip", "Always include **default** to handle unexpected values — like an \"invalid option\" message in a vending machine."),
           callout("warning", "switch does not work directly on `string` in basic C++; use if/else or maps for text menus."),
-          quiz(
-            "What does break do inside a switch?",
-            ["Restarts main()", "Exits the switch after a case", "Deletes the variable", "Skips compilation"],
-            1,
-            "break prevents fall-through to the next case.",
-          ),
         ],
         challenge: {
           title: "Traffic Light",
@@ -738,12 +672,6 @@ cout << total << endl;  // 35`,
           ]),
           callout("tip", "Loop variable `i`, `j`, `k` are tradition. Use descriptive names (`row`, `level`) when it helps readers."),
           callout("info", "Off-by-one errors (`<` vs `<=`) are common. Trace small examples on paper before running."),
-          quiz(
-            "How many times does `for (int i = 0; i < 3; i++)` run the body?",
-            ["2", "3", "4", "Forever"],
-            1,
-            "i takes values 0, 1, 2 — three iterations.",
-          ),
         ],
         challenge: {
           title: "Multiplication Table Row",
@@ -795,12 +723,6 @@ do {
           ]),
           callout("tip", "Ensure something inside the loop **changes** the condition — otherwise you get an **infinite loop**."),
           callout("warning", "If a program hangs, check while loops first — the condition may never become false."),
-          quiz(
-            "Which loop always executes its body at least once?",
-            ["for", "while", "do-while", "if"],
-            2,
-            "do-while checks the condition after the first run.",
-          ),
         ],
         challenge: {
           title: "Savings Goal",
@@ -866,12 +788,6 @@ int main() {
           ]),
           callout("tip", "One function, one job: `calculateTax`, `printReceipt`, `readInput` — easier to test and reuse."),
           callout("info", "C++ requires functions to be declared before use — define helpers above `main()` or use prototypes."),
-          quiz(
-            "What does void mean as a return type?",
-            ["Returns nothing", "Returns zero only", "Returns a string", "Function is private"],
-            0,
-            "void functions perform actions without sending a value back.",
-          ),
         ],
         challenge: {
           title: "Print Banner",
@@ -933,12 +849,6 @@ cout << area(4, 5) << endl;  // 20`,
             { id: "caller", label: "Caller", color: ACCENT, items: ["area(4, 5)", "Values sent", "Expression results"] },
             { id: "params", label: "Parameters", color: "#22c55e", items: ["width, height", "Names in function", "Used in body"] },
           ]),
-          quiz(
-            "In `int add(int a, int b)`, what are a and b?",
-            ["Global variables", "Parameters", "Header files", "Macros"],
-            1,
-            "a and b are parameters — placeholders for values passed in.",
-          ),
         ],
         challenge: {
           title: "Grade Points",
@@ -1001,12 +911,6 @@ void print(double d) { cout << "Dec: " << d << endl; }`,
           ]),
           callout("tip", "Prefer passing values into functions instead of globals — easier to reason about and test."),
           callout("warning", "Two functions cannot differ only by return type — parameter lists must differ for overloading."),
-          quiz(
-            "Where do local variables live?",
-            ["Only inside their function/block", "In every file", "On the internet", "In #include lines"],
-            0,
-            "Local variables are created when the block runs and end when it finishes.",
-          ),
         ],
         challenge: {
           title: "Double Print",
@@ -1075,12 +979,6 @@ scores[2] = 80;             // update third`,
           ]),
           callout("tip", "Use loops to walk arrays: `for (int i = 0; i < 3; i++) cout << scores[i];`"),
           callout("warning", "Never access `arr[size]` — the last valid index is `size - 1`."),
-          quiz(
-            "What is the index of the first element in int data[5]?",
-            ["1", "0", "5", "-1"],
-            1,
-            "C++ arrays are zero-indexed; the first slot is 0.",
-          ),
         ],
         challenge: {
           title: "Weekly Steps",
@@ -1127,12 +1025,6 @@ cout << full << endl;`,
             { id: "string", label: "string", color: ACCENT, items: ["Dynamic size", "+ concat", "length(), substr()"] },
             { id: "char", label: "char / char[]", color: "#22c55e", items: ["Single letter", "C-style text", "Lower-level"] },
           ]),
-          quiz(
-            "Which header provides std::string?",
-            ["<iostream>", "<string>", "<vector>", "<cstring>"],
-            1,
-            "#include <string> brings in the string class.",
-          ),
         ],
         challenge: {
           title: "Username Tag",
@@ -1193,12 +1085,6 @@ for (int h : hp) {
           ]),
           callout("tip", "Use `vector<int> nums` instead of guessing array size when the count may change."),
           callout("info", "STL = Standard Template Library — ready-made containers and algorithms in C++."),
-          quiz(
-            "Which method adds an element to the end of a vector?",
-            ["add()", "push_back()", "append()", "insert_front()"],
-            1,
-            "push_back appends one element to the end.",
-          ),
         ],
         challenge: {
           title: "High Scores List",
@@ -1262,12 +1148,6 @@ for (int lvl : levels) {
             { id: "index", label: "Index for", color: ACCENT, items: ["Need position i", "Modify in place", "2D layouts later"] },
             { id: "range", label: "Range-for", color: "#22c55e", items: ["Read each item", "Cleaner syntax", "vectors & arrays"] },
           ]),
-          quiz(
-            "What does `for (int x : data)` do?",
-            ["Sorts data", "Visits each element in data", "Deletes data", "Compiles headers"],
-            1,
-            "Range-for iterates over every element in the collection.",
-          ),
         ],
         challenge: {
           title: "Class Average",
@@ -1321,12 +1201,6 @@ cout << *ptr << endl;  // 50 (value at address)
           ]),
           callout("tip", "Read declarations right-to-left: `int* p` → p is a pointer to int."),
           callout("warning", "Never use uninitialized pointers — they may point anywhere."),
-          quiz(
-            "What does &score produce?",
-            ["The value of score", "The address of score", "A random number", "Deletes score"],
-            1,
-            "& is the address-of operator.",
-          ),
         ],
         challenge: {
           title: "Update HP",
@@ -1376,12 +1250,6 @@ cout << balance << endl;  // 250`,
           ]),
           callout("tip", "Use references when a parameter must exist and should not be null."),
           callout("info", "References are common in modern C++ for passing large objects efficiently."),
-          quiz(
-            "After int& r = x;, what does r += 1 do?",
-            ["Creates a new variable", "Changes x", "Only changes r copy", "Crashes always"],
-            1,
-            "r is an alias; modifying r modifies x.",
-          ),
         ],
         challenge: {
           title: "Ref Top-Up",
@@ -1443,12 +1311,6 @@ if (key != nullptr) {
             { id: "valid", label: "Valid address", color: "#22c55e", items: ["Points to object", "Safe after check", "&var or new"] },
             { id: "null", label: "nullptr", color: ACCENT, items: ["No target", "Check before *", "Optional data"] },
           ]),
-          quiz(
-            "Which value represents a null pointer in modern C++?",
-            ["nullptr", "void", "NaN", "empty"],
-            0,
-            "nullptr is the type-safe null pointer literal.",
-          ),
         ],
         challenge: {
           title: "Missing Key",
@@ -1510,12 +1372,6 @@ cout << hero.name << endl;`,
           ]),
           callout("tip", "Keep structs focused — a `Product` has price and name; don't mix unrelated globals inside."),
           callout("info", "Add `#include <string>` when struct members use `string`."),
-          quiz(
-            "How do you access member health in Player p?",
-            ["p->health", "p.health", "p::health", "health.p"],
-            1,
-            "Use dot notation for struct objects: p.health.",
-          ),
         ],
         challenge: {
           title: "Book Record",
@@ -1581,12 +1437,6 @@ Color c = Color::GREEN;`,
             { id: "read", label: "Readability", color: ACCENT, items: ["Named constants", "Fewer magic numbers", "IDE autocomplete"] },
             { id: "safe", label: "Safety", color: "#22c55e", items: ["Limited set", "Switch friendly", "enum class scope"] },
           ]),
-          quiz(
-            "What is the default value of the first enumerator in a plain enum?",
-            ["0", "1", "Random", "Undefined"],
-            0,
-            "Unless specified, the first enum value is 0.",
-          ),
         ],
         challenge: {
           title: "Order Status",
@@ -1636,12 +1486,6 @@ Money balance = 42.50;`,
             { id: "short", label: "Shorter names", color: ACCENT, items: ["Score, Money", "Less typing", "Readable APIs"] },
             { id: "intent", label: "Clear intent", color: "#22c55e", items: ["UserId vs int", "Meters vs double", "Safer reviews"] },
           ]),
-          quiz(
-            "Which keyword is preferred for type aliases in modern C++?",
-            ["goto", "using", "malloc", "union"],
-            1,
-            "using Score = int; is the modern type alias syntax.",
-          ),
         ],
         challenge: {
           title: "Alias Wallet",
@@ -1698,12 +1542,6 @@ d.bark();`,
           ]),
           callout("tip", "Think \"noun + verbs\": `Player` + `jump()`, `Account` + `withdraw()`."),
           callout("info", "C++ is multi-paradigm — OOP is powerful but not the only style."),
-          quiz(
-            "What keyword makes class members accessible from outside?",
-            ["hidden", "public", "static", "friend"],
-            1,
-            "public members can be used from code outside the class.",
-          ),
         ],
         challenge: {
           title: "Counter Class",
@@ -1780,12 +1618,6 @@ public:
             { id: "construct", label: "Construct", color: ACCENT, items: ["Object created", "Fields initialized", "Ready to use"] },
             { id: "use", label: "Use", color: "#22c55e", items: ["Call methods", "Read fields", "Pass around"] },
           ]),
-          quiz(
-            "When is a constructor called?",
-            ["When object is created", "When program ends", "Every cout", "Only on Tuesdays"],
-            0,
-            "Constructors run at object creation time.",
-          ),
         ],
         challenge: {
           title: "Item Shop",
@@ -1851,12 +1683,6 @@ public:
             { id: "pub", label: "public API", color: "#22c55e", items: ["deposit()", "getBalance()", "Safe entry points"] },
             { id: "priv", label: "private data", color: ACCENT, items: ["balance", "Internal rules", "Hidden from outside"] },
           ]),
-          quiz(
-            "Why hide balance as private?",
-            ["To save memory", "To control how it is changed", "To prevent compilation", "To remove cout"],
-            1,
-            "Encapsulation lets the class enforce rules on modifications.",
-          ),
         ],
         challenge: {
           title: "Safe Vault",
@@ -1932,12 +1758,6 @@ cout << maximum(2.5, 1.1) << endl;`,
           ]),
           callout("tip", "You do not need to master templates now — recognize them when you see `vector<int>` or `template <typename T>`."),
           callout("info", "Template code often lives in headers because the compiler needs full definitions."),
-          quiz(
-            "What does template <typename T> mean?",
-            ["T is always int", "T is a type parameter", "T is a file name", "T disables cout"],
-            1,
-            "T stands for a type the caller will supply.",
-          ),
         ],
         challenge: {
           title: "Generic Swap",
@@ -2002,12 +1822,6 @@ cout << stock["apple"] << endl;`,
           ]),
           callout("tip", "Include the right header: `#include <map>`, `#include <set>`, `#include <vector>`."),
           callout("info", "STL containers are templates — `map<string, int>` maps strings to ints."),
-          quiz(
-            "Which container maps keys to values?",
-            ["vector", "map", "stack", "array"],
-            1,
-            "map stores key-value pairs like a dictionary.",
-          ),
         ],
         challenge: {
           title: "Price List",
@@ -2066,12 +1880,6 @@ int main() {
             { id: "try", label: "try block", color: ACCENT, items: ["Risky code", "throw on failure", "Normal path"] },
             { id: "catch", label: "catch block", color: "#ef4444", items: ["Handles error", "Logs message", "Recovery or exit"] },
           ]),
-          quiz(
-            "What does throw do?",
-            ["Deletes main", "Signals an error to catch", "Compiles faster", "Closes cin"],
-            1,
-            "throw transfers control to a matching catch block.",
-          ),
         ],
         challenge: {
           title: "Invalid Withdrawal",
@@ -2148,12 +1956,6 @@ cout << result << endl;`,
           ]),
           callout("tip", "Start with **addition only**, test it, then add subtraction — incremental building beats one giant leap."),
           callout("info", "PolyCode runs your full program — keep `main()` complete with includes and return 0."),
-          quiz(
-            "What is a good first step for a multi-feature calculator?",
-            ["Write every operator at once", "Implement one operation, test, then expand", "Skip input", "Remove main"],
-            1,
-            "Build and test one feature at a time.",
-          ),
         ],
         challenge: {
           title: "Pocket Adder",
@@ -2202,12 +2004,6 @@ cout << "Average: " << sum / scores.size() << endl;`,
             "info",
             "C++ standards evolve (C++11, 14, 17, 20…). PolyCode examples use modern, beginner-safe patterns.",
           ),
-          quiz(
-            "Which STL container is best for a growable list of scores?",
-            ["map", "vector", "set", "enum"],
-            1,
-            "vector is the default dynamic array for sequential data.",
-          ),
         ],
         challenge: {
           title: "Graduation Badge",
@@ -2232,6 +2028,7 @@ export const CPP_FUNDAMENTALS_LESSONS = applyLessonVideoLinks(
   CPP_FUNDAMENTALS_CHAPTERS.flatMap((ch) =>
     ch.lessons.map((l) => ({
       ...l,
+      theory: [...l.theory, ...(CPP_FUNDAMENTALS_QUIZZES[l.id] || [])],
       chapterId: ch.id,
       chapterTitle: ch.title,
       chapterColor: ch.color,
