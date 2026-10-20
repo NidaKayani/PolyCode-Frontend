@@ -674,18 +674,38 @@ cout << total << endl;  // 35`,
           callout("info", "Off-by-one errors (`<` vs `<=`) are common. Trace small examples on paper before running."),
         ],
         challenge: {
-          title: "Multiplication Table Row",
-          description: "Print `5 x 1 = 5` through `5 x 3 = 15` using a for loop (table of 5, three lines).",
-          starterCode: `${CPP_MAIN}    // for loop: 5 x 1 through 5 x 3
+          title: "Times Table",
+          description:
+            "`int n = 7;` is set for you. Use a `for` loop to print the times table of `n` from 1 to 10, one line each: `7 x 1 = 7`, `7 x 2 = 14`, … `7 x 10 = 70`. Calculate each answer from `n` and the loop counter — don't type the results by hand.",
+          starterCode: `${CPP_MAIN}    int n = 7;
+
+    // Loop i from 1 to 10 and print: n x i = answer
 ${CPP_MAIN_END}`,
-          solutionCode: `${CPP_MAIN}    for (int i = 1; i <= 3; i++) {
-        cout << "5 x " << i << " = " << 5 * i << endl;
+          solutionCode: `${CPP_MAIN}    int n = 7;
+
+    for (int i = 1; i <= 10; i++) {
+        cout << n << " x " << i << " = " << n * i << endl;
     }
 ${CPP_MAIN_END}`,
           tests: [
-            { id: 1, label: "Uses for loop", keywords: [{ pattern: "for\\s*\\(" }] },
-            { id: 2, label: "Prints 5 x 1", keywords: [{ pattern: "\"5 x \"\\s*<<\\s*\\w+|\\b5\\s*<<\\s*\" x \"\\s*<<\\s*\\w+" }] },
-            { id: 3, label: "Prints = 15", keywords: [{ pattern: "\\b5\\s*\\*\\s*\\w+|\\w+\\s*\\*\\s*5\\b" }, { pattern: "<=\\s*3\\b|<\\s*4\\b" }] },
+            {
+              id: 1,
+              label: "Uses a for loop",
+              keywords: [{ pattern: "\\bfor\\s*\\(" }],
+              hint: "Start with for (int i = 1; i <= 10; i++) { ... }",
+            },
+            {
+              id: 2,
+              label: "Calculates each answer from n and the loop counter",
+              keywords: [{ pattern: "\\bn\\s*\\*\\s*\\w+|\\w+\\s*\\*\\s*n\\b" }],
+              hint: "Print n * i inside the loop instead of typing 7, 14, 21…",
+            },
+            {
+              id: 3,
+              label: "Prints all 10 lines in the format 7 x 1 = 7",
+              expectedOutput: Array.from({ length: 10 }, (_, k) => `7 x ${k + 1} = ${7 * (k + 1)}`).join("\n"),
+              hint: "Check the spaces around x and =, and that the loop goes up to 10 (use <= 10).",
+            },
           ],
         },
       },
