@@ -15,7 +15,6 @@ import {
   LogOut,
   MoreHorizontal,
   Send,
-  SquarePen,
 } from "lucide-react";
 import { useQuantumChatAuth } from "../context/QuantumChatAuthContext";
 import {
@@ -364,7 +363,7 @@ function KeyGatePanel() {
   );
 }
 
-function ChatReadyPanel({ composeRequest, onComposeHandled, onUnreadChange }) {
+function ChatReadyPanel({ onUnreadChange }) {
   const { user } = useQuantumChatAuth();
   const [friends, setFriends] = useState([]);
   const [discover, setDiscover] = useState([]);
@@ -580,14 +579,6 @@ function ChatReadyPanel({ composeRequest, onComposeHandled, onUnreadChange }) {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [user?.id, bumpInbox, peer?.id]);
-
-  useEffect(() => {
-    if (composeRequest > 0) {
-      setPicking(true);
-      setPeer(null);
-      onComposeHandled?.();
-    }
-  }, [composeRequest, onComposeHandled]);
 
   const openPeer = useCallback(
     async (nextPeer) => {
@@ -845,7 +836,6 @@ function QuantumChatDockInner() {
   const [isOpen, setIsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
-  const [composeTick, setComposeTick] = useState(0);
   const [unreadTotal, setUnreadTotal] = useState(0);
 
   const chatUrl = useMemo(() => getQuantumChatAppUrl(), []);
@@ -996,20 +986,6 @@ function QuantumChatDockInner() {
           <button
             type="button"
             className="quantum-chat-dock__icon-btn"
-            aria-label="Compose new message"
-            title="Compose"
-            onClick={(event) => {
-              event.stopPropagation();
-              if (!isOpen) setIsOpen(true);
-              if (user && hasLocalKeyring) setComposeTick((n) => n + 1);
-            }}
-          >
-            <SquarePen size={17} strokeWidth={2.1} />
-          </button>
-
-          <button
-            type="button"
-            className="quantum-chat-dock__icon-btn"
             aria-label={isOpen ? "Collapse QuantumChat" : "Expand QuantumChat"}
             title={isOpen ? "Collapse" : "Expand"}
             onClick={(event) => {
@@ -1034,11 +1010,7 @@ function QuantumChatDockInner() {
           hidden={!isOpen}
           style={isOpen ? undefined : { display: "none" }}
         >
-          <ChatReadyPanel
-            composeRequest={composeTick}
-            onComposeHandled={() => {}}
-            onUnreadChange={handleUnreadChange}
-          />
+          <ChatReadyPanel onUnreadChange={handleUnreadChange} />
         </div>
       )}
       {!chatReady && isOpen && (
