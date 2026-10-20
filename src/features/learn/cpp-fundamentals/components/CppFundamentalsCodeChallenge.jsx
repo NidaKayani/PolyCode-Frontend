@@ -21,7 +21,28 @@ function normalizeWhitespace(value = "") {
   return value.replace(/\s+/g, "");
 }
 
-function testPasses(test, code) {
+// Ignores CRLF vs LF, trailing spaces on a line, and leading/trailing blank lines.
+function normalizeOutput(value = "") {
+  return value
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
+}
+
+// A test with `expectedOutput` also requires the program's stdout to match it;
+// with no stdout (e.g. the run failed) such a test cannot pass.
+function testPasses(test, code, stdout) {
+  if (typeof test.expectedOutput === "string") {
+    if (
+      typeof stdout !== "string" ||
+      normalizeOutput(stdout) !== normalizeOutput(test.expectedOutput)
+    ) {
+      return false;
+    }
+  }
+
   const keywords = test.keywords || [];
   if (!keywords.length) return true;
 
@@ -114,7 +135,7 @@ export default function CppFundamentalsCodeChallenge({
             challenge,
             code,
             challenge.solutionCode,
-            testPasses,
+            (test, testCode) => testPasses(test, testCode),
             {
               runtimeLabel: "C++ runs without errors",
               runtimeHint: error.message || "Could not run C++.",
@@ -141,7 +162,7 @@ export default function CppFundamentalsCodeChallenge({
             challenge,
             code,
             challenge.solutionCode,
-            testPasses,
+            (test, testCode) => testPasses(test, testCode),
             {
               runtimeLabel: "C++ runs without errors",
               runtimeHint: "Fix the error in Output, then run again.",
@@ -160,7 +181,7 @@ export default function CppFundamentalsCodeChallenge({
 
       const testResults = challenge.tests.map((test) => ({
         ...test,
-        passed: testPasses(test, code),
+        passed: testPasses(test, code, runResult?.stdout || ""),
       }));
 
       const allPassed = testResults.every((test) => test.passed);
