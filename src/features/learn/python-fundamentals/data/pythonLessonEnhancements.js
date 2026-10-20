@@ -30,19 +30,6 @@ print("Hello, PolyCode!")
 print("Python", 3)`,
         },
       },
-      {
-        type: "quiz",
-        question: "Which statement about Python blocks is true?",
-        options: [
-          "Blocks use curly braces {}",
-          "Indentation defines which lines belong to an if or for block",
-          "Semicolons are required after every line",
-          "Only functions need indentation",
-        ],
-        answer: 1,
-        explanation:
-          "After a colon, indented lines form the block — consistency matters (usually 4 spaces).",
-      },
     ],
   },
   "py-0b": {
@@ -101,13 +88,6 @@ unit_price = 4.50
 in_stock = True
 
 print(type(item), type(qty), type(unit_price), type(in_stock))`,
-      },
-      {
-        type: "quiz",
-        question: "What is the type of `True` in Python?",
-        options: ["int", "str", "bool", "float"],
-        answer: 2,
-        explanation: "True and False are booleans — used for flags and conditions.",
       },
     ],
   },
@@ -180,13 +160,6 @@ print(f"Amount due: {total:.2f} {currency}")
 line = "-" * 20
 print(line + "\\nThank you!")`,
       },
-      {
-        type: "quiz",
-        question: "Which f-string formats `pi` to two decimal places?",
-        options: ['f"{pi:.2f}"', 'f"{pi:2}"', 'f"{pi,2}"', 'f"{.2pi}"'],
-        answer: 0,
-        explanation: "`:.2f` means fixed-point with 2 digits after the decimal.",
-      },
     ],
   },
   "control-flow": {
@@ -221,13 +194,6 @@ else:
     discount = 0.0
 
 print(f"Discount: {discount * 100:.0f}%")`,
-      },
-      {
-        type: "quiz",
-        question: "Which value is truthy in an `if` statement?",
-        options: ["0", '""', "[]", "[0]"],
-        answer: 3,
-        explanation: "Non-empty lists are truthy; zero, empty strings, and empty lists are falsy.",
       },
     ],
   },
@@ -295,18 +261,6 @@ if username:          # non-empty string is truthy
 if not items:         # empty list is falsy
     print("Cart is empty")`,
       },
-      {
-        type: "quiz",
-        question: "When should you use `is` instead of `==`?",
-        options: [
-          "Comparing two string literals",
-          "Checking if a variable is None",
-          "Comparing integers",
-          "Always — it is faster",
-        ],
-        answer: 1,
-        explanation: "`x is None` is the idiomatic identity check for None.",
-      },
     ],
   },
   "collections-core": {
@@ -336,18 +290,6 @@ log.append("saved")          # OK — list is mutable
 theme = (34, 139, 34)        # immutable green
 r, g, b = theme
 print(log[-1], r, g, b)`,
-      },
-      {
-        type: "quiz",
-        question: "What does `data[1:4]` return?",
-        options: [
-          "Elements at indices 1, 2, 3",
-          "Elements at indices 1, 2, 3, 4",
-          "Only index 1",
-          "A reversed list",
-        ],
-        answer: 0,
-        explanation: "Slice stop index is exclusive — start included, stop excluded.",
       },
     ],
   },
@@ -398,18 +340,6 @@ print(nums, done)`,
 }
 point = (40.7, -74.0)
 print(locations[point])`,
-      },
-      {
-        type: "quiz",
-        question: "Why can tuples be dict keys but lists cannot?",
-        options: [
-          "Tuples are shorter",
-          "Tuples are immutable and therefore hashable",
-          "Lists cannot hold numbers",
-          "Dicts only accept strings",
-        ],
-        answer: 1,
-        explanation: "Mutable lists cannot be hashed; immutable tuples can.",
       },
     ],
   },
@@ -477,18 +407,6 @@ prices = [10, 25, 40]
 for price in prices:
     print(price, tax(price))`,
       },
-      {
-        type: "quiz",
-        question: "What does `return` do inside a function?",
-        options: [
-          "Prints a value to the console",
-          "Sends a value back to the caller and exits the function",
-          "Restarts the loop",
-          "Defines a new variable globally",
-        ],
-        answer: 1,
-        explanation: "return ends the function and optionally provides a result to the caller.",
-      },
     ],
   },
   "py-4": {
@@ -538,18 +456,6 @@ while attempts < 3:
     attempts += 1
 else:
     print("Out of attempts")`,
-      },
-      {
-        type: "quiz",
-        question: "What does `continue` do in a loop?",
-        options: [
-          "Exits the loop entirely",
-          "Skips the rest of the current iteration and goes to the next",
-          "Restarts Python",
-          "Runs the loop backwards",
-        ],
-        answer: 1,
-        explanation: "continue jumps to the next iteration without finishing the current body.",
       },
     ],
   },
@@ -619,13 +525,6 @@ visits = ["u1", "u2", "u1", "u3"]
 unique_visitors = set(visits)
 print(len(unique_visitors))`,
       },
-      {
-        type: "quiz",
-        question: "How do you loop over keys and values together in a dict?",
-        options: [".keys()", ".values()", ".items()", ".pairs()"],
-        answer: 2,
-        explanation: "for k, v in d.items(): gives both key and value each iteration.",
-      },
     ],
   },
   "py-6": {
@@ -676,13 +575,6 @@ print(a | b)   # union
 print(a & b)   # intersection
 print(a - b)   # difference`,
       },
-      {
-        type: "quiz",
-        question: "How do you remove duplicates from a list `nums` preserving no order guarantee?",
-        options: ["nums.unique()", "list(set(nums))", "nums.distinct()", "sorted(nums)"],
-        answer: 1,
-        explanation: "set(nums) keeps unique values; list() wraps back to a list.",
-      },
     ],
   },
   "files-errors": {
@@ -716,13 +608,6 @@ for raw in lines:
         print(f"Skipping invalid line: {raw}")
 
 print(sum(totals))`,
-      },
-      {
-        type: "quiz",
-        question: "Which block runs when no exception occurs in try?",
-        options: ["except", "else (if present)", "finally only", "raise"],
-        answer: 1,
-        explanation: "try/except/else: else runs when try completed without exception.",
       },
     ],
   },
@@ -787,18 +672,6 @@ try:
 except ValueError as err:
     print(err)`,
       },
-      {
-        type: "quiz",
-        question: "What does `raise ValueError('msg')` do?",
-        options: [
-          "Prints a warning and continues",
-          "Creates a new exception and stops normal flow",
-          "Returns None",
-          "Deletes the variable",
-        ],
-        answer: 1,
-        explanation: "raise signals an error condition callers can catch with except.",
-      },
     ],
   },
   "pro-python": {
@@ -826,18 +699,6 @@ except ValueError as err:
     return [c * 9 / 5 + 32 for c in celsius]
 
 print(c_to_f([0, 20, 100]))`,
-      },
-      {
-        type: "quiz",
-        question: "What is the main benefit of a virtual environment?",
-        options: [
-          "Faster CPU",
-          "Isolated package versions per project",
-          "Automatic type checking",
-          "Free cloud hosting",
-        ],
-        answer: 1,
-        explanation: "venv keeps each project's pip installs separate.",
       },
     ],
   },
@@ -895,18 +756,6 @@ print(sqrt(9))
 
 # if __name__ == "__main__":
 #     main()  # runs only when file executed directly`,
-      },
-      {
-        type: "quiz",
-        question: 'Why use if __name__ == "__main__":?',
-        options: [
-          "To make imports faster",
-          "So import does not run your script's main block",
-          "To enable type hints",
-          "To open files safely",
-        ],
-        answer: 1,
-        explanation: "Imported modules should not accidentally start CLI entry logic.",
       },
     ],
   },
@@ -984,18 +833,6 @@ raw = '{"debug": true, "retries": 3}'
 config = json.loads(raw)
 print(config["retries"], type(config["debug"]))`,
       },
-      {
-        type: "quiz",
-        question: "Do type hints change Python's runtime behavior by default?",
-        options: [
-          "Yes — wrong types crash immediately",
-          "No — they help humans and tools like mypy",
-          "Only inside classes",
-          "Only on Linux",
-        ],
-        answer: 1,
-        explanation: "Hints are optional metadata unless you use a type checker.",
-      },
     ],
   },
   "py-12": {
@@ -1053,13 +890,6 @@ for name, scores in grades.items():
 # Class: class C: def __init__(self, x): self.x = x
 # File: with open("f.txt") as f: data = f.read()
 # Error: try: ... except ValueError: ...`,
-      },
-      {
-        type: "quiz",
-        question: "Which collection preserves insertion order and allows duplicate values?",
-        options: ["set", "dict keys only", "list", "tuple (mutable)"],
-        answer: 2,
-        explanation: "Lists are ordered, mutable, and allow duplicates.",
       },
     ],
   },

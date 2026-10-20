@@ -1,10 +1,12 @@
 // PolyCode — Python Fundamentals full curriculum
 // 8 chapters · 22 lessons · browser Python challenges (Pyodide)
 // YouTube links: edit pythonFundamentalsVideoLinks.js (not this file).
+// MCQs: edit pythonFundamentalsQuizzes.js (two per lesson).
 
 import { applyLessonVideoLinks } from "../../shared/applyLessonVideoLinks";
 import { PYTHON_FUNDAMENTALS_VIDEO_LINKS } from "./pythonFundamentalsVideoLinks";
 import { applyChapterEnhancements } from "./pythonLessonEnhancements";
+import { PYTHON_FUNDAMENTALS_QUIZZES } from "./pythonFundamentalsQuizzes";
 
 const ACCENT = "#3776ab";
 
@@ -61,14 +63,6 @@ const RAW_PYTHON_FUNDAMENTALS_CHAPTERS = [
             content:
               "Python uses **indentation** (usually 4 spaces) to define blocks — not curly braces. The colon `:` starts a block; the next lines must be indented consistently.",
           },
-          {
-            type: "quiz",
-            question: "What does Python use to define code blocks?",
-            options: ["Curly braces {}", "Semicolons only", "Indentation", "Parentheses"],
-            answer: 2,
-            explanation:
-              "After a colon, the indented lines belong to that block — if, for, def, class, and more.",
-          },
         ],
         challenge: {
           title: "Hello, PolyCode",
@@ -113,13 +107,6 @@ print("Line 3")`,
             variant: "info",
             content:
               "When something breaks, Python prints a **traceback** — read from the bottom up to find the error type and line number.",
-          },
-          {
-            type: "quiz",
-            question: "In a .py script, in what order does Python run your code?",
-            options: ["Random order", "Bottom to top", "Top to bottom", "Alphabetical by function name"],
-            answer: 2,
-            explanation: "Scripts execute sequentially from the first line unless control flow redirects execution.",
           },
         ],
         challenge: {
@@ -172,13 +159,6 @@ print(type(age), type(price), type(name), type(active))`,
             content:
               "Use descriptive names: `student_count` not `sc`. Constants that never change are often written `MAX_RETRIES = 3`.",
           },
-          {
-            type: "quiz",
-            question: "Which type does `3.14` have in Python?",
-            options: ["int", "float", "str", "bool"],
-            answer: 1,
-            explanation: "Numbers with a decimal point are floats; whole numbers without a dot are ints.",
-          },
         ],
         challenge: {
           title: "Store and Print Types",
@@ -226,13 +206,6 @@ print(f"{name} scored {score}%")`,
             variant: "warning",
             content:
               "Strings use quotes: `\"double\"` or `'single'`. Mixing them incorrectly causes SyntaxError — pick one style per string.",
-          },
-          {
-            type: "quiz",
-            question: "Which prints the value of variable `city` inside a sentence?",
-            options: ["print(\"city\")", "print(f\"I live in {city}\")", "print(city + city)", "print(type(city))"],
-            answer: 1,
-            explanation: "f-strings interpolate variables inside curly braces.",
           },
         ],
         challenge: {
@@ -283,13 +256,6 @@ elif score >= 80:
 else:
     print("Keep practicing")`,
           },
-          {
-            type: "quiz",
-            question: "What keyword adds another condition after if?",
-            options: ["elseif", "elif", "else if", "when"],
-            answer: 1,
-            explanation: "Python uses elif — not elseif or else if.",
-          },
         ],
         challenge: {
           title: "Even or Odd",
@@ -333,13 +299,6 @@ if age >= 18 and has_id:
             type: "callout",
             variant: "warning",
             content: "`==` compares values. `is` checks whether two names refer to the **same object** — use `==` for strings and numbers.",
-          },
-          {
-            type: "quiz",
-            question: "Which value is falsy in Python?",
-            options: ["[1, 2]", "\"hello\"", "0", "True"],
-            answer: 2,
-            explanation: "Zero is falsy; non-empty collections and non-empty strings are truthy.",
           },
         ],
         challenge: {
@@ -388,13 +347,6 @@ tasks.append("ship")
 print(tasks)
 print(len(tasks))`,
           },
-          {
-            type: "quiz",
-            question: "Which method adds one item to the end of a list?",
-            options: [".add()", ".append()", ".push()", ".insert_end()"],
-            answer: 1,
-            explanation: "list.append(x) adds a single element to the end.",
-          },
         ],
         challenge: {
           title: "Build a List",
@@ -428,18 +380,6 @@ print(nums)`,
             content: `point = (10, 20)
 x, y = point
 print(x, y)`,
-          },
-          {
-            type: "quiz",
-            question: "Why use a tuple instead of a list?",
-            options: [
-              "Tuples are always faster at math",
-              "Tuples protect fixed data from accidental changes",
-              "Tuples can only hold numbers",
-              "Lists cannot be indexed",
-            ],
-            answer: 1,
-            explanation: "Immutability makes tuples ideal for coordinates, RGB colors, and dict keys.",
           },
         ],
         challenge: {
@@ -475,13 +415,6 @@ print(r, g)`,
 print(letters[0])
 print(letters[-1])
 print(letters[1:4])`,
-          },
-          {
-            type: "quiz",
-            question: "What does `items[-1]` return?",
-            options: ["First item", "Last item", "Empty list", "SyntaxError always"],
-            answer: 1,
-            explanation: "-1 is a common Python idiom for the last element.",
           },
         ],
         challenge: {
@@ -531,13 +464,6 @@ for fruit in fruits:
             content: `for i in range(3):
     print(i)  # 0, 1, 2`,
           },
-          {
-            type: "quiz",
-            question: "What does range(5) produce?",
-            options: ["1 through 5", "0 through 4", "0 through 5", "5 through 10"],
-            answer: 1,
-            explanation: "range(stop) starts at 0 and stops before stop.",
-          },
         ],
         challenge: {
           title: "Sum with a Loop",
@@ -576,18 +502,6 @@ while count > 0:
     print(count)
     count -= 1
 print("go")`,
-          },
-          {
-            type: "quiz",
-            question: "When is a while loop the better choice?",
-            options: [
-              "When you know the exact number of items in a list",
-              "When repetition depends on a condition that changes each iteration",
-              "When you never need to update variables",
-              "When you want to define a reusable block",
-            ],
-            answer: 1,
-            explanation: "while fits unknown iteration counts — e.g. read until sentinel value.",
           },
         ],
         challenge: {
@@ -630,13 +544,6 @@ print(area(4, 5))`,
             variant: "warning",
             content:
               "Avoid `def add_item(x, bucket=[])` — the default list is shared across calls. Use `bucket=None` and create `[]` inside the function.",
-          },
-          {
-            type: "quiz",
-            question: "What keyword sends a value back to the caller?",
-            options: ["send", "return", "yield", "exit"],
-            answer: 1,
-            explanation: "return exits the function and optionally provides a result.",
           },
         ],
         challenge: {
@@ -681,13 +588,6 @@ print(double(21))`,
 print(prices["apple"])
 print(prices.get("pear", 0))`,
           },
-          {
-            type: "quiz",
-            question: "How do you safely read a key that might be missing?",
-            options: ["prices[key] always", "prices.get(key, default)", "prices.delete(key)", "dict[key] = None"],
-            answer: 1,
-            explanation: ".get returns a default instead of raising KeyError.",
-          },
         ],
         challenge: {
           title: "Lookup a Price",
@@ -721,13 +621,6 @@ print(menu["coffee"])`,
 unique = set(tags)
 print(unique)
 print("py" in unique)`,
-          },
-          {
-            type: "quiz",
-            question: "What happens if you add a duplicate to a set?",
-            options: ["Error", "Two copies remain", "It is ignored — sets keep unique items only", "The set becomes a list"],
-            answer: 2,
-            explanation: "Sets automatically deduplicate values.",
           },
         ],
         challenge: {
@@ -778,18 +671,6 @@ print(len(unique))`,
             content:
               "In browser challenges you simulate file logic with strings. On your machine, paths are relative to where you run the script.",
           },
-          {
-            type: "quiz",
-            question: "Why use `with open(...)` instead of open() alone?",
-            options: [
-              "It runs code faster",
-              "It guarantees the file is closed even if an error occurs",
-              "It only works on Windows",
-              "It converts text to JSON automatically",
-            ],
-            answer: 1,
-            explanation: "Context managers release resources reliably.",
-          },
         ],
         challenge: {
           title: "Line Counter Logic",
@@ -825,13 +706,6 @@ try:
     value = int(raw)
 except ValueError:
     print("not a number")`,
-          },
-          {
-            type: "quiz",
-            question: "Which block runs when int(\"hello\") fails?",
-            options: ["try", "except", "else", "finally only"],
-            answer: 1,
-            explanation: "The except block catches matching exception types.",
           },
         ],
         challenge: {
@@ -885,13 +759,6 @@ print(safe_div(10, 0))`,
 d = Dog("Rex")
 print(d.speak())`,
           },
-          {
-            type: "quiz",
-            question: "What is self in an instance method?",
-            options: ["The class name", "The current instance", "A Python keyword only for static methods", "Always None"],
-            answer: 1,
-            explanation: "self refers to the specific object calling the method.",
-          },
         ],
         challenge: {
           title: "Greeter Class",
@@ -932,18 +799,6 @@ print(g.hello())`,
 
 print(math.sqrt(16))`,
           },
-          {
-            type: "quiz",
-            question: "What does if __name__ == \"__main__\": protect?",
-            options: [
-              "Code from running when the file is imported",
-              "Code from syntax errors",
-              "Variables from deletion",
-              "The Python interpreter from crashing",
-            ],
-            answer: 0,
-            explanation: "Importing a module should not accidentally start your app's main logic.",
-          },
         ],
         challenge: {
           title: "Import math",
@@ -982,13 +837,6 @@ print(squares)`,
             label: "With filter",
             content: `evens = [n for n in range(10) if n % 2 == 0]
 print(evens)`,
-          },
-          {
-            type: "quiz",
-            question: "What does [x*2 for x in [1,2,3]] produce?",
-            options: ["[1,2,3]", "[2,4,6]", "[1,4,9]", "SyntaxError"],
-            answer: 1,
-            explanation: "Each element is doubled in order.",
           },
         ],
         challenge: {
@@ -1030,18 +878,6 @@ print(doubled)`,
             variant: "tip",
             content: "Commit `requirements.txt` — not your `.venv` folder — so teammates install the same versions.",
           },
-          {
-            type: "quiz",
-            question: "Why use a virtual environment?",
-            options: [
-              "To compile Python to C++",
-              "To isolate package versions per project",
-              "To run Python without installing it",
-              "To replace try/except",
-            ],
-            answer: 1,
-            explanation: "Different projects often need different library versions.",
-          },
         ],
         challenge: {
           title: "Requirements Comment",
@@ -1075,13 +911,6 @@ print("numpy>=1.24")`,
     return a + b
 
 print(add(2, 3))`,
-          },
-          {
-            type: "quiz",
-            question: "Do type hints force Python to reject wrong types at runtime by default?",
-            options: ["Yes, always", "No — they are mainly for documentation and tooling", "Only on Windows", "Only inside classes"],
-            answer: 1,
-            explanation: "Python remains dynamically typed; mypy and IDEs use hints for checking.",
           },
         ],
         challenge: {
@@ -1170,13 +999,6 @@ print(avg(scores))`,
             variant: "tip",
             content: "Next step: **NumPy** for numeric arrays, then **Pandas** for tables — both assume the Python basics you just learned.",
           },
-          {
-            type: "quiz",
-            question: "Which collection should map user IDs to email addresses?",
-            options: ["list", "tuple", "dict", "set"],
-            answer: 2,
-            explanation: "Dicts map keys to values — perfect for ID → email.",
-          },
         ],
         challenge: {
           title: "Cheat Sheet Drill",
@@ -1198,7 +1020,13 @@ print(skills[1])`,
 
 export const PYTHON_FUNDAMENTALS_CHAPTERS = applyChapterEnhancements(
   RAW_PYTHON_FUNDAMENTALS_CHAPTERS,
-);
+).map((chapter) => ({
+  ...chapter,
+  lessons: chapter.lessons.map((lesson) => ({
+    ...lesson,
+    theory: [...lesson.theory, ...(PYTHON_FUNDAMENTALS_QUIZZES[lesson.id] || [])],
+  })),
+}));
 
 export const PYTHON_FUNDAMENTALS_LESSONS = applyLessonVideoLinks(
   PYTHON_FUNDAMENTALS_CHAPTERS.flatMap((ch) =>
