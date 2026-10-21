@@ -16,6 +16,11 @@ import {
   getPythonRuntimeError,
   runPythonCode,
 } from "./runPython";
+import {
+  formatPowerShellOutput,
+  getPowerShellRuntimeError,
+  runPowerShellCode,
+} from "./runPowerShell";
 import PythonRunOutput from "./PythonRunOutput";
 import {
   formatCsharpOutput,
@@ -39,6 +44,13 @@ function normalizeLang(lang = "python") {
   if (value === "c") return "c";
   if (value === "javascript" || value === "js") return "javascript";
   if (value === "csharp" || value === "c#") return "csharp";
+  if (
+    value === "powershell" ||
+    value === "pwsh" ||
+    value === "ps1"
+  ) {
+    return "powershell";
+  }
   if (value === "ruby") return "ruby";
   if (value === "php") return "php";
   if (value === "go") return "go";
@@ -57,6 +69,7 @@ function monacoLanguage(lang) {
   if (lang === "css") return "css";
   if (lang === "scss") return "scss";
   if (lang === "csharp") return "csharp";
+  if (lang === "powershell") return "powershell";
   if (lang === "ruby") return "ruby";
   if (lang === "php") return "php";
   if (lang === "go") return "go";
@@ -134,6 +147,9 @@ ${source
   if (lang === "sql") {
     return runSqlCode(source);
   }
+  if (lang === "powershell") {
+    return runPowerShellCode(source, block.authToken);
+  }
   return runPythonCode(source);
 }
 
@@ -150,6 +166,7 @@ function formatTheoryOutput(result, lang) {
   if (lang === "c") return formatCOutput(result);
   if (lang === "javascript") return formatJavaScriptOutput(result);
   if (lang === "csharp") return formatCsharpOutput(result);
+  if (lang === "powershell") return formatPowerShellOutput(result);
   if (lang === "ruby") return formatRubyOutput(result);
   if (lang === "php") return formatPhpOutput(result);
   if (lang === "go") return formatGoOutput(result);
@@ -166,6 +183,7 @@ function getTheoryRuntimeError(result, lang) {
   if (lang === "c") return getCRuntimeError(result);
   if (lang === "javascript") return getJavaScriptRuntimeError(result);
   if (lang === "csharp") return getCsharpRuntimeError(result);
+  if (lang === "powershell") return getPowerShellRuntimeError(result);
   if (lang === "ruby") return getRubyRuntimeError(result);
   if (lang === "php") return getPhpRuntimeError(result);
   if (lang === "go") return getGoRuntimeError(result);
@@ -179,14 +197,16 @@ export default function RunnableCodeBlock({
   accentColor = "#4f46e5",
   language = "python",
 }) {
-  const { loading: authLoading, isAuthenticated } = useAuth();
+  const { loading: authLoading, isAuthenticated, token } = useAuth();
   const { monacoTheme, beforeMount } = useSiteMonacoTheme();
   const isRunnable = block.runnable !== false;
   const canRun = isRunnable && isAuthenticated && !authLoading;
 
-  const lang = normalizeLang(block.lang || language);
+  const sourceLanguage = block.lang || block.language || language;
+  const lang = normalizeLang(sourceLanguage);
   const editorLang = monacoLanguage(lang);
-  const displayLang = (block.lang || language).toUpperCase();
+  const displayLang =
+    lang === "powershell" ? "PowerShell" : sourceLanguage.toUpperCase();
 
   const [copied, setCopied] = useState(false);
   const [running, setRunning] = useState(false);
@@ -233,7 +253,7 @@ export default function RunnableCodeBlock({
         result,
         runtime,
         previewHTML: htmlPreview,
-      } = await executeTheoryCode(code, lang, block);
+      } = await executeTheoryCode(code, lang, { ...block, authToken: token });
       const runtimeError = getTheoryRuntimeError(result, lang);
 
       if (runtimeError) {

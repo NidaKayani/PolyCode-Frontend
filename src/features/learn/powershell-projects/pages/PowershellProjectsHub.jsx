@@ -37,6 +37,18 @@ const LEARNING_PATH = [
     color: "#d35400",
     summary: "Mastery through advanced scenarios and real-world projects.",
   },
+  {
+    level: "Production",
+    chapters: ["ch-5"],
+    color: "#8e44ad",
+    summary: "Turn scripts into documented, testable tools and modules.",
+  },
+  {
+    level: "Expert",
+    chapters: ["ch-6"],
+    color: "#34495e",
+    summary: "Deliver validated projects with safe, observable automation.",
+  },
 ];
 
 function lessonPlainText(lesson) {

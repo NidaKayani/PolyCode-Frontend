@@ -489,7 +489,7 @@ function NumpyTheoryBlock({ block, step, accentColor }) {
             <RunnableCodeBlock
               block={block.code}
               accentColor={accentColor}
-              language={block.code.lang || "python"}
+              language={block.code.lang || block.code.language || "python"}
             />
           </div>
         )}
@@ -568,7 +568,7 @@ function NumpyTheoryBlock({ block, step, accentColor }) {
         <RunnableCodeBlock
           block={block}
           accentColor={accentColor}
-          language={block.lang || "python"}
+          language={block.lang || block.language || "python"}
         />
       </div>
     );
