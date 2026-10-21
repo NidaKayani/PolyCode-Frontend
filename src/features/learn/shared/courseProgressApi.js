@@ -1,4 +1,5 @@
 import { apiFetch } from "../../../lib/apiClient";
+import { getApiBase } from "../../../config/apiBase";
 
 async function request(courseId, path, token, options = {}) {
   const data = await apiFetch(
@@ -189,11 +190,27 @@ export async function putLessonAnnotation(
         tab: tab || "theory",
         strokes: payload?.strokes || [],
         labels: payload?.labels || [],
+        images: payload?.images || [],
       }),
       fallbackMessage: "Unable to save lesson annotations",
     },
   );
   return data.annotation;
+}
+
+/** Upload a compressed image data URL; resolves to its imageId. */
+export async function uploadAnnotationImage(token, imageBase64) {
+  const data = await apiFetch("/auth/learn/annotation-images", {
+    token,
+    method: "POST",
+    body: JSON.stringify({ imageBase64 }),
+    fallbackMessage: "Unable to upload image",
+  });
+  return data.image.imageId;
+}
+
+export function annotationImageUrl(imageId) {
+  return `${getApiBase()}/auth/learn/annotation-images/${encodeURIComponent(imageId)}`;
 }
 
 export async function mergeLocalAnnotations(token, annotations) {
