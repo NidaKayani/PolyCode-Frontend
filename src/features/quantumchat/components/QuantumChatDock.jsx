@@ -11,10 +11,12 @@ import {
   ArrowLeft,
   ChevronDown,
   ChevronUp,
+  Clock,
   Download,
   LogOut,
   MoreHorizontal,
   Send,
+  WifiOff,
 } from "lucide-react";
 import { useQuantumChatAuth } from "../context/QuantumChatAuthContext";
 import {
@@ -29,10 +31,19 @@ import {
   fetchAllDiscoverUsers,
   fetchFriends,
   fetchUser,
+  isNetworkError,
   markPeerConversationRead,
-  sendDirectMessage,
+  postSealedMessage,
+  sealDirectMessage,
   syncInbox,
 } from "../services/chatService";
+import useOnlineStatus from "../hooks/useOnlineStatus";
+import {
+  addToOutbox,
+  newClientMessageId,
+  readOutbox,
+  removeFromOutbox,
+} from "../utils/outbox";
 import {
   conversationKeyForUser,
   getConversationActivity,
@@ -76,6 +87,35 @@ function previewFromMessage(raw, myUserId) {
   }
   if (raw.attachment) return "Attachment";
   return "New message";
+}
+
+const OUTBOX_RETRY_MS = 15000;
+
+/** A queued (not yet sent) message, shown in the thread with a clock. */
+function pendingBubble(entry, myUserId) {
+  const decrypted = decryptMessage(
+    { from: myUserId, to: entry.to, forSender: entry.forSender },
+    myUserId,
+  );
+  return {
+    id: `pending-${entry.clientMessageId}`,
+    clientMessageId: entry.clientMessageId,
+    from: myUserId,
+    to: entry.to,
+    text: decrypted.text,
+    createdAt: entry.queuedAt,
+    pending: entry.failed ? "failed" : "waiting",
+  };
+}
+
+/** Plain-language text for a failed request. */
+function friendlyError(err, fallback) {
+  if (isNetworkError(err)) {
+    return typeof navigator !== "undefined" && navigator.onLine === false
+      ? "You're offline."
+      : "Can't reach QuantumChat right now.";
+  }
+  return err?.response?.data?.error || err?.message || fallback;
 }
 
 function AuthPanel({ mode, onSwitchMode }) {
@@ -370,6 +410,11 @@ function ChatReadyPanel({ onUnreadChange }) {
   const [inboxPeers, setInboxPeers] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [listError, setListError] = useState("");
+  const [threadError, setThreadError] = useState("");
+  const [threadLoadFailed, setThreadLoadFailed] = useState(false);
+  const online = useOnlineStatus();
+  const flushingRef = useRef(false);
+  const listLoadedRef = useRef(false);
   const [peer, setPeer] = useState(null);
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
@@ -396,8 +441,14 @@ function ChatReadyPanel({ onUnreadChange }) {
       ]);
       setFriends(Array.isArray(friendRows) ? friendRows : []);
       setDiscover(Array.isArray(discoverRows) ? discoverRows : []);
+      listLoadedRef.current = true;
     } catch (err) {
-      setListError(err.response?.data?.error || err.message || "Could not load contacts.");
+      // Keep whatever list we already have; being offline is shown by the banner.
+      setListError(
+        isNetworkError(err)
+          ? "Couldn't load your contacts. They'll refresh when you're back online."
+          : friendlyError(err, "Could not load contacts."),
+      );
     } finally {
       setLoadingList(false);
     }
@@ -406,6 +457,11 @@ function ChatReadyPanel({ onUnreadChange }) {
   useEffect(() => {
     loadLists();
   }, [loadLists]);
+
+  // Back online: refresh the contact list if the first load failed.
+  useEffect(() => {
+    if (online && !listLoadedRef.current) loadLists();
+  }, [online, loadLists]);
 
   // Server-side discover search so people outside the first local page are findable.
   useEffect(() => {
@@ -495,17 +551,24 @@ function ChatReadyPanel({ onUnreadChange }) {
 
       if (openThreadMessages.length && openId && peerIdRef.current === openId) {
         setMessages((prev) => {
-          const seen = new Set(
-            prev.map((m) => String(m.id || m._id || "")).filter(Boolean),
+          // A synced copy of a message we queued replaces its pending bubble.
+          const arrivedClientIds = new Set(
+            openThreadMessages.map((m) => m.clientMessageId).filter(Boolean),
           );
-          const next = [...prev];
+          const base = arrivedClientIds.size
+            ? prev.filter((m) => !(m.pending && arrivedClientIds.has(m.clientMessageId)))
+            : prev;
+          const seen = new Set(
+            base.map((m) => String(m.id || m._id || "")).filter(Boolean),
+          );
+          const next = [...base];
           for (const msg of openThreadMessages) {
             const id = String(msg.id || msg._id || "");
             if (!id || seen.has(id)) continue;
             seen.add(id);
             next.push(msg);
           }
-          return next.length === prev.length ? prev : next;
+          return next.length === prev.length && base === prev ? prev : next;
         });
         const key = conversationKeyForUser(openId);
         markConversationRead(user.id, key);
@@ -585,7 +648,12 @@ function ChatReadyPanel({ onUnreadChange }) {
       const peerId = String(nextPeer.id || nextPeer._id);
       setPeer({ ...nextPeer, id: peerId });
       setPicking(false);
-      setMessages([]);
+      setThreadError("");
+      setThreadLoadFailed(false);
+      const pendingForPeer = readOutbox(user.id)
+        .filter((entry) => String(entry.to) === peerId)
+        .map((entry) => pendingBubble(entry, user.id));
+      setMessages(pendingForPeer);
       const key = conversationKeyForUser(peerId);
       markConversationRead(user.id, key);
       bumpInbox();
@@ -593,7 +661,11 @@ function ChatReadyPanel({ onUnreadChange }) {
       try {
         const rows = await fetchConversation(peerId);
         const decrypted = (rows || []).map((row) => decryptMessage(row, user.id));
-        setMessages(decrypted);
+        const sentClientIds = new Set(decrypted.map((m) => m.clientMessageId).filter(Boolean));
+        setMessages([
+          ...decrypted,
+          ...pendingForPeer.filter((m) => !sentClientIds.has(m.clientMessageId)),
+        ]);
         if (decrypted.length) {
           const last = rows[rows.length - 1];
           const lastDec = decrypted[decrypted.length - 1];
@@ -610,11 +682,22 @@ function ChatReadyPanel({ onUnreadChange }) {
           bumpInbox();
         }
       } catch (err) {
-        setListError(err.response?.data?.error || err.message || "Could not load chat.");
+        setThreadLoadFailed(true);
+        setThreadError(
+          isNetworkError(err)
+            ? "Couldn't load this chat. It will load when you're back online."
+            : friendlyError(err, "Could not load chat."),
+        );
       }
     },
     [user.id, bumpInbox],
   );
+
+  // Back online with a chat that failed to load: try again.
+  useEffect(() => {
+    if (online && threadLoadFailed && peer) openPeer(peer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online]);
 
   useLayoutEffect(() => {
     // Jump to latest message before paint so opening a chat does not animate from the top.
@@ -678,34 +761,139 @@ function ChatReadyPanel({ onUnreadChange }) {
     onUnreadChange?.(total);
   }, [contacts, user.id, onUnreadChange, inboxTick]);
 
+  /**
+   * Sends everything in the outbox, oldest first. Stops at the first network
+   * failure (still offline) and leaves the rest for the next try. A message
+   * the server rejects outright (e.g. you were blocked) is marked "Not sent"
+   * instead of being retried forever.
+   */
+  const flushOutbox = useCallback(async () => {
+    if (flushingRef.current || !user?.id) return;
+    flushingRef.current = true;
+    try {
+      for (const entry of readOutbox(user.id)) {
+        if (entry.failed) continue;
+        let raw;
+        try {
+          raw = await postSealedMessage(entry);
+        } catch (err) {
+          if (isNetworkError(err)) break;
+          addToOutbox(user.id, { ...entry, failed: true });
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.clientMessageId === entry.clientMessageId && m.pending
+                ? { ...m, pending: "failed" }
+                : m,
+            ),
+          );
+          if (peerIdRef.current === String(entry.to)) {
+            setThreadError(friendlyError(err, "Message not sent."));
+          }
+          continue;
+        }
+        removeFromOutbox(user.id, entry.clientMessageId);
+        if (!raw) continue;
+        const sent = decryptMessage(raw, user.id);
+        if (peerIdRef.current === String(entry.to)) {
+          setMessages((prev) => {
+            const withoutPending = prev.filter(
+              (m) => !(m.pending && m.clientMessageId === entry.clientMessageId),
+            );
+            const sentId = String(sent.id || "");
+            if (sentId && withoutPending.some((m) => String(m.id) === sentId)) {
+              return withoutPending;
+            }
+            return [...withoutPending, sent];
+          });
+        }
+        setConversationActivity(user.id, conversationKeyForUser(entry.to), {
+          at: raw.createdAt || new Date().toISOString(),
+          from: user.id,
+          preview: `You: ${String(sent.text || "").replace(/\s+/g, " ").trim().slice(0, 64)}`,
+        });
+        bumpInbox();
+      }
+    } finally {
+      flushingRef.current = false;
+    }
+  }, [user?.id, bumpInbox]);
+
+  // Send queued messages on load, whenever the connection comes back, and
+  // every 15s while online (covers "online" but the server was unreachable).
+  useEffect(() => {
+    if (!online) return undefined;
+    flushOutbox();
+    const timer = window.setInterval(() => {
+      if (readOutbox(user.id).some((e) => !e.failed)) flushOutbox();
+    }, OUTBOX_RETRY_MS);
+    return () => window.clearInterval(timer);
+  }, [online, flushOutbox, user.id]);
+
   const handleSend = async (event) => {
     event.preventDefault();
     const text = draft.trim();
     if (!peer || !text || sending) return;
     setSending(true);
+    setThreadError("");
+    let sealed;
     try {
-      const raw = await sendDirectMessage({
-        myUserId: user.id,
-        peer,
-        text,
-      });
-      setDraft("");
-      if (raw) {
-        setMessages((prev) => [...prev, decryptMessage(raw, user.id)]);
-        const key = conversationKeyForUser(peer.id);
-        setConversationActivity(user.id, key, {
-          at: raw.createdAt || new Date().toISOString(),
-          from: user.id,
-          preview: `You: ${text.slice(0, 64)}`,
-        });
-        bumpInbox();
-      }
+      // Encrypting needs the contact's public keys. They come with the
+      // contact list, so this normally works offline too.
+      sealed = await sealDirectMessage({ myUserId: user.id, peer, text });
     } catch (err) {
-      setListError(err.response?.data?.error || err.message || "Send failed.");
-    } finally {
+      setThreadError(
+        isNetworkError(err)
+          ? "Can't send to this contact until you're back online."
+          : friendlyError(err, "Send failed."),
+      );
       setSending(false);
+      return;
     }
+
+    const entry = {
+      ...sealed,
+      clientMessageId: newClientMessageId(),
+      queuedAt: new Date().toISOString(),
+    };
+    addToOutbox(user.id, entry);
+    setDraft("");
+    setMessages((prev) => [...prev, pendingBubble(entry, user.id)]);
+    setConversationActivity(user.id, conversationKeyForUser(peer.id), {
+      at: entry.queuedAt,
+      from: user.id,
+      preview: `You: ${text.slice(0, 64)}`,
+    });
+    bumpInbox();
+    setSending(false);
+    if (online) flushOutbox();
   };
+
+  const retryFailed = (clientMessageId) => {
+    const entry = readOutbox(user.id).find((e) => e.clientMessageId === clientMessageId);
+    if (!entry) return;
+    addToOutbox(user.id, { ...entry, failed: false });
+    setThreadError("");
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.clientMessageId === clientMessageId && m.pending ? { ...m, pending: "waiting" } : m,
+      ),
+    );
+    if (online) flushOutbox();
+  };
+
+  const discardFailed = (clientMessageId) => {
+    removeFromOutbox(user.id, clientMessageId);
+    setMessages((prev) =>
+      prev.filter((m) => !(m.pending && m.clientMessageId === clientMessageId)),
+    );
+  };
+
+  const offlineBanner = online ? null : (
+    <p className="qc-offline-banner" role="status">
+      <WifiOff size={14} aria-hidden="true" />
+      You&apos;re offline. Messages will send when you&apos;re back online.
+    </p>
+  );
 
   if (peer && !picking) {
     return (
@@ -715,7 +903,10 @@ function ChatReadyPanel({ onUnreadChange }) {
             type="button"
             className="quantum-chat-dock__icon-btn"
             aria-label="Back to chats"
-            onClick={() => setPeer(null)}
+            onClick={() => {
+              setPeer(null);
+              setThreadError("");
+            }}
           >
             <ArrowLeft size={16} />
           </button>
@@ -723,8 +914,10 @@ function ChatReadyPanel({ onUnreadChange }) {
             {peer.displayName || peer.username || "Chat"}
           </span>
         </div>
+        {offlineBanner}
+        {threadError && <p className="qc-auth-form__error qc-thread__error">{threadError}</p>}
         <div className="qc-thread__messages">
-          {messages.length === 0 && (
+          {messages.length === 0 && !threadLoadFailed && (
             <p className="qc-thread__empty">No messages yet. Say hello.</p>
           )}
           {messages.map((msg) => {
@@ -740,7 +933,22 @@ function ChatReadyPanel({ onUnreadChange }) {
                     <em className="qc-bubble__locked">Unable to decrypt</em>
                   )}
                 </div>
-                {timeLabel ? (
+                {msg.pending === "waiting" ? (
+                  <span className="qc-bubble__status" title="Waiting to send">
+                    <Clock size={11} aria-hidden="true" /> Waiting to send
+                  </span>
+                ) : msg.pending === "failed" ? (
+                  <span className="qc-bubble__status qc-bubble__status--failed">
+                    Not sent ·{" "}
+                    <button type="button" onClick={() => retryFailed(msg.clientMessageId)}>
+                      Retry
+                    </button>{" "}
+                    ·{" "}
+                    <button type="button" onClick={() => discardFailed(msg.clientMessageId)}>
+                      Delete
+                    </button>
+                  </span>
+                ) : timeLabel ? (
                   <time className="qc-bubble__time" dateTime={msg.createdAt || msg.at}>
                     {timeLabel}
                   </time>
@@ -775,7 +983,10 @@ function ChatReadyPanel({ onUnreadChange }) {
           placeholder="Search people…"
         />
       </div>
-      {listError && <p className="qc-auth-form__error">{listError}</p>}
+      {offlineBanner}
+      {listError && !(offlineBanner && contacts.length) && (
+        <p className="qc-auth-form__error">{listError}</p>
+      )}
       {loadingList ? (
         <p className="quantum-chat-loading">Loading contacts…</p>
       ) : contacts.length === 0 ? (

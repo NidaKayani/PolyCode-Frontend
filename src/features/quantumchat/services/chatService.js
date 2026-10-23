@@ -100,7 +100,17 @@ export function decryptMessage(raw, myUserId) {
   };
 }
 
-export async function sendDirectMessage({ myUserId, peer, text }) {
+/** True when the request never got an answer (offline, DNS, server down) — worth retrying. */
+export function isNetworkError(err) {
+  if (!err || err.response) return false;
+  return err.code === "ERR_NETWORK" || err.code === "ECONNABORTED" || err.message === "Network Error";
+}
+
+/**
+ * Encrypts a DM for both sides. Works offline as long as the peer's public
+ * keys are already known (they come with the contact list).
+ */
+export async function sealDirectMessage({ myUserId, peer, text }) {
   const trimmed = (text || "").trim();
   if (!trimmed) throw new Error("Message cannot be empty");
   if (!peer?.id && !peer?._id) throw new Error("No recipient selected");
@@ -117,12 +127,23 @@ export async function sendDirectMessage({ myUserId, peer, text }) {
     throw new Error("Missing encryption keys for this conversation");
   }
 
-  const forRecipient = sealMessage(trimmed, pickRandom(recipientKeys));
-  const forSender = sealMessage(trimmed, myKey.publicKey);
+  return {
+    to: String(peerId),
+    forRecipient: sealMessage(trimmed, pickRandom(recipientKeys)),
+    forSender: sealMessage(trimmed, myKey.publicKey),
+  };
+}
+
+/**
+ * Sends a sealed DM. `clientMessageId` makes retries safe: if the server
+ * already stored it, it returns that message instead of creating a duplicate.
+ */
+export async function postSealedMessage({ to, forRecipient, forSender, clientMessageId }) {
   const { data } = await client.post("/messages", {
-    to: peerId,
+    to,
     forRecipient,
     forSender,
+    ...(clientMessageId ? { clientMessageId } : {}),
   });
   return data?.data;
 }

@@ -106,6 +106,69 @@ function saveScene(storageKey, elements, appState, files) {
   }
 }
 
+// Image files are stored in IndexedDB: a couple of pasted photos as base64
+// would exceed localStorage's ~5 MB quota and silently stop all saving.
+const FILE_DB_NAME = "polycode_whiteboard";
+const FILE_STORE = "files";
+let fileDbPromise = null;
+
+function getFileDb() {
+  if (!fileDbPromise) {
+    fileDbPromise = new Promise((resolve, reject) => {
+      if (typeof indexedDB === "undefined") {
+        reject(new Error("IndexedDB unavailable"));
+        return;
+      }
+      const request = indexedDB.open(FILE_DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore(FILE_STORE);
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    }).catch((error) => {
+      fileDbPromise = null;
+      throw error;
+    });
+  }
+  return fileDbPromise;
+}
+
+function fileRecordPrefix(storageKey) {
+  return `${storageKey || "default"}::`;
+}
+
+async function loadSceneFiles(storageKey) {
+  const db = await getFileDb();
+  const prefix = fileRecordPrefix(storageKey);
+  return new Promise((resolve, reject) => {
+    const request = db
+      .transaction(FILE_STORE, "readonly")
+      .objectStore(FILE_STORE)
+      .getAll(IDBKeyRange.bound(prefix, `${prefix}￿`));
+    request.onsuccess = () => {
+      const files = {};
+      (request.result || []).forEach((file) => {
+        if (file?.id) files[file.id] = file;
+      });
+      resolve(files);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveSceneFiles(storageKey, files) {
+  const db = await getFileDb();
+  const prefix = fileRecordPrefix(storageKey);
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(FILE_STORE, "readwrite");
+    const store = tx.objectStore(FILE_STORE);
+    files.forEach((file) => store.put(file, `${prefix}${file.id}`));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
 function getResizeDir(event, panel) {
   const rect = panel.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -147,6 +210,9 @@ export default function LessonWhiteboard({ open, onClose, storageKey }) {
   const resizeRef = useRef(null);
   const saveTimerRef = useRef(null);
   const sceneRef = useRef(null);
+  const sceneReadyRef = useRef(null);
+  /** File ids already in IndexedDB; null when IndexedDB is unavailable. */
+  const savedFileIdsRef = useRef(null);
 
   const [layout, setLayout] = useState(() => loadLayout(storageKey));
   const [maximized, setMaximized] = useState(false);
@@ -159,7 +225,9 @@ export default function LessonWhiteboard({ open, onClose, storageKey }) {
     [],
   );
 
-  const sendInit = useCallback(() => {
+  const sendInit = useCallback(async () => {
+    if (!sceneReadyRef.current) return;
+    await sceneReadyRef.current;
     const win = iframeRef.current?.contentWindow;
     if (!win) return;
     win.postMessage(
@@ -179,11 +247,25 @@ export default function LessonWhiteboard({ open, onClose, storageKey }) {
   useEffect(() => {
     if (!open) return undefined;
 
-    sceneRef.current = loadScene(storageKey) || {
+    const localScene = loadScene(storageKey) || {
       elements: [],
       appState: { viewBackgroundColor: "#ffffff" },
       files: {},
     };
+    sceneRef.current = localScene;
+    savedFileIdsRef.current = null;
+    sceneReadyRef.current = loadSceneFiles(storageKey)
+      .then((storedFiles) => {
+        savedFileIdsRef.current = new Set(Object.keys(storedFiles));
+        // Files still in localStorage (older saves) migrate on the next save.
+        sceneRef.current = {
+          ...localScene,
+          files: { ...localScene.files, ...storedFiles },
+        };
+      })
+      .catch((error) => {
+        console.warn("Whiteboard image storage unavailable:", error);
+      });
     setLayout(loadLayout(storageKey));
     setMaximized(false);
     setFrameStatus("loading");
@@ -211,12 +293,23 @@ export default function LessonWhiteboard({ open, onClose, storageKey }) {
       if (data.type === "change") {
         window.clearTimeout(saveTimerRef.current);
         saveTimerRef.current = window.setTimeout(() => {
-          saveScene(
-            storageKey,
-            data.elements || [],
-            data.appState,
-            data.files || {},
+          const files = data.files || {};
+          const savedIds = savedFileIdsRef.current;
+          if (!savedIds) {
+            saveScene(storageKey, data.elements || [], data.appState, files);
+            return;
+          }
+
+          saveScene(storageKey, data.elements || [], data.appState, {});
+          const fresh = Object.values(files).filter(
+            (file) => file?.id && file.dataURL && !savedIds.has(file.id),
           );
+          if (!fresh.length) return;
+          saveSceneFiles(storageKey, fresh)
+            .then(() => fresh.forEach((file) => savedIds.add(file.id)))
+            .catch((error) => {
+              console.warn("Could not save whiteboard image:", error);
+            });
         }, 200);
       }
     };
@@ -427,6 +520,7 @@ export default function LessonWhiteboard({ open, onClose, storageKey }) {
           className="lesson-whiteboard-frame"
           title="Excalidraw whiteboard"
           src={hostSrc}
+          allow="clipboard-read; clipboard-write"
           onLoad={sendInit}
         />
       </div>

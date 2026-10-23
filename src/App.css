@@ -12328,6 +12328,94 @@ body {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 
+.lesson-annotator-images {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lesson-annotator-image {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+.lesson-annotator-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.lesson-annotator-image--interactive {
+  pointer-events: auto;
+  cursor: grab;
+  outline: 1px dashed transparent;
+  outline-offset: 2px;
+}
+
+.lesson-annotator-image--interactive:hover {
+  outline-color: rgba(255, 229, 102, 0.7);
+}
+
+.lesson-annotator-image--dragging {
+  cursor: grabbing;
+  opacity: 0.92;
+}
+
+.lesson-annotator-image-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(20, 24, 36, 0.85);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.lesson-annotator-image:hover .lesson-annotator-image-delete,
+.lesson-annotator-image-delete:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .lesson-annotator-image-delete {
+    opacity: 1;
+  }
+}
+
+.lesson-annotator-notice {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 10000;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(20, 24, 36, 0.95);
+  color: #ffe566;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
 .lesson-annotator-text-input {
   position: absolute;
   z-index: 4;

@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import {
   Eraser,
   GripVertical,
+  ImagePlus,
   MousePointer2,
   Pencil,
   PenLine,
@@ -28,18 +29,23 @@ import {
 } from "./annotationCursors";
 import { useAuth } from "../../auth/context/AuthContext";
 import {
+  annotationImageUrl,
   getLessonAnnotation,
   putLessonAnnotation,
+  uploadAnnotationImage,
 } from "./courseProgressApi";
+import { compressImageFile } from "./compressImage";
 import LessonWhiteboard from "./LessonWhiteboard";
 
 const STAGE_INTERACTIVE_SELECTOR =
-  ".lesson-annotator-text-input, .lesson-annotator-label, .lesson-annotator-fab-wrap, .lesson-whiteboard, .numpy-lesson-outcomes, .numpy-confidence-panel, .numpy-mark-read-panel, .numpy-theory-actions, .lesson-read-gate, .lesson-confidence-panel, .lesson-read-actions, textarea, input, select, button, a";
+  ".lesson-annotator-text-input, .lesson-annotator-label, .lesson-annotator-image,.lesson-annotator-fab-wrap, .lesson-whiteboard, .numpy-lesson-outcomes, .numpy-confidence-panel, .numpy-mark-read-panel, .numpy-theory-actions, .lesson-read-gate, .lesson-confidence-panel, .lesson-read-actions, textarea, input, select, button, a";
 
 const LABEL_MIN_W = 120;
 const LABEL_MIN_H = 36;
 const TEXT_INPUT_MIN_W = 160;
 const TEXT_INPUT_MIN_H = 88;
+const IMAGE_MIN_W = 48;
+const IMAGE_DEFAULT_MAX_W = 360;
 
 const TOOLS = {
   POINTER: "pointer",
@@ -106,25 +112,26 @@ function annotationStorageKey(storageKey) {
 }
 
 function parseAnnotationPayload(raw) {
-  if (!raw) return { strokes: [], labels: [] };
+  if (!raw) return { strokes: [], labels: [], images: [] };
   try {
     const parsed = JSON.parse(raw);
     return {
       strokes: Array.isArray(parsed.strokes) ? parsed.strokes : [],
       labels: Array.isArray(parsed.labels) ? parsed.labels : [],
+      images: Array.isArray(parsed.images) ? parsed.images : [],
     };
   } catch {
-    return { strokes: [], labels: [] };
+    return { strokes: [], labels: [], images: [] };
   }
 }
 
 function loadAnnotations(storageKey) {
-  if (!storageKey) return { strokes: [], labels: [] };
+  if (!storageKey) return { strokes: [], labels: [], images: [] };
 
   const current = parseAnnotationPayload(
     localStorage.getItem(annotationStorageKey(storageKey)),
   );
-  if (current.strokes.length || current.labels.length) {
+  if (current.strokes.length || current.labels.length || current.images.length) {
     return current;
   }
 
@@ -148,9 +155,31 @@ function loadAnnotations(storageKey) {
   return current;
 }
 
+/** Returns false when localStorage is full (e.g. too many inline images). */
 function saveAnnotations(storageKey, data) {
-  if (!storageKey) return;
-  localStorage.setItem(annotationStorageKey(storageKey), JSON.stringify(data));
+  if (!storageKey) return true;
+  try {
+    localStorage.setItem(
+      annotationStorageKey(storageKey),
+      JSON.stringify(data),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function imageSrc(image) {
+  return image.imageId ? annotationImageUrl(image.imageId) : image.src;
+}
+
+function isEditableTarget(target) {
+  if (!target || !target.closest) return false;
+  return Boolean(
+    target.closest(
+      "input, textarea, select, [contenteditable=''], [contenteditable='true'], .monaco-editor",
+    ),
+  );
 }
 
 function getPoint(event, stage) {
@@ -517,6 +546,103 @@ function AnnotationLabel({
   );
 }
 
+function AnnotationImage({ image, canAdjust, onChange, onDelete, stageRef }) {
+  const [live, setLive] = useState(null);
+
+  const begin = (event, mode) => {
+    if (!canAdjust) return;
+    if (event.button !== undefined && event.button !== 0) return;
+    if (event.target.closest(".lesson-annotator-image-delete")) return;
+    event.stopPropagation();
+    event.preventDefault();
+
+    const stage = stageRef.current;
+    if (!stage) return;
+    const start = getPoint(event, stage);
+    const origin = {
+      x: image.x,
+      y: image.y,
+      width: image.width,
+      height: image.height,
+    };
+    const ratio = origin.width / Math.max(1, origin.height);
+    const state = { moved: false, latest: origin };
+
+    const onMove = (moveEvent) => {
+      const point = getPoint(moveEvent, stage);
+      const dx = point.x - start.x;
+      const dy = point.y - start.y;
+      if (!state.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+      state.moved = true;
+      if (mode === "resize") {
+        const width = Math.max(IMAGE_MIN_W, origin.width + dx);
+        state.latest = { ...origin, width, height: width / ratio };
+      } else {
+        state.latest = { ...origin, x: origin.x + dx, y: origin.y + dy };
+      }
+      setLive(state.latest);
+    };
+
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+      setLive(null);
+      if (state.moved) onChange(image.id, state.latest);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+  };
+
+  const box = live || image;
+
+  return (
+    <div
+      className={`lesson-annotator-image${canAdjust ? " lesson-annotator-image--interactive" : ""}${live ? " lesson-annotator-image--dragging" : ""}`}
+      style={{
+        left: box.x,
+        top: box.y,
+        width: box.width,
+        height: box.height,
+      }}
+      onMouseDown={(event) => begin(event, "move")}
+      onTouchStart={(event) => begin(event, "move")}
+    >
+      <img src={imageSrc(image)} alt="" draggable={false} />
+      {canAdjust ? (
+        <button
+          type="button"
+          className="lesson-annotator-image-delete"
+          onMouseDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(image.id);
+          }}
+          aria-label="Delete image"
+          title="Delete image"
+        >
+          <X size={12} />
+        </button>
+      ) : null}
+      {canAdjust ? (
+        <button
+          type="button"
+          className="lesson-annotator-label-resize"
+          aria-label="Resize image"
+          title="Drag to resize"
+          onMouseDown={(event) => begin(event, "resize")}
+          onTouchStart={(event) => begin(event, "resize")}
+        />
+      ) : null}
+    </div>
+  );
+}
+
 export default function LessonAnnotator({
   storageKey,
   children,
@@ -550,6 +676,12 @@ export default function LessonAnnotator({
   const [labels, setLabels] = useState(
     () => loadAnnotations(storageKey).labels,
   );
+  const [images, setImages] = useState(
+    () => loadAnnotations(storageKey).images,
+  );
+  const [notice, setNotice] = useState(null);
+  const noticeTimerRef = useRef(null);
+  const imageInputRef = useRef(null);
   const [textDraft, setTextDraft] = useState("");
   const [pendingTextPoint, setPendingTextPoint] = useState(null);
   const [laserPoint, setLaserPoint] = useState(null);
@@ -561,6 +693,56 @@ export default function LessonAnnotator({
     height: 120,
   });
   const pendingResizeRef = useRef(null);
+
+  const showNotice = useCallback((message) => {
+    window.clearTimeout(noticeTimerRef.current);
+    setNotice(message);
+    noticeTimerRef.current = window.setTimeout(() => setNotice(null), 4500);
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(noticeTimerRef.current), []);
+
+  /** Compress an image file and drop it in the middle of the visible lesson. */
+  const addImageFromFile = useCallback(
+    async (file) => {
+      const stage = stageRef.current;
+      if (!stage || !file) return;
+      const keyAtStart = loadedKeyRef.current;
+      let compressed;
+      try {
+        compressed = await compressImageFile(file);
+      } catch (error) {
+        showNotice(error.message || "Could not add that image");
+        return;
+      }
+      if (loadedKeyRef.current !== keyAtStart) return;
+
+      const rect = stage.getBoundingClientRect();
+      const maxWidth = Math.max(
+        IMAGE_MIN_W,
+        Math.min(IMAGE_DEFAULT_MAX_W, rect.width - 32),
+      );
+      const width = Math.min(maxWidth, compressed.width);
+      const height = (width / compressed.width) * compressed.height;
+      const visibleTop = Math.max(0, -rect.top);
+      const visibleBottom = Math.min(rect.height, window.innerHeight - rect.top);
+      const centerY = (visibleTop + visibleBottom) / 2 + stage.scrollTop;
+
+      setImages((prev) => [
+        ...prev,
+        {
+          id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          x: Math.max(8, (rect.width - width) / 2),
+          y: Math.max(8, centerY - height / 2),
+          width,
+          height,
+          src: compressed.dataUrl,
+        },
+      ]);
+      setTool(TOOLS.POINTER);
+    },
+    [showNotice],
+  );
 
   const fabWrapStyle = useMemo(() => {
     if (!fabPosition) return undefined;
@@ -627,6 +809,7 @@ export default function LessonAnnotator({
     remoteUpdatedAtRef.current = null;
     setStrokes(saved.strokes);
     setLabels(saved.labels);
+    setImages(saved.images);
     setPendingTextPoint(null);
     setTextDraft("");
     setLaserPoint(null);
@@ -642,15 +825,25 @@ export default function LessonAnnotator({
         if (cancelled || loadedKeyRef.current !== storageKey) return;
         const remoteStrokes = annotation?.strokes || [];
         const remoteLabels = annotation?.labels || [];
-        const hasRemote = remoteStrokes.length > 0 || remoteLabels.length > 0;
+        const remoteImages = annotation?.images || [];
+        const hasRemote =
+          remoteStrokes.length > 0 ||
+          remoteLabels.length > 0 ||
+          remoteImages.length > 0;
         if (!hasRemote) return;
+        // Images added while signed out (inline data, not uploaded yet) only
+        // exist locally — keep them so the next sync uploads them.
+        const localOnlyImages = saved.images.filter((image) => !image.imageId);
+        const nextImages = [...remoteImages, ...localOnlyImages];
         remoteUpdatedAtRef.current = annotation?.updatedAt || null;
-        skipNextSaveRef.current = true;
+        skipNextSaveRef.current = localOnlyImages.length === 0;
         setStrokes(remoteStrokes);
         setLabels(remoteLabels);
+        setImages(nextImages);
         saveAnnotations(storageKey, {
           strokes: remoteStrokes,
           labels: remoteLabels,
+          images: nextImages,
         });
       })
       .catch(() => {
@@ -670,15 +863,53 @@ export default function LessonAnnotator({
       skipNextSaveRef.current = false;
       return;
     }
-    saveAnnotations(storageKey, { strokes, labels });
+    const savedLocally = saveAnnotations(storageKey, {
+      strokes,
+      labels,
+      images,
+    });
 
-    if (!isAuthenticated || !token || !courseId || !lessonId) return undefined;
+    if (!isAuthenticated || !token || !courseId || !lessonId) {
+      if (!savedLocally) {
+        showNotice(
+          "Browser storage is full — sign in to keep images, or remove some.",
+        );
+      }
+      return undefined;
+    }
 
     window.clearTimeout(syncTimerRef.current);
-    syncTimerRef.current = window.setTimeout(() => {
+    syncTimerRef.current = window.setTimeout(async () => {
+      // Upload inline images first; swapping in their imageId re-runs this
+      // effect, which then saves the annotation with the uploaded images.
+      const pending = images.filter((image) => !image.imageId && image.src);
+      if (pending.length) {
+        const uploaded = {};
+        for (const image of pending) {
+          try {
+            uploaded[image.id] = await uploadAnnotationImage(token, image.src);
+          } catch (error) {
+            console.warn("Annotation image upload failed:", error.message);
+          }
+        }
+        if (loadedKeyRef.current !== storageKey) return;
+        if (Object.keys(uploaded).length) {
+          setImages((prev) =>
+            prev.map((image) => {
+              if (!uploaded[image.id]) return image;
+              const { src, ...rest } = image;
+              return { ...rest, imageId: uploaded[image.id] };
+            }),
+          );
+          return;
+        }
+        showNotice("Could not upload the image. It is kept on this device.");
+      }
+
       putLessonAnnotation(token, courseId, lessonId, tab || "theory", {
         strokes,
         labels,
+        images,
       }).catch((error) => {
         console.warn("Annotation sync failed:", error.message);
       });
@@ -691,11 +922,13 @@ export default function LessonAnnotator({
     storageKey,
     strokes,
     labels,
+    images,
     isAuthenticated,
     token,
     courseId,
     lessonId,
     tab,
+    showNotice,
   ]);
 
   useEffect(() => {
@@ -744,9 +977,37 @@ export default function LessonAnnotator({
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    // Ctrl/Cmd+V an image (e.g. a screenshot) anywhere on the lesson.
+    const onPaste = (event) => {
+      if (whiteboardOpen || isEditableTarget(event.target)) return;
+      const stage = stageRef.current;
+      if (!stage || !stage.offsetParent) return;
+      const item = Array.from(event.clipboardData?.items || []).find(
+        (entry) => entry.kind === "file" && entry.type.startsWith("image/"),
+      );
+      const file = item?.getAsFile();
+      if (!file) return;
+      event.preventDefault();
+      addImageFromFile(file);
+    };
+
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, [addImageFromFile, whiteboardOpen]);
+
   const eraseAt = useCallback((point) => {
     setStrokes((prev) =>
       prev.filter((stroke) => !strokeNearPoint(stroke, point, ERASER_RADIUS)),
+    );
+    setImages((prev) =>
+      prev.filter(
+        (image) =>
+          point.x < image.x ||
+          point.x > image.x + image.width ||
+          point.y < image.y ||
+          point.y > image.y + image.height,
+      ),
     );
     setLabels((prev) =>
       prev.filter(
@@ -979,9 +1240,22 @@ export default function LessonAnnotator({
     setEditingLabelId(null);
   };
 
+  const handleChangeImage = (imageId, box) => {
+    setImages((prev) =>
+      prev.map((image) =>
+        image.id === imageId ? { ...image, ...box } : image,
+      ),
+    );
+  };
+
+  const handleDeleteImage = (imageId) => {
+    setImages((prev) => prev.filter((image) => image.id !== imageId));
+  };
+
   const handleClearAll = () => {
     setStrokes([]);
     setLabels([]);
+    setImages([]);
     setPendingTextPoint(null);
     setTextDraft("");
     setLaserPoint(null);
@@ -1143,6 +1417,19 @@ export default function LessonAnnotator({
 
             <button
               type="button"
+              className="lesson-annotator-fab-whiteboard"
+              onClick={() => {
+                setMenuOpen(false);
+                imageInputRef.current?.click();
+              }}
+              title="Add an image to this lesson (or paste one with Ctrl+V)"
+            >
+              <ImagePlus size={14} aria-hidden />
+              Add image
+            </button>
+
+            <button
+              type="button"
               className="lesson-annotator-fab-clear"
               onClick={handleClearAll}
             >
@@ -1152,8 +1439,8 @@ export default function LessonAnnotator({
 
             {canAdjustLabels ? (
               <p className="lesson-annotator-fab-hint">
-                Drag notes to move · corner to resize · double-click or ✎ to
-                edit
+                Drag notes and images to move · corner to resize ·
+                double-click or ✎ to edit · Ctrl+V pastes an image
               </p>
             ) : null}
           </div>
@@ -1184,6 +1471,20 @@ export default function LessonAnnotator({
       >
         <div ref={contentRef} className="lesson-annotator-content">
           {children}
+        </div>
+
+        {/* Before the canvas so pencil strokes draw on top of images. */}
+        <div className="lesson-annotator-images">
+          {images.map((image) => (
+            <AnnotationImage
+              key={image.id}
+              image={image}
+              canAdjust={canAdjustLabels}
+              onChange={handleChangeImage}
+              onDelete={handleDeleteImage}
+              stageRef={stageRef}
+            />
+          ))}
         </div>
 
         <canvas
@@ -1281,6 +1582,22 @@ export default function LessonAnnotator({
       </div>
 
       {fabUi ? createPortal(fabUi, document.body) : null}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/png, image/jpeg, image/webp, image/gif"
+        style={{ display: "none" }}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (file) addImageFromFile(file);
+        }}
+      />
+      {notice ? (
+        <div className="lesson-annotator-notice" role="status">
+          {notice}
+        </div>
+      ) : null}
       <LessonWhiteboard
         open={whiteboardOpen}
         onClose={() => setWhiteboardOpen(false)}
