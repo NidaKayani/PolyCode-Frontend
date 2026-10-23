@@ -40,6 +40,7 @@ import {
 import useOnlineStatus from "../hooks/useOnlineStatus";
 import {
   addToOutbox,
+  hasPendingOutbox,
   newClientMessageId,
   readOutbox,
   removeFromOutbox,
@@ -829,6 +830,17 @@ function ChatReadyPanel({ onUnreadChange }) {
     return () => window.clearInterval(timer);
   }, [online, flushOutbox, user.id]);
 
+  // The outbox is memory-only, so warn before a reload/close drops unsent messages.
+  useEffect(() => {
+    const onBeforeUnload = (event) => {
+      if (!hasPendingOutbox(user.id)) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [user.id]);
+
   const handleSend = async (event) => {
     event.preventDefault();
     const text = draft.trim();
@@ -891,7 +903,7 @@ function ChatReadyPanel({ onUnreadChange }) {
   const offlineBanner = online ? null : (
     <p className="qc-offline-banner" role="status">
       <WifiOff size={14} aria-hidden="true" />
-      You&apos;re offline. Messages will send when you&apos;re back online.
+      You&apos;re offline. Messages will send when you&apos;re back online — keep this tab open.
     </p>
   );
 

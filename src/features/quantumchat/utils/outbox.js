@@ -1,34 +1,34 @@
 // Messages written while offline wait here until they can be sent.
 //
-// Only the already-sealed payload is stored ({ to, forRecipient, forSender }),
-// i.e. the exact ciphertext the server would hold anyway — never plaintext.
-// The dock shows the text again by decrypting `forSender` with the user's own
-// key. Each entry keeps its `clientMessageId`, which the backend uses to
-// ignore duplicates, so retrying after a lost response can't double-send.
+// The queue lives in memory only — nothing is written to localStorage, so a
+// reload or closed tab drops unsent messages (the dock warns before unload).
+// Only the already-sealed payload is kept ({ to, forRecipient, forSender }),
+// never plaintext. The dock shows the text again by decrypting `forSender`
+// with the user's own key. Each entry keeps its `clientMessageId`, which the
+// backend uses to ignore duplicates, so retrying after a lost response can't
+// double-send.
 
-const PREFIX = "polycode_qc_outbox_";
+const queues = new Map();
 
-function storageKey(userId) {
-  return `${PREFIX}${userId}`;
+// Earlier builds persisted the queue under this prefix; remove any leftovers.
+const LEGACY_PREFIX = "polycode_qc_outbox_";
+try {
+  for (let i = localStorage.length - 1; i >= 0; i -= 1) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(LEGACY_PREFIX)) localStorage.removeItem(key);
+  }
+} catch {
+  // Storage blocked — nothing to clean up.
 }
 
 export function readOutbox(userId) {
   if (!userId) return [];
-  try {
-    const parsed = JSON.parse(localStorage.getItem(storageKey(userId)) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  return [...(queues.get(String(userId)) || [])];
 }
 
 function writeOutbox(userId, entries) {
-  try {
-    if (entries.length) localStorage.setItem(storageKey(userId), JSON.stringify(entries));
-    else localStorage.removeItem(storageKey(userId));
-  } catch {
-    // Storage full or blocked — the message still shows as pending this session.
-  }
+  if (entries.length) queues.set(String(userId), entries);
+  else queues.delete(String(userId));
 }
 
 export function addToOutbox(userId, entry) {
@@ -41,6 +41,10 @@ export function removeFromOutbox(userId, clientMessageId) {
     userId,
     readOutbox(userId).filter((e) => e.clientMessageId !== clientMessageId),
   );
+}
+
+export function hasPendingOutbox(userId) {
+  return readOutbox(userId).length > 0;
 }
 
 export function newClientMessageId() {
