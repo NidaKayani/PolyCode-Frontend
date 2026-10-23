@@ -37,6 +37,18 @@ const LEARNING_PATH = [
     color: "#d35400",
     summary: "Mastery through advanced scenarios and real-world projects.",
   },
+  {
+    level: "Production",
+    chapters: ["ch-5"],
+    color: "#8e44ad",
+    summary: "Govern identity changes with scoped, reviewable automation.",
+  },
+  {
+    level: "Expert",
+    chapters: ["ch-6"],
+    color: "#34495e",
+    summary: "Run observable, resilient operations across managed fleets.",
+  },
 ];
 
 function lessonPlainText(lesson) {

@@ -12,6 +12,7 @@
  *   - basePath:  the hub's route
  *   - lessonIds: ids of the *_LESSONS array the hub counts towards completion
  *   - totalXp:   sum of those lessons' xp (the XP printed on the certificate)
+ * The shared PowerShell specialization hub is expanded from its track data.
  *
  * Writes scripts/certificates/courseLessons.json, and with --backend the same
  * file to <backend>/src/modules/certificates/data/courseLessons.json.
@@ -32,7 +33,11 @@ const LEARN_DIR = path.join(ROOT, "src", "features", "learn");
 const OUT_FILE = path.join(__dirname, "certificates", "courseLessons.json");
 const ROUTES_FILE = path.join(LEARN_DIR, "shared", "certificateCourseRoutes.json");
 const BACKEND_REL = path.join("src", "modules", "certificates", "data", "courseLessons.json");
-const SHARED_HUB_FILES = new Set(["CourseCertificate.jsx", "QuantumLanguageHub.jsx"]);
+const SHARED_HUB_FILES = new Set([
+  "CourseCertificate.jsx",
+  "QuantumLanguageHub.jsx",
+  "PowershellSpecializationHub.jsx",
+]);
 
 function listFiles(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -158,6 +163,51 @@ export async function collectCertificateCourses() {
       hub: rel(file),
       source,
       totalXp,
+      lessonIds: ids,
+    };
+  }
+
+  const specializationFile = path.join(
+    LEARN_DIR,
+    "shared",
+    "powershell-specializations",
+    "data",
+    "powershellSpecializationCurricula.js",
+  );
+  const specializationHub = path.join(
+    LEARN_DIR,
+    "shared",
+    "powershell-specializations",
+    "pages",
+    "PowershellSpecializationHub.jsx",
+  );
+  const { POWERSHELL_SPECIALIZATION_TRACKS } = await import(
+    pathToFileURL(specializationFile).href
+  );
+  for (const [courseId, track] of Object.entries(POWERSHELL_SPECIALIZATION_TRACKS)) {
+    const lessons = track.lessons;
+    if (!Array.isArray(lessons) || !lessons.length) {
+      fail(specializationFile, `${courseId} has no lessons`);
+    }
+    const ids = lessons.map((lesson) => lesson?.id);
+    if (ids.some((id) => typeof id !== "string" || !id)) {
+      fail(specializationFile, `${courseId} has a lesson with no string id`);
+    }
+    if (new Set(ids).size !== ids.length) {
+      fail(specializationFile, `${courseId} has duplicate lesson ids`);
+    }
+    if (lessons.some((lesson) => !(Number.isFinite(lesson.xp) && lesson.xp >= 0))) {
+      fail(specializationFile, `${courseId} has a lesson with invalid XP`);
+    }
+    if (courses[courseId]) {
+      fail(specializationFile, `course id ${courseId} is used by another hub too`);
+    }
+    courses[courseId] = {
+      name: track.title,
+      basePath: `/learn/${track.slug}`,
+      hub: rel(specializationHub),
+      source: `${rel(specializationFile)}#POWERSHELL_SPECIALIZATION_TRACKS.${courseId}`,
+      totalXp: lessons.reduce((sum, lesson) => sum + lesson.xp, 0),
       lessonIds: ids,
     };
   }
