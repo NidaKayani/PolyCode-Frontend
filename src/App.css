@@ -11145,6 +11145,41 @@ body {
   margin: 0 0 14px;
 }
 
+.numpy-quiz-question > p {
+  margin: 0 0 8px;
+}
+
+.numpy-quiz-question > p:last-child {
+  margin-bottom: 0;
+}
+
+.lesson-quiz-codeblock {
+  margin: 8px 0 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.35);
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #f5d76e;
+  white-space: pre;
+}
+
+.lesson-quiz-codeblock code {
+  font: inherit;
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+.app.theme-light .lesson-quiz-codeblock {
+  background: #f1f5f9;
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+}
+
 .numpy-quiz-options {
   display: flex;
   flex-direction: column;

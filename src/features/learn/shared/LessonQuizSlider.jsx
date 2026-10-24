@@ -21,6 +21,30 @@ export function InlineText({ text, codeClassName = "numpy-inline-code" }) {
   );
 }
 
+/**
+ * Question text that may contain fenced ```code``` blocks. Prose segments use
+ * InlineText inside `Tag`; each fenced block becomes a multi-line <pre> so
+ * snippets keep their line breaks instead of being squashed into one line.
+ */
+function QuestionText({ text, Tag = "p", codeClassName }) {
+  const segments = String(text ?? "").split(/```(?:[a-zA-Z0-9+#-]*\n)?([\s\S]*?)```/g);
+  return segments.map((segment, index) => {
+    if (index % 2 === 1) {
+      return (
+        <pre key={index} className="lesson-quiz-codeblock">
+          <code>{segment.replace(/^\n+|\s+$/g, "")}</code>
+        </pre>
+      );
+    }
+    if (!segment.trim()) return null;
+    return (
+      <Tag key={index}>
+        <InlineText text={segment.trim()} codeClassName={codeClassName} />
+      </Tag>
+    );
+  });
+}
+
 function QuizSlide({
   block,
   selected,
@@ -44,14 +68,12 @@ function QuizSlide({
       }`}
     >
       {isNumpy ? (
-        <p className={questionClass}>
-          <InlineText text={block.question} />
-        </p>
+        <div className={questionClass}>
+          <QuestionText text={block.question} codeClassName="numpy-inline-code" />
+        </div>
       ) : (
         <div className={questionClass}>
-          <h3>
-            <InlineText text={block.question} codeClassName="oops-inline-code" />
-          </h3>
+          <QuestionText text={block.question} Tag="h3" codeClassName="oops-inline-code" />
         </div>
       )}
       <div className={optionsClass}>
