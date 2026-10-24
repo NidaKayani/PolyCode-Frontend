@@ -74,7 +74,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-1b": [
     quiz(
-      "What does this print? `name = \"Fatima\"` then `score = 95` then `print(f\"{name} scored {score}%\")`",
+      "What does this print?\n```\nname = \"Fatima\"\nscore = 95\nprint(f\"{name} scored {score}%\")\n```",
       ["`Fatima scored 95%`", "`{name} scored {score}%`", "`name scored score%`", "`Fatima scored 95`"],
       0,
       "The `f` prefix replaces each `{...}` with the variable's value. The `%` is ordinary text.",
@@ -126,13 +126,13 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-3": [
     quiz(
-      "What does this print? `nums = [1, 2]` then `nums.append([3, 4])` then `print(len(nums))`",
+      "What does this print?\n```\nnums = [1, 2]\nnums.append([3, 4])\nprint(len(nums))\n```",
       ["`3`", "`4`", "`2`", "An error"],
       0,
       "`append` adds one element, here the whole list `[3, 4]`. `extend([3, 4])` would add two items, making the length 4.",
     ),
     quiz(
-      "What does this print? `a = [1, 2]` then `b = a` then `b.append(3)` then `print(a)`",
+      "What does this print?\n```\na = [1, 2]\nb = a\nb.append(3)\nprint(a)\n```",
       ["`[1, 2, 3]`", "`[1, 2]`", "`[3]`", "An error"],
       0,
       "`b = a` doesn't copy anything — both names point to the same list. Use `a.copy()` or `a[:]` to get an independent copy.",
@@ -140,7 +140,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-3b": [
     quiz(
-      "What happens? `point = (10, 20)` then `point[0] = 5`",
+      "What happens?\n```\npoint = (10, 20)\npoint[0] = 5\n```",
       [
         "`TypeError` — a tuple's items can't be changed",
         "`point` becomes `(5, 20)`",
@@ -192,7 +192,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-4b": [
     quiz(
-      "What does this print? `count = 3` then `while count > 0:` → `print(count)` and `count -= 1`, then `print(\"go\")`",
+      "What does this print?\n```\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint(\"go\")\n```",
       ["`3`, `2`, `1`, `go` (one per line)", "`3`, `2`, `1`, `0`, `go`", "Only `go`", "`3` forever"],
       0,
       "The loop stops when `count` reaches 0, so 0 is never printed. Then the line after the loop runs.",
@@ -211,7 +211,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-5": [
     quiz(
-      "What does this print? `def greet(name): print(f\"Hi {name}\")` then `result = greet(\"Ada\")` then `print(result)`",
+      "What does this print?\n```\ndef greet(name):\n    print(f\"Hi {name}\")\n\nresult = greet(\"Ada\")\nprint(result)\n```",
       [
         "`Hi Ada` then `None`",
         "`Hi Ada` twice",
@@ -265,7 +265,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
       "`&` is intersection, meaning the items in both sets. `|` is union and `-` is difference.",
     ),
     quiz(
-      "What happens? `unique = {\"py\", \"data\"}` then `print(unique[0])`",
+      "What happens?\n```\nunique = {\"py\", \"data\"}\nprint(unique[0])\n```",
       [
         "`TypeError` — sets are unordered, so they have no indexes",
         "It prints `py`",
@@ -321,7 +321,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
   ],
   "py-8": [
     quiz(
-      "`deposit` adds `amount` to `self.balance`. What does this print? `acct = BankAccount(\"Ada\", 100)` then `acct.deposit(50)` then `print(acct.balance)`",
+      "`deposit` adds `amount` to `self.balance`. What does this print?\n```\nacct = BankAccount(\"Ada\", 100)\nacct.deposit(50)\nprint(acct.balance)\n```",
       ["`150`", "`100`", "`50`", "An error"],
       0,
       "`__init__` sets the balance to 100, and `deposit` updates that same object's `self.balance`.",
@@ -408,7 +408,7 @@ export const PYTHON_FUNDAMENTALS_QUIZZES = {
       "Hints are documentation for people and tools like mypy. At runtime, Python still just joins the two strings.",
     ),
     quiz(
-      "What does this print? `config = json.loads('{\"debug\": true, \"retries\": 3}')` then `print(config[\"retries\"], config[\"debug\"])`",
+      "What does this print?\n```\nconfig = json.loads('{\"debug\": true, \"retries\": 3}')\nprint(config[\"retries\"], config[\"debug\"])\n```",
       ["`3 True`", "`3 true`", "`\"3\" \"true\"`", "An error — JSON can't be loaded from a string"],
       0,
       "`json.loads` turns JSON text into Python objects: `true` becomes `True`, and `3` stays an int.",

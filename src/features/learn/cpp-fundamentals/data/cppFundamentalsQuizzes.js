@@ -246,7 +246,7 @@ export const CPP_FUNDAMENTALS_QUIZZES = {
       "`rate` uses its default of 0.1, so the result is 100 + 100 × 0.1 = 110.",
     ),
     quiz(
-      "What does this print? `void boost(int s) { s += 10; }` then `int score = 5; boost(score); cout << score;`",
+      "What does this print?\n```\nvoid boost(int s) { s += 10; }\n\nint score = 5;\nboost(score);\ncout << score;\n```",
       ["`5`", "`15`", "`10`", "Compile error"],
       0,
       "`s` is a copy of `score`, so changing it does not affect the original. A reference parameter (`int& s`) would change it.",
@@ -458,7 +458,7 @@ export const CPP_FUNDAMENTALS_QUIZZES = {
   ],
   "cpp-24": [
     quiz(
-      "What does this print? `class Dog { public: string name; void bark() { cout << name << \" says woof!\"; } };` then `Dog d; d.name = \"Rex\"; d.bark();`",
+      "What does this print?\n```\nclass Dog {\npublic:\n    string name;\n    void bark() { cout << name << \" says woof!\"; }\n};\n\nDog d;\nd.name = \"Rex\";\nd.bark();\n```",
       ["`Rex says woof!`", "`says woof!` with no name", "`name says woof!`", "Compile error"],
       0,
       "`bark()` uses the `name` stored in the object it is called on, which is `d`.",
