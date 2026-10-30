@@ -32,6 +32,7 @@ import { formatRubyOutput, getRubyRuntimeError, runRubyCode } from "./runRuby";
 import { formatPhpOutput, getPhpRuntimeError, runPhpCode } from "./runPhp";
 import { formatGoOutput, getGoRuntimeError, runGoCode } from "./runGo";
 import { formatSqlOutput, getSqlRuntimeError, runSqlCode } from "./runSql";
+import { formatDartOutput, getDartRuntimeError, runDartCode } from "./runDart";
 import {
   runHTML,
   runCSS,
@@ -56,6 +57,7 @@ function normalizeLang(lang = "python") {
   if (value === "go") return "go";
   if (value === "rust" || value === "rs") return "rust";
   if (value === "sql") return "sql";
+  if (value === "dart" || value === "flutter") return "dart";
   return value;
 }
 
@@ -75,6 +77,7 @@ function monacoLanguage(lang) {
   if (lang === "go") return "go";
   if (lang === "rust") return "rust";
   if (lang === "sql") return "sql";
+  if (lang === "dart") return "dart";
   return "python";
 }
 
@@ -147,6 +150,9 @@ ${source
   if (lang === "sql") {
     return runSqlCode(source);
   }
+  if (lang === "dart") {
+    return runDartCode(source);
+  }
   if (lang === "powershell") {
     return runPowerShellCode(source, block.authToken);
   }
@@ -172,6 +178,7 @@ function formatTheoryOutput(result, lang) {
   if (lang === "go") return formatGoOutput(result);
   if (lang === "rust") return formatRustOutput(result);
   if (lang === "sql") return formatSqlOutput(result);
+  if (lang === "dart") return formatDartOutput(result);
   return formatPythonOutput(result);
 }
 
@@ -189,6 +196,7 @@ function getTheoryRuntimeError(result, lang) {
   if (lang === "go") return getGoRuntimeError(result);
   if (lang === "rust") return getRustRuntimeError(result);
   if (lang === "sql") return getSqlRuntimeError(result);
+  if (lang === "dart") return getDartRuntimeError(result);
   return getPythonRuntimeError(result);
 }
 

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getProfilePathForUser } from "../../../lib/authSession";
 import ContinueWithGoogle from "../components/ContinueWithGoogle";
+import PasswordInput from "../components/PasswordInput";
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
@@ -78,9 +79,8 @@ export default function LoginPage() {
 
           <div className="auth-field">
             <label htmlFor="password">Password</label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"

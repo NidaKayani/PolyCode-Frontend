@@ -290,6 +290,40 @@ textarea {
   color: var(--txt-3, #3a4260);
 }
 
+.auth-password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.auth-password-wrap input {
+  flex: 1;
+  min-width: 0;
+  padding-right: 44px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--txt-2, #8a93b0);
+  cursor: pointer;
+}
+
+.auth-password-toggle:hover,
+.auth-password-toggle:focus-visible {
+  color: var(--txt-0, #f0f0ff);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--acid-dim, rgba(184, 255, 0, 0.1));
+}
+
 .auth-submit {
   margin-top: 4px;
   width: 100%;
